@@ -1,0 +1,27 @@
+*.class
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+#Eclipse files
+.metadata
+bin/**
+tmp/**
+tmp/**/*
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.classpath
+.settings/
+.loadpath
+.externalToolBuilders/
+*.launch
+.buildpath
+.project
+
+#Target directory
+target/*
