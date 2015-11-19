@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html data-ng-app="sparkserver">
+<html data-ng-app="app">
 <head>
     <title>Spark Server</title>
     <link rel="shortcut icon" href="/images/favicon.ico">
@@ -16,11 +16,15 @@
     </div>
 </div>
  
+ <div data-ng-controller="mainCtrl">{{test}}</div>
+ 
 <div class="container" data-ng-view=""></div>
  
-<script src="/js/jquery.js"></script>
-<script src="/js/angular.js"></script>
-<script src="/js/bootstrap.js"></script>
+<script src="/js/jquery/jquery.js"></script>
+<script src="/js/angular/angular.js"></script>
+<script src="/js/angular/angular-route.js"></script>
+<script src="/js/angular/angular-resource.js"></script>
+<script src="/js/boostrap/bootstrap.js"></script>
 
 </body>
 </html>
