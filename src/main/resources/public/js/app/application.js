@@ -7,12 +7,12 @@ app.config([ '$routeProvider', '$locationProvider' , function($routeProvider, $l
 		templateUrl : '/js/app/views/primaryView.html',
 		controller : 'primaryController'
 	})
-	.when('/2', {
+	.when('/two', {
 		
 		templateUrl : '/js/app/views/secondaryView.html',
 		controller : 'secondaryController'
 	})
-	.when('/3', {
+	.when('/three', {
 		
 		templateUrl : '/js/app/views/ternaryView.html',
 		controller : 'ternaryController'
