@@ -4,8 +4,8 @@ app.factory('primaryFactory', ['$http', function($http) {
         return $http.get('/testGet');
     };
 	
-    var testPost = function () {
-        return $http.post('/testPost');
+    var testPost = function (payload) {
+    	return $http.post('/testPost', payload);
     };
     
     return {

@@ -1,7 +1,8 @@
 app.controller('primaryController', ['$scope', 'primaryFactory' ,function($scope, primaryFactory) {
   
 	$scope.greetings = 'Variable Passed From Primary Controller Successfully';
-
+	$scope.inputData;
+	
 	$scope.getData = function getData() { 
 		
 		primaryFactory.testGet().success(function (data) {
@@ -14,12 +15,9 @@ app.controller('primaryController', ['$scope', 'primaryFactory' ,function($scope
 	
 	$scope.postData = function postData(data) { 
 		
-		primaryFactory.testPost().success(function (data) {
-			$scope.postResponse = data;
-        })
-        .error(function (error) {
-        	$scope.postResponse = 'Failure Posting Data';
-        });
+		console.log('Input data from JS : '+$scope.inputData);
+		
+		primaryFactory.testPost($scope.inputData);
    }
 	
 }]);

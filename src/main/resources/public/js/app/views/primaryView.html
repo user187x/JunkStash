@@ -13,9 +13,9 @@
 		Primary View Response : {{getResponse}}
 	</div>
 	
-	<div class="alert alert-info" data-ng-click="postData()"
-		style="border-radius: 25px; text-align:center; opacity: 0.75;" role="alert">
-		Primary View Response : {{postResponse}}
+	<div class="alert alert-info" style="border-radius: 25px; text-align:center; opacity: 0.75" role="alert">
+		<input type="text" name="name" class="form-control" data-ng-model="inputData">
+		<button type="submit" class="btn btn-primary" data-ng-click="postData(inputData)">Submit</button>
 	</div>
 
 </div>
