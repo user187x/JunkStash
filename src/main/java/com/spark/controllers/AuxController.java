@@ -3,6 +3,9 @@ package com.spark.controllers;
 import java.util.Date;
 
 import org.bson.Document;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.stereotype.Controller;
 
 import com.spark.services.DatabaseService;
 
@@ -11,13 +14,14 @@ import spark.Response;
 import spark.Route;
 import spark.Spark;
 
-public class TestController {
+@Controller
+@Configurable
+public class AuxController {
 
+	@Autowired
 	private DatabaseService databaseService;
 	
-	public TestController(final DatabaseService databaseService) {
-		this.databaseService = databaseService;
-		
+	public AuxController() {	
 		setUpRoutes();
 	}
 	
