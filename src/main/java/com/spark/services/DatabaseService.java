@@ -23,11 +23,11 @@ public class DatabaseService {
 	}
 	
 	public void saveMessage(String message) {
-		databaseService.getMongoCollection().insertOne(new Document("message", message));
+		databaseService.getMongoDatabase().getCollection("stuff").insertOne(new Document("message", message));
 	}
 	
 	public Iterable<Document> getAllDocuments(){
-		return databaseService.getMongoCollection().find();
+		return databaseService.getMongoDatabase().getCollection("stuff").find();
 	}
 	
 	private void cacheResource() throws Exception{
