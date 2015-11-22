@@ -1,4 +1,4 @@
-<div data-ng-controller="primaryController">
+<div data-ng-controller="primaryController" data-ng-init="getAllData()">
 	
 	<div data-ng-show="greetings"> 
 		<div class="alert alert-success" style="border-radius: 25px; text-align:center; opacity: 0.75;" role="alert">Primary View Parameter : {{greetings}}</div>
@@ -16,6 +16,14 @@
 	<div class="alert alert-info" style="border-radius: 25px; text-align:center; opacity: 0.75" role="alert">
 		<input type="text" name="name" class="form-control" data-ng-model="inputData">
 		<button type="submit" class="btn btn-primary" data-ng-click="postData(inputData)">Submit</button>
+	</div>
+	
+	<div class="alert alert-info" style="border-radius: 25px; text-align:center; opacity: 0.75" role="alert">
+		 <table>
+		  	<tr data-ng-repeat="x in data">
+			    <td>{{data.Document}}</td>
+		  	</tr>
+		</table> 
 	</div>
 
 </div>

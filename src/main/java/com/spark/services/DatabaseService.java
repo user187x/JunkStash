@@ -1,4 +1,4 @@
-package com.spark.service;
+package com.spark.services;
 
 import java.io.File;
 import java.net.URL;
@@ -24,6 +24,10 @@ public class DatabaseService {
 	
 	public void saveMessage(String message) {
 		databaseService.getMongoCollection().insertOne(new Document("message", message));
+	}
+	
+	public Iterable<Document> getAllDocuments(){
+		return databaseService.getMongoCollection().find();
 	}
 	
 	private void cacheResource() throws Exception{

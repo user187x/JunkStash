@@ -1,75 +1,56 @@
 package com.spark.config;
 
-import static spark.Spark.get;
-import static spark.Spark.post;
-import static spark.SparkBase.staticFileLocation;
-
 import java.util.Date;
 
-import com.spark.service.DatabaseService;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import com.spark.WebApp;
+import com.spark.controllers.MainController;
+import com.spark.controllers.TestController;
+import com.spark.services.DatabaseService;
 
 import spark.Request;
 import spark.Response;
 import spark.Route;
+import spark.Spark;
 
 public class WebConfig {
 	
 	private DatabaseService databaseService;
 
-	public WebConfig(final DatabaseService databaseService) {
+	public WebConfig() {
 		
-		this.databaseService = databaseService;
+		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(WebApp.class);	
+		ctx.registerShutdownHook();
 		
-		staticFileLocation("/public");
+		this.databaseService = ctx.getBean(DatabaseService.class);
+		ctx.close();
 		
-		setupRoutes();
+		Spark.staticFileLocation("/public");
+		Spark.port(4567);
+		
+		serveIndexPage();
+		addControllers();
 	}
 	
-	private void setupRoutes() {
+	public void serveIndexPage(){
 		
-        get("/", new Route() {
-
-			@Override
-			public Object handle(Request request, Response response) throws Exception {
+		 Spark.get("/", new Route() {
 				
-				String message = "User Request at Path : ("+request.pathInfo()+") "+new Date();
-				
-				databaseService.saveMessage(message);
-				System.out.println(message);
-				
-				return databaseService.getIndex();
-			}
-        });
-        
-        get("/testGet", new Route() {
-
-			@Override
-			public Object handle(Request request, Response response) throws Exception {
-				
-				String message = "User Request at Path : ("+request.pathInfo()+") "+new Date();
-				
-				databaseService.saveMessage(message);
-				System.out.println(message);
-				
-				return "Working!";
-			}
-        });
-        
-        post("/testPost", new Route() {
-        	
-        	@Override
-            public Object handle(Request request, Response response) {
-                
-            	String payload = request.body();
-            	System.out.println("Server Recieved Payload : "+payload);
-            	
-            	databaseService.saveMessage(payload);
-            	
-            	String message = "User Request at Path : ("+request.pathInfo()+") "+new Date();
-            	System.out.println(message);
-         	
-                return "Input Recieved : "+payload;
-             }
-        });
+				@Override
+				public Object handle(Request request, Response response) throws Exception {
+					
+					String message = "User Request at Path : ("+request.pathInfo()+") "+new Date();
+					System.out.println(message);
+					
+					return databaseService.getIndex();
+				}
+	     });
+	}
+	
+	private void addControllers() {
+		
+		new MainController(databaseService);
+		new TestController(databaseService);
     }
 }

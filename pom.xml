@@ -8,7 +8,7 @@
 
 	<properties>
 		<jdk.version>1.8</jdk.version>
-		<spark.version>2.2</spark.version>
+		<spark.version>2.3</spark.version>
 		<spring.version>4.2.0.RELEASE</spring.version>
 		<commons.beanutils.version>1.9.2</commons.beanutils.version>
 	</properties>
@@ -68,6 +68,13 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>3.0</version>
+		</dependency>
+
+		<!-- Json Library  -->
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.4</version>
 		</dependency>
 
 	</dependencies>

@@ -3,20 +3,31 @@ app.controller('primaryController', ['$scope', 'primaryFactory' ,function($scope
 	$scope.greetings = 'Variable Passed From Primary Controller Successfully';
 	$scope.inputData;
 	
+	$scope.allData;
+	
 	$scope.getData = function getData() { 
 		
 		primaryFactory.testGet().success(function (data) {
 			$scope.getResponse = data;
         })
         .error(function (error) {
-        	$scope.getResponse = 'Failure Retreiving Data';
+        	console.log(error);
         });
    }
 	
-	$scope.postData = function postData(data) { 
+	$scope.getAllData = function getAllData() { 
 		
-		console.log('Input data from JS : '+$scope.inputData);
-		
+		primaryFactory.testGetAll().success(function (data) {
+			$scope.allData = data;
+			
+			console.log('Data...'+data);
+        })
+        .error(function (error) {
+        	console.log(error);
+        });
+   }
+	
+	$scope.postData = function postData(data) { 		
 		primaryFactory.testPost($scope.inputData);
    }
 	
