@@ -27,35 +27,21 @@ public class AuxController {
 	
 	private void setUpRoutes(){
 	
-		 Spark.get("/testGet", new Route() {
+		 Spark.get("/showAll", new Route() {
 	
 				@Override
 				public Object handle(Request request, Response response) throws Exception {
 					
 					String message = "User Request at Path : ("+request.pathInfo()+") "+new Date();
 					
-					databaseService.saveMessage(message);
+					databaseService.save(message);
 					System.out.println(message);
 					
 					return "Working!";
 				}
 	     });
 	     
-		 Spark.get("/testGetAll", new Route() {
-	
-				@Override
-				public Object handle(Request request, Response response) throws Exception {
-					
-					String message = "User Request at Path : ("+request.pathInfo()+") "+new Date();
-					System.out.println(message);
-				
-					Iterable<Document> documents = databaseService.getAllDocuments();
-					
-					return documents.toString();
-				}
-	     });
-	     
-		 Spark.post("/testPost", new Route() {
+		 Spark.post("/search", new Route() {
 	     	
 	     	@Override
 	         public Object handle(Request request, Response response) {
@@ -63,12 +49,12 @@ public class AuxController {
 	         	String payload = request.body();
 	         	System.out.println("Server Recieved Payload : "+payload);
 	         	
-	         	databaseService.saveMessage(payload);
-	         	
-	         	String message = "User Request at Path : ("+request.pathInfo()+") "+new Date();
-	         	System.out.println(message);
+	         	Document document = databaseService.find(payload);
 	      	
-	             return "Input Recieved : "+payload;
+	         	if(document.isEmpty())
+	         		return "No Result";
+	         	else
+	         		return document.getString("message");
 	          }
 	     });
 	}

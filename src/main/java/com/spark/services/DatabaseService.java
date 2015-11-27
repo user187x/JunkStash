@@ -8,6 +8,7 @@ import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.mongodb.client.FindIterable;
 import com.spark.config.DatabaseConfig;
 
 @Service
@@ -22,12 +23,23 @@ public class DatabaseService {
 		cacheResource();
 	}
 	
-	public void saveMessage(String message) {
-		databaseService.getMongoDatabase().getCollection("stuff").insertOne(new Document("message", message));
+	public void save(String message) {
+		databaseService.getCollection().insertOne(new Document("message", message));
 	}
 	
 	public Iterable<Document> getAllDocuments(){
-		return databaseService.getMongoDatabase().getCollection("stuff").find();
+		return databaseService.getCollection().find();
+	}
+	
+	public Document find(String query){
+		
+		FindIterable<Document> results = databaseService.getCollection().find(new Document("message", query));
+		
+		if(results.iterator().hasNext())
+			return results.iterator().next();
+		
+		else
+			return new Document();
 	}
 	
 	private void cacheResource() throws Exception{
@@ -35,7 +47,7 @@ public class DatabaseService {
 		URL indexFile = getClass().getClassLoader().getResource("index.html");
 		cachedIndex = FileUtils.readFileToString(new File(indexFile.toURI()));
 		
-		System.out.println("Caching Resource : "+indexFile);
+		System.out.println("Resource Cached : "+indexFile);
 	}
 	
 	public String getIndex(){

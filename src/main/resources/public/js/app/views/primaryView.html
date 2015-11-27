@@ -1,29 +1,12 @@
-<div data-ng-controller="primaryController" data-ng-init="getAllData()">
-	
-	<div data-ng-show="greetings"> 
-		<div class="alert alert-success" style="border-radius: 25px; text-align:center; opacity: 0.75;" role="alert">Primary View Parameter : {{greetings}}</div>
+<div data-ng-controller="primaryController">
+
+	<div class="input-group" style="padding-bottom:20px">
+  		<input type="text" class="form-control" placeholder="Search" data-ng-model="inputData">
+  		<span class="input-group-addon" data-ng-click="search(inputData)">Submit</span>
 	</div>
 	
-	<div data-ng-show="!greetings"> 
-		<div class="alert alert-danger" style="border-radius: 25px; text-align:center; opacity: 0.75;" role="alert">Primary View : Failure Finding Variable</div>
-	</div>
-	
-	<div class="alert alert-info" data-ng-click="getData()"
-		style="border-radius: 25px; text-align:center; opacity: 0.75;" role="alert">
-		Primary View Response : {{getResponse}}
-	</div>
-	
-	<div class="alert alert-info" style="border-radius: 25px; text-align:center; opacity: 0.75" role="alert">
-		<input type="text" name="name" class="form-control" data-ng-model="inputData">
-		<button type="submit" class="btn btn-primary" data-ng-click="postData(inputData)">Submit</button>
-	</div>
-	
-	<div class="alert alert-info" style="border-radius: 25px; text-align:center; opacity: 0.75" role="alert">
-		 <table>
-		  	<tr data-ng-repeat="x in data">
-			    <td>{{data.Document}}</td>
-		  	</tr>
-		</table> 
+	<div class="alert alert-info"
+		style="border-radius: 25px; text-align:center; opacity: 0.75;" role="alert">{{result}}
 	</div>
 
 </div>
