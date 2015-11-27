@@ -27,17 +27,14 @@ public class AuxController {
 	
 	private void setUpRoutes(){
 	
-		 Spark.get("/showAll", new Route() {
+		 Spark.get("/getAll", new Route() {
 	
 				@Override
 				public Object handle(Request request, Response response) throws Exception {
 					
-					String message = "User Request at Path : ("+request.pathInfo()+") "+new Date();
+					System.out.println("User Request at Path : ("+request.pathInfo()+") "+new Date());
 					
-					databaseService.save(message);
-					System.out.println(message);
-					
-					return "Working!";
+					return databaseService.getAllDocuments();
 				}
 	     });
 	     
@@ -54,7 +51,7 @@ public class AuxController {
 	         	if(document.isEmpty())
 	         		return "No Result";
 	         	else
-	         		return document.getString("message");
+	         		return "Found : "+document.getString("message");
 	          }
 	     });
 	}

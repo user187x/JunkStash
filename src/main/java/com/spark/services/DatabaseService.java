@@ -8,7 +8,9 @@ import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.google.gson.JsonArray;
 import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCursor;
 import com.spark.config.DatabaseConfig;
 
 @Service
@@ -27,8 +29,19 @@ public class DatabaseService {
 		databaseService.getCollection().insertOne(new Document("message", message));
 	}
 	
-	public Iterable<Document> getAllDocuments(){
-		return databaseService.getCollection().find();
+	public JsonArray getAllDocuments(){
+		
+		MongoCursor<Document> cursor = databaseService.getCollection().find().iterator();
+		
+		JsonArray jsonArray = new JsonArray();
+		
+		while(cursor.hasNext()){
+			
+			Document result = cursor.next();
+			jsonArray.add(result.getString("message"));
+		}
+		
+		return jsonArray;
 	}
 	
 	public Document find(String query){

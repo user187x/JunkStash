@@ -4,8 +4,13 @@ app.factory('primaryFactory', ['$http', function($http) {
     	return $http.post('/search', payload);
     };
     
+    var getAll = function () {
+    	return $http.get('/getAll');
+    };
+    
     return {
-    	search : search
+    	search : search,
+    	getAll : getAll
     };
     
 }]);
