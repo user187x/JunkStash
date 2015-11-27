@@ -10,7 +10,17 @@ app.controller('primaryController', ['$scope', 'primaryFactory' ,function($scope
 			
 			$scope.result = data;
 		});
-   }
+	}
+	
+	$scope.submit = function postData(data) { 		
+		
+		primaryFactory.submit($scope.inputData).success(function (data) {
+			
+			$scope.result = data;
+		});
+		
+		$scope.getAll();
+	}
 	
 	$scope.getAll = function postData(data) { 		
 		
@@ -28,6 +38,6 @@ app.controller('primaryController', ['$scope', 'primaryFactory' ,function($scope
 		      
 		    });
 		});
-   }
+	}
 	
 }]);

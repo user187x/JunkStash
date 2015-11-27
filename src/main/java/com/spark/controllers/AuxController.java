@@ -37,6 +37,21 @@ public class AuxController {
 					return databaseService.getAllDocuments();
 				}
 	     });
+		 
+		 Spark.post("/submit", new Route() {
+		     	
+		     	@Override
+		         public Object handle(Request request, Response response) {
+		             
+		         	String payload = request.body();
+		         	System.out.println("Server Recieved Payload : "+payload);
+		         	
+		         	databaseService.save(payload);
+		      	
+		         	return "Entry Saved";
+		         	
+		          }
+	     });
 	     
 		 Spark.post("/search", new Route() {
 	     	

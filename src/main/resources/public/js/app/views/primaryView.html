@@ -2,16 +2,25 @@
 
 	<div class="jumbotron">
 		
-		<div class="input-group" style="padding-bottom: 20px">
-		
-		<input type="text" 
-			class="form-control" 
-			placeholder="Search"
-			data-ng-model="inputData">
+		<div class="input-group" style="padding-bottom: 20px">	
+			<input 
+				type="text" 
+				class="form-control" 
+				placeholder="Search"
+				data-ng-model="inputData">
 			 
-			<span class="input-group-addon btn btn-primary" data-ng-click="search(inputData)">Submit</span>
+			<span class="input-group-addon btn btn-primary" data-ng-click="search(inputData)">Search</span>
 			<span class="input-group-addon btn btn-success" role="button" data-ng-click="getAll()">Show All</span>
-			
+		</div>
+
+		<div class="input-group" style="padding-bottom: 20px">
+			<input 
+				type="text" 
+				class="form-control" 
+				placeholder="Add Entry"
+				data-ng-model="inputData">
+			 
+			<span class="input-group-addon btn btn-primary" data-ng-click="submit(inputData)">Submit</span>
 		</div>
 
 		<div class="alert alert-info"
