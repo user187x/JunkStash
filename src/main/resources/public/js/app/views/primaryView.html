@@ -1,6 +1,12 @@
-<div data-ng-controller="primaryController">
+<div data-ng-controller="primaryController" data-ng-init="getAll()">
 
 	<div class="jumbotron">
+		
+		<div>
+			<div class="alert alert-success">
+  				<strong>{{result}}</strong>
+			</div>
+		</div>
 		
 		<div class="input-group" style="padding-bottom: 20px">	
 			<input 
@@ -9,31 +15,24 @@
 				placeholder="Search"
 				data-ng-model="inputData">
 			 
-			<span class="input-group-addon btn btn-primary" data-ng-click="search(inputData)">Search</span>
-			<span class="input-group-addon btn btn-success" role="button" data-ng-click="getAll()">Show All</span>
-		</div>
-
-		<div class="input-group" style="padding-bottom: 20px">
-			<input 
-				type="text" 
-				class="form-control" 
-				placeholder="Add Entry"
-				data-ng-model="inputData">
-			 
-			<span class="input-group-addon btn btn-primary" data-ng-click="submit(inputData)">Submit</span>
-		</div>
-
-		<div class="alert alert-info"
-			style="border-radius: 25px; 
-			text-align: center; 
-			opacity: 0.75;"
-			role="alert">{{result}}
+			<span class="input-group-addon btn btn-default" data-ng-click="search(inputData)">Search</span>
+			<span class="input-group-addon btn btn-success" data-ng-click="submit(inputData)">Add</span>
+			<span class="input-group-addon btn btn-primary" role="button" data-ng-click="getAll()">Show</span>
 		</div>
 		
-		<table class="table table-striped table-hover">
-			<tr data-ng-repeat="message in messages">
-				<td>{{message.message}}</td>
-			</tr>
+		<table class="table table-striped table-hover" style="border: 2px solid #ccc">
+	    	<thead>
+		        <tr>
+		            <th>Time</th>
+		            <th>Message</th>
+		        </tr>
+	    	</thead>
+	    	<tbody>
+				<tr data-ng-repeat="message in messages">
+					<td>{{message.time}}</td>
+					<td>{{message.message}}</td>
+				</tr>
+			</tbody>
 		</table>
 		
 	</div>

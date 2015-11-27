@@ -44,6 +44,10 @@ public class AuxController {
 		         public Object handle(Request request, Response response) {
 		             
 		         	String payload = request.body();
+		         	
+		         	if(payload.isEmpty())
+		         		return "Empty Entry";
+		         	
 		         	System.out.println("Server Recieved Payload : "+payload);
 		         	
 		         	databaseService.save(payload);

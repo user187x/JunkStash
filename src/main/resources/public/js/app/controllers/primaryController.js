@@ -1,5 +1,5 @@
 app.controller('primaryController', ['$scope', 'primaryFactory' ,function($scope, primaryFactory) {
-  
+	
 	$scope.inputData;
 	$scope.result;
 	$scope.messages = [];
@@ -17,9 +17,8 @@ app.controller('primaryController', ['$scope', 'primaryFactory' ,function($scope
 		primaryFactory.submit($scope.inputData).success(function (data) {
 			
 			$scope.result = data;
+			$scope.getAll();
 		});
-		
-		$scope.getAll();
 	}
 	
 	$scope.getAll = function postData(data) { 		
@@ -32,7 +31,8 @@ app.controller('primaryController', ['$scope', 'primaryFactory' ,function($scope
 		        
 		    	$scope.messages.push(
 	    			{ 
-	    				message : value
+	    				message : value.message,
+	    				time : value.time
     				}
     			);
 		      

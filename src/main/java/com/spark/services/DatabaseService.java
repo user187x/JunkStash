@@ -2,6 +2,7 @@ package com.spark.services;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Date;
 
 import org.apache.commons.io.FileUtils;
 import org.bson.Document;
@@ -9,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCursor;
 import com.spark.config.DatabaseConfig;
@@ -26,7 +29,7 @@ public class DatabaseService {
 	}
 	
 	public void save(String message) {
-		databaseService.getCollection().insertOne(new Document("message", message));
+		databaseService.getCollection().insertOne(new Document("message", message).append("time", new Date()));
 	}
 	
 	public JsonArray getAllDocuments(){
@@ -38,7 +41,14 @@ public class DatabaseService {
 		while(cursor.hasNext()){
 			
 			Document result = cursor.next();
-			jsonArray.add(result.getString("message"));
+			String messsage = result.getString("message");
+			String time = result.getDate("time").toString();
+			
+			JsonObject json = new JsonObject();
+			json.add("message", new JsonPrimitive(messsage));
+			json.add("time", new JsonPrimitive(time));
+			
+			jsonArray.add(json);
 		}
 		
 		return jsonArray;
