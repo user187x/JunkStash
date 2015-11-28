@@ -8,6 +8,10 @@ app.factory('primaryFactory', ['$http', function($http) {
     	return $http.post('/submit', payload);
     };
     
+    var remove = function (payload) {
+    	return $http.post('/remove', payload);
+    };
+    
     var getAll = function () {
     	return $http.get('/getAll');
     };
@@ -15,6 +19,7 @@ app.factory('primaryFactory', ['$http', function($http) {
     return {
     	search : search,
     	submit : submit,
+    	remove : remove,
     	getAll : getAll
     };
     

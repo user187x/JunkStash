@@ -2,9 +2,15 @@
 
 	<div class="jumbotron">
 		
-		<div>
+		<div data-ng-if="result.success==false">
+			<div class="alert alert-danger" style="text-align:center">
+  				<strong>{{result.message}}</strong>
+			</div>
+		</div>
+		
+		<div data-ng-if="result.success==true">
 			<div class="alert alert-success" style="text-align:center">
-  				<strong>{{result}}</strong>
+  				<strong>{{result.message}}</strong>
 			</div>
 		</div>
 		
@@ -23,14 +29,16 @@
 		<table class="table table-striped table-hover" style="border: 2px solid #ccc">
 	    	<thead>
 		        <tr>
+		        	<th>Message</th>
 		            <th>Time</th>
-		            <th>Message</th>
+		            <th></th>
 		        </tr>
 	    	</thead>
 	    	<tbody>
 				<tr data-ng-repeat="message in messages | filter:inputData">
-					<td>{{message.time}}</td>
 					<td>{{message.message}}</td>
+					<td>{{message.time}}</td>
+					<td data-ng-click="remove(message)"><i class="fa fa-trash-o" style="cursor: pointer;"></i></td>
 				</tr>
 			</tbody>
 		</table>

@@ -14,6 +14,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCursor;
+import com.mongodb.client.result.DeleteResult;
 import com.spark.config.DatabaseConfig;
 
 @Service
@@ -28,8 +29,34 @@ public class DatabaseService {
 		cacheResource();
 	}
 	
-	public void save(String message) {
+	public boolean save(String message) {
+		
+		if(exists(message))
+			return false;
+		
 		databaseService.getCollection().insertOne(new Document("message", message).append("time", new Date()));
+		
+		return true;
+	}
+	
+	public boolean exists(String message){
+		
+		FindIterable<Document> results = databaseService.getCollection().find(new Document("message", message));
+		
+		if(results.iterator().hasNext())
+			return true;
+		else
+			return false;
+	}
+	
+	public boolean remove(String message){
+		
+		Document document = new Document();
+		document.append("message", message);
+		
+		DeleteResult result = databaseService.getCollection().deleteOne(document);
+		
+		return result.getDeletedCount()>0;
 	}
 	
 	public JsonArray getAllDocuments(){

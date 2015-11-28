@@ -1,8 +1,10 @@
 app.controller('primaryController', ['$scope', 'primaryFactory' ,function($scope, primaryFactory) {
 	
 	$scope.inputData;
-	$scope.result;
 	$scope.messages = [];
+	
+	$scope.result;
+	$scope.success;
 	
 	$scope.search = function postData(data) { 		
 		
@@ -16,7 +18,9 @@ app.controller('primaryController', ['$scope', 'primaryFactory' ,function($scope
 		primaryFactory.submit($scope.inputData).success(function (data) {
 			
 			$scope.result = data;
-			$scope.refresh()
+			
+			$scope.clear();
+			$scope.refresh();
 		});
 	}
 	
@@ -26,15 +30,14 @@ app.controller('primaryController', ['$scope', 'primaryFactory' ,function($scope
 		
 		primaryFactory.getAll().success(function (data) {
 			
-		    angular.forEach(data, function(value, key) {
+		    angular.forEach(data.payload, function(value, key) {
 		        
-		    	$scope.messages.push(
-	    			{ 
-	    				message : value.message,
-	    				time : value.time
-    				}
-    			);
-		      
+		    	$scope.messages.push({ 
+    				
+		    		message : value.message,
+    				time : value.time,
+    				id : value.id
+				});
 		    });
 		});
 	}
@@ -45,6 +48,16 @@ app.controller('primaryController', ['$scope', 'primaryFactory' ,function($scope
 	
 	$scope.clear = function(){
 		$scope.inputData = undefined;
+		$scope.result = undefined;
+	}
+	
+	$scope.remove = function remove(data){
+		
+		primaryFactory.remove(data).success(function (data) {
+			
+			$scope.result = data;
+			$scope.refresh();
+		});
 	}
 	
 }]);

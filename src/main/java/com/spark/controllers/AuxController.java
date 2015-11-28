@@ -7,6 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Controller;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
 import com.spark.services.DatabaseService;
 
 import spark.Request;
@@ -32,9 +36,27 @@ public class AuxController {
 				@Override
 				public Object handle(Request request, Response response) throws Exception {
 					
+					JsonObject payload = new JsonObject();
+					
 					System.out.println("User Request at Path : ("+request.pathInfo()+") "+new Date());
 					
-					return databaseService.getAllDocuments();
+					JsonArray jsonArray = databaseService.getAllDocuments();
+					
+					if(jsonArray.isJsonNull() || !jsonArray.iterator().hasNext()){
+						
+						payload.add("message", new JsonPrimitive("Request Was Empty"));
+			         	payload.add("success", new JsonPrimitive(false));
+		         		
+		         		return payload;
+					}
+					else{
+						
+						payload.add("message", new JsonPrimitive("Successfully Found "+jsonArray.size()));
+			         	payload.add("success", new JsonPrimitive(true));
+			         	payload.add("payload", jsonArray);
+			         	
+			         	return payload;
+					}
 				}
 	     });
 		 
@@ -42,23 +64,80 @@ public class AuxController {
 		     	
 		     	@Override
 		         public Object handle(Request request, Response response) {
+		            
+		     		JsonObject payload = new JsonObject();
+		     		
+		         	String data = request.body();
+		         	
+		         	if(data.isEmpty()){
+			         	
+		         		payload.add("message", new JsonPrimitive("Request Was Empty"));
+			         	payload.add("success", new JsonPrimitive(false));
+		         		
+		         		return payload;
+		         	}
+		         	
+		         	System.out.println("Server Recieved Payload : "+data);
+		         	
+		         	boolean saved = databaseService.save(data);
+		         	
+		         	if(saved){
+		         		
+		         		payload.add("message", new JsonPrimitive("Entry Successfully Saved"));
+			         	payload.add("success", new JsonPrimitive(true));
+		         		
+		         		return payload;
+		         	}
+		         	else{
+			         	
+		         		payload.add("message", new JsonPrimitive("Entry Already Exists"));
+			         	payload.add("success", new JsonPrimitive(false));
+		         		
+		         		return payload;
+		         	}	
+		          }
+	     });
+		 
+		 Spark.post("/remove", new Route() {
+		     	
+		     	@Override
+		         public Object handle(Request request, Response response) {
 		             
-		         	String payload = request.body();
+		     		JsonObject payload = new JsonObject();
+		     		
+		         	String data = request.body();
 		         	
-		         	if(payload.isEmpty())
-		         		return "Empty Entry";
+		         	if(data.isEmpty()){
+			         	
+		         		payload.add("message", new JsonPrimitive("Request Was Empty"));
+			         	payload.add("success", new JsonPrimitive(false));
+		         		
+		         		return payload;
+		         	}
 		         	
-		         	Document document = databaseService.find(payload);
+		         	JsonParser jsonParser = new JsonParser();
+		         	JsonObject json = jsonParser.parse(data).getAsJsonObject();
 		         	
-		         	if(!document.isEmpty())
-		         		return "Entry Already Exists";
+		         	System.out.println("Server Attempting To Remove Entry : "+json.get("message").getAsString());
 		         	
-		         	System.out.println("Server Recieved Payload : "+payload);
+		         	String message = json.get("message").getAsString();
+		         			
+		         	boolean removed = databaseService.remove(message);
 		         	
-		         	databaseService.save(payload);
-		      	
-		         	return "Entry Saved";
-		         	
+		         	if(removed){
+		         		
+		         		payload.add("message", new JsonPrimitive("Entry Successfully Removed"));
+			         	payload.add("success", new JsonPrimitive(true));
+		         		
+		         		return payload;
+		         	}
+		         	else{
+			         	
+		         		payload.add("message", new JsonPrimitive("Entry Failed To Remove"));
+			         	payload.add("success", new JsonPrimitive(false));
+		         		
+		         		return payload;
+		         	}
 		          }
 	     });
 	     
@@ -67,15 +146,37 @@ public class AuxController {
 	     	@Override
 	         public Object handle(Request request, Response response) {
 	             
-	         	String payload = request.body();
-	         	System.out.println("Server Recieved Payload : "+payload);
+	     		JsonObject payload = new JsonObject();
+	     		
+	         	String data = request.body();
 	         	
-	         	Document document = databaseService.find(payload);
+	         	if(data.isEmpty()){
+		         	
+	         		payload.add("message", new JsonPrimitive("Request Was Empty"));
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
+	         	}
+	         	
+	         	System.out.println("Server Recieved Payload : "+data);
+	         	
+	         	Document document = databaseService.find(data);
 	      	
-	         	if(document.isEmpty())
-	         		return "No Result Found";
-	         	else
-	         		return "Entry Exists : "+document.getString("message")+" :: "+document.getDate("time");
+	         	if(document.isEmpty()){
+	         		
+	         		payload.add("message", new JsonPrimitive("No Entry Found"));
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
+	         	}
+	         	else{
+	         		
+	         		payload.add("message", new JsonPrimitive("Entry Found : "+document.getDate("time")));
+		         	payload.add("success", new JsonPrimitive(true));
+	         		
+	         		return payload;
+	         		
+	         	}
 	          }
 	     });
 	}
