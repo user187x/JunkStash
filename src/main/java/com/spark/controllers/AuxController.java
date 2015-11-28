@@ -48,6 +48,11 @@ public class AuxController {
 		         	if(payload.isEmpty())
 		         		return "Empty Entry";
 		         	
+		         	Document document = databaseService.find(payload);
+		         	
+		         	if(!document.isEmpty())
+		         		return "Entry Already Exists";
+		         	
 		         	System.out.println("Server Recieved Payload : "+payload);
 		         	
 		         	databaseService.save(payload);
@@ -68,9 +73,9 @@ public class AuxController {
 	         	Document document = databaseService.find(payload);
 	      	
 	         	if(document.isEmpty())
-	         		return "No Result";
+	         		return "No Result Found";
 	         	else
-	         		return "Found : "+document.getString("message");
+	         		return "Entry Exists : "+document.getString("message")+" :: "+document.getDate("time");
 	          }
 	     });
 	}

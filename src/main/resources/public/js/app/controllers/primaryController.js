@@ -7,7 +7,6 @@ app.controller('primaryController', ['$scope', 'primaryFactory' ,function($scope
 	$scope.search = function postData(data) { 		
 		
 		primaryFactory.search($scope.inputData).success(function (data) {
-			
 			$scope.result = data;
 		});
 	}
@@ -17,7 +16,7 @@ app.controller('primaryController', ['$scope', 'primaryFactory' ,function($scope
 		primaryFactory.submit($scope.inputData).success(function (data) {
 			
 			$scope.result = data;
-			$scope.getAll();
+			$scope.refresh()
 		});
 	}
 	
@@ -38,6 +37,14 @@ app.controller('primaryController', ['$scope', 'primaryFactory' ,function($scope
 		      
 		    });
 		});
+	}
+	
+	$scope.refresh = function(){
+		$scope.getAll();
+	}
+	
+	$scope.clear = function(){
+		$scope.inputData = undefined;
 	}
 	
 }]);
