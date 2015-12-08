@@ -6,3 +6,8 @@
 * Mongo 3.0.0
 * Angular 1.4.8
 
+# To Run
+
+* Simply execute Webapp.java
+* Open browser to : localhost:4567
+

@@ -1,7 +1,11 @@
 package com.spark.controllers;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.Date;
 
+import org.apache.commons.io.IOUtils;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
@@ -139,6 +143,46 @@ public class AuxController {
 		         		return payload;
 		         	}
 		          }
+	     });
+		 
+		 Spark.post("/upload", new Route() {
+		     	
+			 	JsonObject payload = new JsonObject();
+			 
+		     	@Override
+		         public Object handle(Request request, Response response) {
+		             
+		     		try{
+		     			
+		     			//First Attempt
+			            byte[] image = IOUtils.toByteArray(request.raw().getInputStream());
+			            OutputStream out = new FileOutputStream(new File("/home/xxx/Desktop/stuff.jpg"));
+			            IOUtils.write(image, out);
+			            out.flush();
+			            out.close();
+			            
+			            
+		     			//Second Attempt
+		     			//MultipartConfigElement multipartConfigElement = new MultipartConfigElement("/home/xxx/Desktop/");
+		                //request.raw().setAttribute("org.eclipse.jetty.multipartConfig",multipartConfigElement);
+		                //Part file = request.raw().getPart("file");
+			            
+		     		}
+		     		
+		     		catch(Exception e){
+		     			
+		     			payload.add("message", new JsonPrimitive("Failed Uploading File"));
+			         	payload.add("success", new JsonPrimitive(false));
+		         		
+		         		return payload;
+		     		}
+		         	
+		     		payload.add("message", new JsonPrimitive("Successfully Uploaded File"));
+		         	payload.add("success", new JsonPrimitive(true));
+		         	
+		         	return payload;
+		     	}
+		         	
 	     });
 	     
 		 Spark.post("/search", new Route() {

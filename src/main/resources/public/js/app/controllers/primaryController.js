@@ -1,10 +1,8 @@
 app.controller('primaryController', ['$scope', 'primaryFactory' ,function($scope, primaryFactory) {
 	
-	$scope.inputData;
 	$scope.messages = [];
-	
+	$scope.inputData;
 	$scope.result;
-	$scope.success;
 	
 	$scope.search = function postData(data) { 		
 		
@@ -21,6 +19,15 @@ app.controller('primaryController', ['$scope', 'primaryFactory' ,function($scope
 			
 			$scope.clear();
 			$scope.refresh();
+		});
+	}
+	
+	$scope.upload = function postData(data) { 		
+		
+		primaryFactory.upload($scope.file).success(function (data) {
+			
+			$scope.result = data;
+			
 		});
 	}
 	
