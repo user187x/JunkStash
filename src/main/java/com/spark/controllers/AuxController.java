@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.util.Date;
 
 import javax.servlet.MultipartConfigElement;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
 
 import org.apache.commons.io.FileUtils;
@@ -155,23 +154,23 @@ public class AuxController {
 			 
 		     	@Override
 		         public Object handle(Request request, Response response) {
-		             
+		            
 		     		try{
 		     			
-			            HttpServletRequest httpServletRequest = request.raw();
-			            
 			            MultipartConfigElement multipartConfigElement = new MultipartConfigElement("/tmp");
 			            request.raw().setAttribute("org.eclipse.jetty.multipartConfig", multipartConfigElement);
 			            
-			            Part filePart = httpServletRequest.getPart("file");
+			            Part filePart = request.raw().getPart("file");
 			           
 			            String fileName = filePart.getSubmittedFileName();
-			            System.out.println("File Name : "+fileName);
 			            InputStream fileStream = filePart.getInputStream();
 			            
-			            FileUtils.copyInputStreamToFile(fileStream, new File("/tmp/"+fileName));
+			            File uploadFile = new File("/tmp/"+fileName);
+			            
+			            FileUtils.copyInputStreamToFile(fileStream, uploadFile);
 			            IOUtils.closeQuietly(fileStream);
 			            
+			            System.out.println("Successfully File Upload : "+fileName);
 		     		}
 		     		
 		     		catch(Exception e){

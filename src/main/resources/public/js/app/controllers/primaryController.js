@@ -4,6 +4,7 @@ app.controller('primaryController', ['$scope', 'primaryFactory' ,function($scope
 	$scope.inputData = null;
 	$scope.result = null;
 	$scope.uploadFile = null;
+	$scope.loading = false;
 	
 	$scope.search = function postData(data) { 		
 		
@@ -24,11 +25,20 @@ app.controller('primaryController', ['$scope', 'primaryFactory' ,function($scope
 	}
 	
 	$scope.upload = function postData() { 		
+		
+		$scope.loading = true;
+		
+		primaryFactory.upload($scope.uploadFile)
+			.success(function (data) {
 			
-		primaryFactory.upload($scope.uploadFile).success(function (data) {
+				$scope.result = data;
+				$scope.loading = false;
+			})
+			.error(function (data) {
 			
-			$scope.result = data;
-		});
+				$scope.result = data;
+				$scope.loading = false;
+			});
 	}
 	
 	$scope.getAll = function postData(data) { 		
