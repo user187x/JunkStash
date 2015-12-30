@@ -1,10 +1,14 @@
 package com.spark.controllers;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
+import java.io.InputStream;
 import java.util.Date;
 
+import javax.servlet.MultipartConfigElement;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.Part;
+
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -154,24 +158,25 @@ public class AuxController {
 		             
 		     		try{
 		     			
-		     			//First Attempt
-			            byte[] image = IOUtils.toByteArray(request.raw().getInputStream());
-			            OutputStream out = new FileOutputStream(new File("/home/xxx/Desktop/stuff.jpg"));
-			            IOUtils.write(image, out);
-			            out.flush();
-			            out.close();
+			            HttpServletRequest httpServletRequest = request.raw();
 			            
+			            MultipartConfigElement multipartConfigElement = new MultipartConfigElement("/tmp");
+			            request.raw().setAttribute("org.eclipse.jetty.multipartConfig", multipartConfigElement);
 			            
-		     			//Second Attempt
-		     			//MultipartConfigElement multipartConfigElement = new MultipartConfigElement("/home/xxx/Desktop/");
-		                //request.raw().setAttribute("org.eclipse.jetty.multipartConfig",multipartConfigElement);
-		                //Part file = request.raw().getPart("file");
+			            Part filePart = httpServletRequest.getPart("file");
+			           
+			            String fileName = filePart.getSubmittedFileName();
+			            System.out.println("File Name : "+fileName);
+			            InputStream fileStream = filePart.getInputStream();
+			            
+			            FileUtils.copyInputStreamToFile(fileStream, new File("/tmp/"+fileName));
+			            IOUtils.closeQuietly(fileStream);
 			            
 		     		}
 		     		
 		     		catch(Exception e){
 		     			
-		     			payload.add("message", new JsonPrimitive("Failed Uploading File"));
+		     			payload.add("message", new JsonPrimitive("Failed Uploading File "+e.getMessage()));
 			         	payload.add("success", new JsonPrimitive(false));
 		         		
 		         		return payload;

@@ -9,18 +9,14 @@ app.factory('primaryFactory', ['$http', function($http) {
     };
     
     var upload = function (payload){
-        
+    	
     	var formData = new FormData();
     	formData.append('file', payload);
-        
-        return $http.post(
-        	'/upload', 
-        	formData, 
-        	{
-	            transformRequest: angular.identity,
-	            headers: {'Content-Type': undefined }
-        	}
-        );
+    	
+	    return $http.post('/upload', formData, {
+	        headers: {'Content-Type': undefined },
+	        transformRequest: angular.identity
+	    });
     };
     
     var remove = function (payload) {
