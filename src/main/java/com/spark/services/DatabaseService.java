@@ -2,9 +2,9 @@ package com.spark.services;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Date;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.gridfs.GridFSBucket;
-import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.UpdateResult;
 import com.spark.config.DatabaseConfig;
 
 @Service
@@ -32,17 +32,7 @@ public class DatabaseService {
 	public DatabaseService() throws Exception{
 		cacheResource();
 	}
-	
-	public boolean save(String message) {
 		
-		if(exists(message))
-			return false;
-		
-		databaseService.getCollection().insertOne(new Document("message", message).append("time", new Date()));
-		
-		return true;
-	}
-	
 	public MongoDatabase getMongoDatabase(){
 		return databaseService.getMongoDatabase();
 	}
@@ -55,41 +45,69 @@ public class DatabaseService {
 		return databaseService.getGridFSBucket();
 	}
 	
-	public boolean exists(String message){
+	public boolean exists(String fileId){
 		
-		FindIterable<Document> results = databaseService.getCollection().find(new Document("message", message));
+		ObjectId objectId = new ObjectId(fileId);
+		
+		Document query = new Document();
+		query.append("_id", objectId);
+		
+		FindIterable<Document> results = databaseService.getFileCollection().find(query);
 		
 		if(results.iterator().hasNext())
 			return true;
+		
 		else
 			return false;
 	}
 	
-	public boolean remove(String message){
+	public boolean remove(String fileId){
 		
-		Document document = new Document();
-		document.append("message", message);
+		try{
+			getGridFSBucket().delete(new ObjectId(fileId));
+		}
+		catch(Exception e){
+			return false;
+		}
 		
-		DeleteResult result = databaseService.getCollection().deleteOne(document);
-		
-		return result.getDeletedCount()>0;
+		return true;
 	}
 	
 	public JsonArray getAllDocuments(){
 		
-		MongoCursor<Document> cursor = databaseService.getCollection().find().iterator();
+		MongoCursor<Document> cursor = databaseService.getFileCollection().find().iterator();
 		
 		JsonArray jsonArray = new JsonArray();
 		
 		while(cursor.hasNext()){
 			
 			Document result = cursor.next();
+			
 			String messsage = result.getString("message");
-			String time = result.getDate("time").toString();
+			String type = result.getString("type");
+			String id = result.get("_id").toString();
+			String name = result.getString("filename");
+			String time = result.getDate("uploadDate").toString();
+			long size = result.getLong("length");
 			
 			JsonObject json = new JsonObject();
-			json.add("message", new JsonPrimitive(messsage));
-			json.add("time", new JsonPrimitive(time));
+			
+			if(StringUtils.isNotEmpty(messsage))
+				json.add("message", new JsonPrimitive(messsage));
+			
+			if(StringUtils.isNotEmpty(time))
+				json.add("time", new JsonPrimitive(time));
+			
+			if(StringUtils.isNotEmpty(type))
+				json.add("type", new JsonPrimitive(type));
+			
+			if(StringUtils.isNotEmpty(id))
+				json.add("id", new JsonPrimitive(id));
+			
+			if(StringUtils.isNotEmpty(name))
+				json.add("name", new JsonPrimitive(name));
+			
+			json.add("size", new JsonPrimitive(FileUtils.byteCountToDisplaySize(size)));
 			
 			jsonArray.add(json);
 		}
@@ -97,9 +115,30 @@ public class DatabaseService {
 		return jsonArray;
 	}
 	
-	public Document find(String query){
+	public boolean setFileType(String fileId, String fileType){
 		
-		FindIterable<Document> results = databaseService.getCollection().find(new Document("message", query));
+		Document query = new Document();
+		query.append("_id", new ObjectId(fileId));
+		
+		Document update = new Document();
+		update.append("$set", new Document("type", fileType));
+		
+		UpdateResult results = databaseService.getFileCollection().updateOne(query, update);
+		
+		if(results.getModifiedCount()>0)
+			return true;
+		else
+			return false;
+	}
+	
+	public Document find(String fileId){
+		
+		ObjectId objectId = new ObjectId(fileId);
+		
+		Document query = new Document();
+		query.append("_id", objectId);
+		
+		FindIterable<Document> results = databaseService.getFileCollection().find(query);
 		
 		if(results.iterator().hasNext())
 			return results.iterator().next();
@@ -122,18 +161,6 @@ public class DatabaseService {
 		
 		else
 			return null;
-	}
-	
-	public boolean deleteFile(String fileId){
-		
-		try{
-			getGridFSBucket().delete(new ObjectId(fileId));
-		}
-		catch(Exception e){
-			return false;
-		}
-		
-		return true;
 	}
 	
 	private void cacheResource() throws Exception{

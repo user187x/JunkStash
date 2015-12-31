@@ -33,6 +33,7 @@
 		        	<th>Name</th>
 		        	<th>Type</th>
 		            <th>Time</th>
+		            <th>Size</th>
 		            <th></th>
 		            <th></th>
 		        </tr>
@@ -43,8 +44,9 @@
 					<td>{{message.name}}</td>
 					<td>{{message.type}}</td>
 					<td>{{message.time}}</td>
+					<td>{{message.size}}</td>
 					<td>
-						<a href="download/{{message.message}}" download="{{message.name}}">
+						<a href="download/{{message.id}}" download="{{message.name}}">
 							<i class="fa fa-download" style="cursor:pointer;"></i>
 						</a>
 					</td>
@@ -57,12 +59,16 @@
 		
 		<div style="margin-bottom:20px">
 			<div data-ng-show="!loading">
-	    		<input type="file" name="file" data-file-model="uploadFile"/>
-	    		<button data-ng-click="upload()">Upload</button>
+   				<span class="btn btn-default btn-file">
+    				Browse <input type="file" data-file-model="uploadFile">
+				</span>
+				<button data-ng-show="uploadFile" class="btn btn-success" data-ng-click="upload()">Upload</button>
+				<button data-ng-show="!uploadFile" class="btn btn-default" disabled>Upload</button>
     		</div>
     		<div data-ng-show="loading" style="text-align:center">
-    			<i class="fa fa-cog fa-spin fa-2x"></i>&nbsp;Uploading...
+    			<i class="fa fa-cog fa-spin fa-2x"></i>Uploading...
    			</div>
+   			
 		</div>
 		
 	</div>

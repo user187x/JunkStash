@@ -84,52 +84,51 @@ public class AuxController {
 					}
 					else{
 						
-						String fileName = databaseService.getFileName(fileId);
-						
-						databaseService.getGridFSBucket().downloadToStreamByName(fileName, response.raw().getOutputStream());
+						ObjectId objectId = new ObjectId(fileId);
+						databaseService.getGridFSBucket().downloadToStream(objectId, response.raw().getOutputStream());
 			         	
 			         	return response.raw();
 					}
 				}
 	     });
 		 
-		 Spark.post("/submit", new Route() {
-		     	
-		     	@Override
-		         public Object handle(Request request, Response response) {
-		            
-		     		JsonObject payload = new JsonObject();
-		     		
-		         	String data = request.body();
-		         	
-		         	if(data.isEmpty()){
-			         	
-		         		payload.add("message", new JsonPrimitive("Request Was Empty"));
-			         	payload.add("success", new JsonPrimitive(false));
-		         		
-		         		return payload;
-		         	}
-		         	
-		         	System.out.println("Server Recieved Payload : "+data);
-		         	
-		         	boolean saved = databaseService.save(data);
-		         	
-		         	if(saved){
-		         		
-		         		payload.add("message", new JsonPrimitive("Entry Successfully Saved"));
-			         	payload.add("success", new JsonPrimitive(true));
-		         		
-		         		return payload;
-		         	}
-		         	else{
-			         	
-		         		payload.add("message", new JsonPrimitive("Entry Already Exists"));
-			         	payload.add("success", new JsonPrimitive(false));
-		         		
-		         		return payload;
-		         	}	
-		          }
-	     });
+//		 Spark.post("/submit", new Route() {
+//		     	
+//		     	@Override
+//		         public Object handle(Request request, Response response) {
+//		            
+//		     		JsonObject payload = new JsonObject();
+//		     		
+//		         	String data = request.body();
+//		         	
+//		         	if(data.isEmpty()){
+//			         	
+//		         		payload.add("message", new JsonPrimitive("Request Was Empty"));
+//			         	payload.add("success", new JsonPrimitive(false));
+//		         		
+//		         		return payload;
+//		         	}
+//		         	
+//		         	System.out.println("Server Recieved Payload : "+data);
+//		         	
+//		         	boolean saved = databaseService.save(data);
+//		         	
+//		         	if(saved){
+//		         		
+//		         		payload.add("message", new JsonPrimitive("Entry Successfully Saved"));
+//			         	payload.add("success", new JsonPrimitive(true));
+//		         		
+//		         		return payload;
+//		         	}
+//		         	else{
+//			         	
+//		         		payload.add("message", new JsonPrimitive("Entry Already Exists"));
+//			         	payload.add("success", new JsonPrimitive(false));
+//		         		
+//		         		return payload;
+//		         	}	
+//		          }
+//	     });
 		 
 		 Spark.post("/remove", new Route() {
 		     	
@@ -151,11 +150,11 @@ public class AuxController {
 		         	JsonParser jsonParser = new JsonParser();
 		         	JsonObject json = jsonParser.parse(data).getAsJsonObject();
 		         	
-		         	System.out.println("Server Attempting To Remove Entry : "+json.get("message").getAsString());
+		         	System.out.println("Server Attempting To Remove File : "+json.get("name").getAsString());
 		         	
-		         	String message = json.get("message").getAsString();
+		         	String fileId = json.get("id").getAsString();
 		         			
-		         	boolean removed = databaseService.remove(message);
+		         	boolean removed = databaseService.remove(fileId);
 		         	
 		         	if(removed){
 		         		
@@ -191,11 +190,15 @@ public class AuxController {
 			            Part filePart = request.raw().getPart("file");
 			           
 			            fileName = filePart.getSubmittedFileName();
+			            String fileType = filePart.getContentType();
+			            
+			            System.out.println("Upload FileType : "+fileType);
+			            
 			            InputStream fileStream = filePart.getInputStream();
 			           
 			            ObjectId fileId = databaseService.getGridFSBucket().uploadFromStream(fileName, fileStream);
 			            
-			            databaseService.save(fileId.toString());
+			            databaseService.setFileType(fileId.toString(), fileType);
 		     		}
 		     		
 		     		catch(Exception e){

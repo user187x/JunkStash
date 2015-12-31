@@ -11,7 +11,7 @@ app.controller('primaryController', ['$scope', 'primaryFactory' ,function($scope
 		primaryFactory.search($scope.inputData).success(function (data) {
 			$scope.result = data;
 		});
-	}
+	};
 	
 	$scope.submit = function postData(data) { 		
 		
@@ -22,7 +22,7 @@ app.controller('primaryController', ['$scope', 'primaryFactory' ,function($scope
 			$scope.clear();
 			$scope.refresh();
 		});
-	}
+	};
 	
 	$scope.upload = function postData() { 		
 		
@@ -33,13 +33,17 @@ app.controller('primaryController', ['$scope', 'primaryFactory' ,function($scope
 			
 				$scope.result = data;
 				$scope.loading = false;
+				$scope.uploadFile = undefined;
+				
+				$scope.refresh();
 			})
 			.error(function (data) {
 			
 				$scope.result = data;
 				$scope.loading = false;
+				$scope.uploadFile = undefined;
 			});
-	}
+	};
 	
 	$scope.getAll = function postData(data) { 		
 		
@@ -54,20 +58,22 @@ app.controller('primaryController', ['$scope', 'primaryFactory' ,function($scope
 		    		message : value.message,
     				time : value.time,
     				id : value.id,
-    				name : value.name
+    				name : value.name,
+    				type : value.type,
+    				size : value.size
 				});
 		    });
 		});
-	}
+	};
 	
 	$scope.refresh = function(){
 		$scope.getAll();
-	}
+	};
 	
 	$scope.clear = function(){
 		$scope.inputData = undefined;
 		$scope.result = undefined;
-	}
+	};
 	
 	$scope.remove = function remove(data){
 		
@@ -75,6 +81,6 @@ app.controller('primaryController', ['$scope', 'primaryFactory' ,function($scope
 			$scope.result = data;
 			$scope.refresh();
 		});
-	}
+	};
 	
 }]);

@@ -16,7 +16,7 @@ public class DatabaseConfig {
 
 	public static final String GRID_FS = "fileStore";
 	
-	public static final String USER_COLLECTION = "users";
+	//public static final String USER_COLLECTION = "users";
 	public static final String FILE_COLLECTION = "fileStore.files";
 	public static final String DATABASE = "webapp";
 	
@@ -39,9 +39,9 @@ public class DatabaseConfig {
     	 return mongoClient;
      }
      
-     public MongoCollection<Document> getCollection(){
-    	 return getMongoDatabase().getCollection(USER_COLLECTION);
-     }
+//     public MongoCollection<Document> getUserCollection(){
+//    	 return getMongoDatabase().getCollection(USER_COLLECTION);
+//     }
      
      public MongoCollection<Document> getFileCollection(){
     	 return getMongoDatabase().getCollection(FILE_COLLECTION);
