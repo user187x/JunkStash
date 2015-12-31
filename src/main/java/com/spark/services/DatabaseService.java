@@ -6,14 +6,18 @@ import java.util.Date;
 
 import org.apache.commons.io.FileUtils;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCursor;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.result.DeleteResult;
 import com.spark.config.DatabaseConfig;
 
@@ -37,6 +41,18 @@ public class DatabaseService {
 		databaseService.getCollection().insertOne(new Document("message", message).append("time", new Date()));
 		
 		return true;
+	}
+	
+	public MongoDatabase getMongoDatabase(){
+		return databaseService.getMongoDatabase();
+	}
+	
+	public MongoClient getMongoClient(){
+		return databaseService.getMongoClient();
+	}
+	
+	public GridFSBucket getGridFSBucket(){
+		return databaseService.getGridFSBucket();
 	}
 	
 	public boolean exists(String message){
@@ -90,6 +106,34 @@ public class DatabaseService {
 		
 		else
 			return new Document();
+	}
+	
+	public String getFileName(String fileId){
+		
+		ObjectId objectId = new ObjectId(fileId);
+		
+		Document query = new Document();
+		query.append("_id", objectId);
+		
+		FindIterable<Document> results = databaseService.getFileCollection().find(query);
+		
+		if(results.iterator().hasNext())
+			return results.iterator().next().getString("filename");
+		
+		else
+			return null;
+	}
+	
+	public boolean deleteFile(String fileId){
+		
+		try{
+			getGridFSBucket().delete(new ObjectId(fileId));
+		}
+		catch(Exception e){
+			return false;
+		}
+		
+		return true;
 	}
 	
 	private void cacheResource() throws Exception{

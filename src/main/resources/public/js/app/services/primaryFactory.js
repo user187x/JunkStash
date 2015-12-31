@@ -26,7 +26,7 @@ app.factory('primaryFactory', ['$http', function($http) {
     var getAll = function () {
     	return $http.get('/getAll');
     };
-    
+
     return {
     	search : search,
     	submit : submit,

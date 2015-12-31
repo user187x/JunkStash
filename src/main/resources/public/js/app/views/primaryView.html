@@ -30,15 +30,27 @@
 	    	<thead>
 		        <tr>
 		        	<th>Message</th>
+		        	<th>Name</th>
+		        	<th>Type</th>
 		            <th>Time</th>
+		            <th></th>
 		            <th></th>
 		        </tr>
 	    	</thead>
 	    	<tbody>
 				<tr data-ng-repeat="message in messages | filter:inputData">
 					<td>{{message.message}}</td>
+					<td>{{message.name}}</td>
+					<td>{{message.type}}</td>
 					<td>{{message.time}}</td>
-					<td data-ng-click="remove(message)"><i class="fa fa-trash-o" style="cursor: pointer;"></i></td>
+					<td>
+						<a href="download/{{message.message}}" download="{{message.name}}">
+							<i class="fa fa-download" style="cursor:pointer;"></i>
+						</a>
+					</td>
+					<td data-ng-click="remove(message)">
+						<i class="fa fa-trash-o" style="cursor: pointer;"></i>
+					</td>
 				</tr>
 			</tbody>
 		</table>
@@ -49,7 +61,7 @@
 	    		<button data-ng-click="upload()">Upload</button>
     		</div>
     		<div data-ng-show="loading" style="text-align:center">
-    			<i class="fa fa-cog fa-spin"></i>
+    			<i class="fa fa-cog fa-spin fa-2x"></i>&nbsp;Uploading...
    			</div>
 		</div>
 		

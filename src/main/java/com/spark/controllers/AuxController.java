@@ -1,15 +1,13 @@
 package com.spark.controllers;
 
-import java.io.File;
 import java.io.InputStream;
 import java.util.Date;
 
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.Part;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Controller;
@@ -63,6 +61,34 @@ public class AuxController {
 			         	payload.add("payload", jsonArray);
 			         	
 			         	return payload;
+					}
+				}
+	     });
+		 
+		 Spark.get("/download/:fileId", new Route() {
+				
+				@Override
+				public Object handle(Request request, Response response) throws Exception {
+					
+					String fileId = request.params(":fileId");
+					
+					if(fileId == null || fileId.isEmpty()){
+						
+						System.out.println("User Request To Download File With ID : "+fileId);
+						
+						JsonObject payload = new JsonObject();
+						payload.add("message", new JsonPrimitive("Request Was Empty"));
+			         	payload.add("success", new JsonPrimitive(false));
+		         		
+		         		return payload;
+					}
+					else{
+						
+						String fileName = databaseService.getFileName(fileId);
+						
+						databaseService.getGridFSBucket().downloadToStreamByName(fileName, response.raw().getOutputStream());
+			         	
+			         	return response.raw();
 					}
 				}
 	     });
@@ -155,6 +181,8 @@ public class AuxController {
 		     	@Override
 		         public Object handle(Request request, Response response) {
 		            
+		     		String fileName = null;
+		     		
 		     		try{
 		     			
 			            MultipartConfigElement multipartConfigElement = new MultipartConfigElement("/tmp");
@@ -162,15 +190,12 @@ public class AuxController {
 			            
 			            Part filePart = request.raw().getPart("file");
 			           
-			            String fileName = filePart.getSubmittedFileName();
+			            fileName = filePart.getSubmittedFileName();
 			            InputStream fileStream = filePart.getInputStream();
+			           
+			            ObjectId fileId = databaseService.getGridFSBucket().uploadFromStream(fileName, fileStream);
 			            
-			            File uploadFile = new File("/tmp/"+fileName);
-			            
-			            FileUtils.copyInputStreamToFile(fileStream, uploadFile);
-			            IOUtils.closeQuietly(fileStream);
-			            
-			            System.out.println("Successfully File Upload : "+fileName);
+			            databaseService.save(fileId.toString());
 		     		}
 		     		
 		     		catch(Exception e){
@@ -181,6 +206,8 @@ public class AuxController {
 		         		return payload;
 		     		}
 		         	
+		     		System.out.println("Successfully File Upload : "+fileName);
+		     		
 		     		payload.add("message", new JsonPrimitive("Successfully Uploaded File"));
 		         	payload.add("success", new JsonPrimitive(true));
 		         	

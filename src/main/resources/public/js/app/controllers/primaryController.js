@@ -1,9 +1,9 @@
 app.controller('primaryController', ['$scope', 'primaryFactory' ,function($scope, primaryFactory) {
 	
 	$scope.messages = [];
-	$scope.inputData = null;
-	$scope.result = null;
-	$scope.uploadFile = null;
+	$scope.inputData = undefined;
+	$scope.result = undefined;
+	$scope.uploadFile = undefined;
 	$scope.loading = false;
 	
 	$scope.search = function postData(data) { 		
@@ -53,7 +53,8 @@ app.controller('primaryController', ['$scope', 'primaryFactory' ,function($scope
     				
 		    		message : value.message,
     				time : value.time,
-    				id : value.id
+    				id : value.id,
+    				name : value.name
 				});
 		    });
 		});
@@ -71,7 +72,6 @@ app.controller('primaryController', ['$scope', 'primaryFactory' ,function($scope
 	$scope.remove = function remove(data){
 		
 		primaryFactory.remove(data).success(function (data) {
-			
 			$scope.result = data;
 			$scope.refresh();
 		});
