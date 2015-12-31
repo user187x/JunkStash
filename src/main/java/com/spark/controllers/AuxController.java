@@ -195,7 +195,6 @@ public class AuxController {
 			            System.out.println("Upload FileType : "+fileType);
 			            
 			            InputStream fileStream = filePart.getInputStream();
-			           
 			            ObjectId fileId = databaseService.getGridFSBucket().uploadFromStream(fileName, fileStream);
 			            
 			            databaseService.setFileType(fileId.toString(), fileType);
