@@ -29,15 +29,20 @@ app.factory('primaryFactory', ['$http', function($http) {
 
     var login = function(payload){
     	return $http.post('/login', payload);
-    }
+    };
+    
+    var register = function(payload){
+    	return $http.post('/register', payload);
+    };
     
     return {
-    	login  : login,
-    	search : search,
-    	submit : submit,
-    	upload : upload,
-    	remove : remove,
-    	getAll : getAll
+    	login    : login,
+    	register : register,
+    	search   : search,
+    	submit   : submit,
+    	upload   : upload,
+    	remove   : remove,
+    	getAll   : getAll
     };
     
 }]);

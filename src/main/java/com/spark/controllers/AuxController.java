@@ -142,6 +142,52 @@ public class AuxController {
 		          }
 	     });
 		 
+		 Spark.post("/register", new Route() {
+		     	
+		     	@Override
+		         public Object handle(Request request, Response response) {
+		            
+		     		JsonObject payload = new JsonObject();
+		     		
+		         	String data = request.body();
+		         	
+		         	if(data.isEmpty()){
+			         	
+		         		payload.add("message", new JsonPrimitive("Request Was Empty"));
+			         	payload.add("success", new JsonPrimitive(false));
+		         		
+		         		return payload;
+		         	}
+		         	
+		         	System.out.println("Server Recieved Payload : "+data);
+		         	
+		         	JsonParser jsonParser = new JsonParser();
+		         	JsonObject json = jsonParser.parse(data).getAsJsonObject();
+		         	
+		         	System.out.println("Server Creating Account For User "+json.get("user").getAsString());
+		         	
+		         	String userName = json.get("user").getAsString();
+		         	String userPassword = json.get("password").getAsString();
+		         	
+		         	boolean userFound = userService.register(userName, userPassword);
+		         	
+		         	if(userFound){
+		         		
+		         		payload.add("message", new JsonPrimitive("Account Created"));
+			         	payload.add("success", new JsonPrimitive(true));
+		         		
+		         		return payload;
+		         	}
+		         	else{
+			         	
+		         		payload.add("message", new JsonPrimitive("Failure Creating User Account"));
+			         	payload.add("success", new JsonPrimitive(false));
+		         		
+		         		return payload;
+		         	}	
+		          }
+	     });
+		 
 		 Spark.post("/remove", new Route() {
 		     	
 		     	@Override

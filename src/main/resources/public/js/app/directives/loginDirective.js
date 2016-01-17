@@ -1,4 +1,4 @@
-app.directive('modal', ['primaryFactory', function (primaryFactory) {
+app.directive('modal', ['primaryFactory', '$timeout', function (primaryFactory, $timeout) {
 	
 	return {
 	    
@@ -11,8 +11,11 @@ app.directive('modal', ['primaryFactory', function (primaryFactory) {
     
 	        scope.$watch(attrs.visible, function(value){
 	          
-	        	if(value == true)
+	        	if(value == true){
+	        		
+	        		clearForm();
 	        		$(element).modal('show');
+	        	}
 	        	else
 	        		$(element).modal('hide');
 	        });
@@ -38,6 +41,35 @@ app.directive('modal', ['primaryFactory', function (primaryFactory) {
 	    			
 	    			scope.result = data;
 	    			
+	        	});
+	        };
+	        
+	        var autoClose = function(success){
+	            
+	        	if(success===false)
+	        		return;
+	        	
+	        	$timeout(function(){
+	        		$(element).modal('hide');
+	            }, 1000);
+	        };
+	        
+	        var clearForm = function(){
+	        	
+	        	scope.userId = undefined;
+	        	scope.userPassword = undefined;
+	        };
+	        
+	        scope.register = function(userName, userPassword){
+	        	
+	        	scope.result = undefined;
+	        	
+	        	var payload = {user : userName, password : userPassword};
+	        	primaryFactory.register(payload).success(function (data) {
+	    			
+	    			scope.result = data;
+	    			
+	    			autoClose(data.success);
 	        	});
 	        };
 	    }

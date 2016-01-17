@@ -27,4 +27,15 @@ public class UserService {
 		else
 			return false;
 	}
+	
+	public boolean register(String user, String password){
+		
+		Document document = new Document();
+		document.append("user", user);
+		document.append("password", password);
+		
+		databaseService.getUserCollection().insertOne(document);
+		
+		return getUser(user, password);
+	}
 }
