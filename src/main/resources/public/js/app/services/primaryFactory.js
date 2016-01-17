@@ -27,7 +27,12 @@ app.factory('primaryFactory', ['$http', function($http) {
     	return $http.get('/getAll');
     };
 
+    var login = function(payload){
+    	return $http.post('/login', payload);
+    }
+    
     return {
+    	login  : login,
     	search : search,
     	submit : submit,
     	upload : upload,

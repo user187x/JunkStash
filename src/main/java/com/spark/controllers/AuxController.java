@@ -17,6 +17,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.spark.services.DatabaseService;
+import com.spark.services.UserService;
 
 import spark.Request;
 import spark.Response;
@@ -29,6 +30,9 @@ public class AuxController {
 
 	@Autowired
 	private DatabaseService databaseService;
+	
+	@Autowired
+	private UserService userService;
 	
 	public AuxController() {	
 		setUpRoutes();
@@ -92,43 +96,51 @@ public class AuxController {
 				}
 	     });
 		 
-//		 Spark.post("/submit", new Route() {
-//		     	
-//		     	@Override
-//		         public Object handle(Request request, Response response) {
-//		            
-//		     		JsonObject payload = new JsonObject();
-//		     		
-//		         	String data = request.body();
-//		         	
-//		         	if(data.isEmpty()){
-//			         	
-//		         		payload.add("message", new JsonPrimitive("Request Was Empty"));
-//			         	payload.add("success", new JsonPrimitive(false));
-//		         		
-//		         		return payload;
-//		         	}
-//		         	
-//		         	System.out.println("Server Recieved Payload : "+data);
-//		         	
-//		         	boolean saved = databaseService.save(data);
-//		         	
-//		         	if(saved){
-//		         		
-//		         		payload.add("message", new JsonPrimitive("Entry Successfully Saved"));
-//			         	payload.add("success", new JsonPrimitive(true));
-//		         		
-//		         		return payload;
-//		         	}
-//		         	else{
-//			         	
-//		         		payload.add("message", new JsonPrimitive("Entry Already Exists"));
-//			         	payload.add("success", new JsonPrimitive(false));
-//		         		
-//		         		return payload;
-//		         	}	
-//		          }
-//	     });
+		 Spark.post("/login", new Route() {
+		     	
+		     	@Override
+		         public Object handle(Request request, Response response) {
+		            
+		     		JsonObject payload = new JsonObject();
+		     		
+		         	String data = request.body();
+		         	
+		         	if(data.isEmpty()){
+			         	
+		         		payload.add("message", new JsonPrimitive("Request Was Empty"));
+			         	payload.add("success", new JsonPrimitive(false));
+		         		
+		         		return payload;
+		         	}
+		         	
+		         	System.out.println("Server Recieved Payload : "+data);
+		         	
+		         	JsonParser jsonParser = new JsonParser();
+		         	JsonObject json = jsonParser.parse(data).getAsJsonObject();
+		         	
+		         	System.out.println("Server Looking Up User "+json.get("user").getAsString());
+		         	
+		         	String userName = json.get("user").getAsString();
+		         	String userPassword = json.get("password").getAsString();
+		         	
+		         	boolean userFound = userService.getUser(userName, userPassword);
+		         	
+		         	if(userFound){
+		         		
+		         		payload.add("message", new JsonPrimitive("User Found"));
+			         	payload.add("success", new JsonPrimitive(true));
+		         		
+		         		return payload;
+		         	}
+		         	else{
+			         	
+		         		payload.add("message", new JsonPrimitive("User Not Found"));
+			         	payload.add("success", new JsonPrimitive(false));
+		         		
+		         		return payload;
+		         	}	
+		          }
+	     });
 		 
 		 Spark.post("/remove", new Route() {
 		     	

@@ -5,6 +5,12 @@ app.controller('primaryController', ['$scope', 'primaryFactory' ,function($scope
 	$scope.result = undefined;
 	$scope.uploadFile = undefined;
 	$scope.loading = false;
+    $scope.showModal = false;
+    
+    $scope.toggleModal = function(){
+    	
+        $scope.showModal = !$scope.showModal;
+    };
 	
 	$scope.search = function postData(data) { 		
 		
