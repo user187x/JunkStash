@@ -26,6 +26,10 @@ app.factory('primaryFactory', ['$http', function($http) {
     var getAll = function () {
     	return $http.get('/getAll');
     };
+    
+    var getTotalDiskSpace = function () {
+    	return $http.get('/getTotalDiskSpace');
+    };
 
     var login = function(payload){
     	return $http.post('/login', payload);
@@ -42,7 +46,8 @@ app.factory('primaryFactory', ['$http', function($http) {
     	submit   : submit,
     	upload   : upload,
     	remove   : remove,
-    	getAll   : getAll
+    	getAll   : getAll,
+    	getTotalDiskSpace : getTotalDiskSpace
     };
     
 }]);

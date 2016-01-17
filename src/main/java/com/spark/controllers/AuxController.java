@@ -69,6 +69,35 @@ public class AuxController {
 				}
 	     });
 		 
+		 Spark.get("/getTotalDiskSpace", new Route() {
+				
+				@Override
+				public Object handle(Request request, Response response) throws Exception {
+					
+					JsonObject payload = new JsonObject();
+					
+					System.out.println("User Request at Path : ("+request.pathInfo()+") "+new Date());
+					
+					JsonObject totalSize = databaseService.getTotalDiskSpace();
+					
+					if(totalSize == null || totalSize.isJsonNull()){
+						
+						payload.add("message", new JsonPrimitive("Space Was Empty"));
+			         	payload.add("success", new JsonPrimitive(false));
+		         		
+		         		return payload;
+					}
+					else{
+						
+						payload.add("message", new JsonPrimitive("Total Space Used "+totalSize.get("normalized")));
+			         	payload.add("success", new JsonPrimitive(true));
+			         	payload.add("payload", totalSize);
+			         	
+			         	return payload;
+					}
+				}
+	     });
+		 
 		 Spark.get("/download/:fileId", new Route() {
 				
 				@Override

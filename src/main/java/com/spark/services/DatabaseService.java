@@ -115,6 +115,29 @@ public class DatabaseService {
 		return jsonArray;
 	}
 	
+	public JsonObject getTotalDiskSpace(){
+		
+		MongoCursor<Document> cursor = databaseService.getFileCollection().find().iterator();
+		
+		JsonObject json = new JsonObject();
+		long totalSize = 0;
+		
+		while(cursor.hasNext()){
+			
+			Document result = cursor.next();
+
+			long size = result.getLong("length");
+			totalSize += size;
+		}
+		
+		json.add("size", new JsonPrimitive(totalSize));
+		json.add("normalized", new JsonPrimitive(FileUtils.byteCountToDisplaySize(totalSize)));
+		json.add("maxSpaceNormalized", new JsonPrimitive(FileUtils.byteCountToDisplaySize(52428800L)));
+		json.add("maxSpace", new JsonPrimitive(52428800));
+		
+		return json;
+	}
+	
 	public boolean setFileType(String fileId, String fileType){
 		
 		Document query = new Document();

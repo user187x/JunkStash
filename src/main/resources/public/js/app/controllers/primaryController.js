@@ -8,6 +8,12 @@ app.controller('primaryController', ['$scope', 'primaryFactory', '$rootScope' ,f
     $scope.showModal = false;
     $scope.user = undefined;
     
+    $scope.totalSpace = undefined;
+    $scope.totalSpaceNormalized = undefined;
+    $scope.maxSpaceNormalized = undefined;
+    $scope.maxSpace = undefined;
+    $scope.percentUsed = undefined;
+    
     $scope.toggleModal = function(){
     	
         $scope.showModal = !$scope.showModal;
@@ -73,8 +79,23 @@ app.controller('primaryController', ['$scope', 'primaryFactory', '$rootScope' ,f
 		});
 	};
 	
+	$scope.getTotalDiskSpace = function postData(data) { 		
+		
+		primaryFactory.getTotalDiskSpace().success(function (data) {
+			
+			$scope.totalSpace = data.payload.size;
+			$scope.totalSpaceNormalized = data.payload.normalized;
+			$scope.maxSpace = data.payload.maxSpace;
+			$scope.maxSpaceNormalized = data.payload.maxSpaceNormalized;
+			$scope.percentUsed = ($scope.totalSpace/$scope.maxSpace)*100;
+			
+		});
+	};
+	
+	
 	$scope.refresh = function(){
 		$scope.getAll();
+		$scope.getTotalDiskSpace();
 	};
 	
 	$scope.clear = function(){
