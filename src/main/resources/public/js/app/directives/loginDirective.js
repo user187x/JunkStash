@@ -1,4 +1,4 @@
-app.directive('modal', ['primaryFactory', '$timeout', function (primaryFactory, $timeout) {
+app.directive('modal', ['primaryFactory', '$timeout', '$rootScope', function (primaryFactory, $timeout, $rootScope) {
 	
 	return {
 	    
@@ -12,12 +12,12 @@ app.directive('modal', ['primaryFactory', '$timeout', function (primaryFactory, 
 	        scope.$watch(attrs.visible, function(value){
 	          
 	        	if(value == true){
-	        		
 	        		clearForm();
 	        		$(element).modal('show');
 	        	}
-	        	else
+	        	else{
 	        		$(element).modal('hide');
+	        	}
 	        });
 	
 	        $(element).on('shown.bs.modal', function(){
@@ -32,15 +32,19 @@ app.directive('modal', ['primaryFactory', '$timeout', function (primaryFactory, 
 		        });
 	        });
 	        
-	        scope.submit = function(userName, userPassword){
+	        scope.submit = function(user, password){
 	        	
-	        	scope.result = undefined;
+	        	clearForm();
 	        	
-	        	var payload = {user : userName, password : userPassword};
+	        	scope.userId = user;
+	        	scope.userPassword = password;
+	        	
+	        	var payload = {user : scope.userId, password : scope.userPassword};
 	        	primaryFactory.login(payload).success(function (data) {
 	    			
 	    			scope.result = data;
-	    			
+	    			autoClose(data.success);
+	    			acknowledge(data.success);
 	        	});
 	        };
 	        
@@ -51,25 +55,39 @@ app.directive('modal', ['primaryFactory', '$timeout', function (primaryFactory, 
 	        	
 	        	$timeout(function(){
 	        		$(element).modal('hide');
-	            }, 1000);
+	            }, 500);
+	        };
+	        
+	        var acknowledge = function(success){
+
+	        	if(success===false)
+	        		return;
+	        	
+	        	$rootScope.$broadcast('user-login', {
+	        		user : scope.userId
+	        	});
 	        };
 	        
 	        var clearForm = function(){
-	        	
 	        	scope.userId = undefined;
 	        	scope.userPassword = undefined;
 	        };
-	        
-	        scope.register = function(userName, userPassword){
+	    
+	        scope.register = function(user, password){
 	        	
-	        	scope.result = undefined;
+	        	clearForm();
 	        	
-	        	var payload = {user : userName, password : userPassword};
+	        	scope.userId = user;
+	        	scope.userPassword = password;
+	        	
+	        	var payload = {user : scope.userId, password : scope.userPassword};
 	        	primaryFactory.register(payload).success(function (data) {
 	    			
 	    			scope.result = data;
 	    			
+	    			
 	    			autoClose(data.success);
+	    			acknowledge(data.success);
 	        	});
 	        };
 	    }

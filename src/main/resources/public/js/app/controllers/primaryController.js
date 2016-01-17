@@ -1,4 +1,4 @@
-app.controller('primaryController', ['$scope', 'primaryFactory' ,function($scope, primaryFactory) {
+app.controller('primaryController', ['$scope', 'primaryFactory', '$rootScope' ,function($scope, primaryFactory, $rootScope) {
 	
 	$scope.messages = [];
 	$scope.inputData = undefined;
@@ -6,6 +6,7 @@ app.controller('primaryController', ['$scope', 'primaryFactory' ,function($scope
 	$scope.uploadFile = undefined;
 	$scope.loading = false;
     $scope.showModal = false;
+    $scope.user = undefined;
     
     $scope.toggleModal = function(){
     	
@@ -88,5 +89,9 @@ app.controller('primaryController', ['$scope', 'primaryFactory' ,function($scope
 			$scope.refresh();
 		});
 	};
+	
+	$rootScope.$on('user-login', function (event, args) {
+		$scope.user = args.user;
+	});
 	
 }]);

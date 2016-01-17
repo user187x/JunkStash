@@ -11,10 +11,20 @@
 		    	</div>
 		    	<ul class="nav navbar-nav navbar-right">
 		      		<li>
-		      			<a data-ng-click="toggleModal()">
+		      			<a data-ng-show="!user" data-ng-click="toggleModal()">
 		      				<span class="glyphicon glyphicon-log-in"></span> Login
 		      			</a>
 	      			</li>
+	      			<li data-ng-show="user" class="dropdown">
+				        <a class="dropdown-toggle" data-toggle="dropdown">
+				        <span class="glyphicon glyphicon-user" style="padding-right:10px"></span> {{user}}
+				        <span class="caret"></span></a>
+				        <ul class="dropdown-menu">
+				        	<li>
+				          		<a ><span class="glyphicon glyphicon-log-out"></span> Logout</a>
+				        	</li>
+				        </ul>
+				   </li>
 		   	 	</ul>
 		  	</div>
 		</nav>
