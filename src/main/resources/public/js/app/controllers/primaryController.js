@@ -96,6 +96,8 @@ app.controller('primaryController', ['$scope', 'primaryFactory', '$timeout','$ro
 			$rootScope.$broadcast('user-logout', function (event, args) {});
 			
 			$scope.refresh();
+			autoCloseAlert();
+			
 		});
 	};
 	
@@ -135,7 +137,7 @@ app.controller('primaryController', ['$scope', 'primaryFactory', '$timeout','$ro
 	var autoCloseAlert = function(){
         
     	$timeout(function(){
-    		$scope.result.success = undefined;
+    		$scope.result = undefined;
     	}, 1000);
     };
 	

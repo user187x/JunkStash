@@ -1,5 +1,7 @@
 package com.spark.services;
 
+import java.util.Date;
+
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,6 +41,19 @@ public class UserService {
 			return results.iterator().next().getString("user");
 		else
 			return null;
+	}
+	
+	public boolean createUser(String userId, String password){
+		
+		Document document = new Document();
+		document.append("user", userId);
+		document.append("password", password);
+		document.append("created", new Date());
+		
+		databaseService.getUserCollection().insertOne(document);
+		addUserIdentifier(userId, password);
+		
+		return userExists(userId, password);
 	}
 	
 	public String getUserKey(String user, String password){

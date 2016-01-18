@@ -48,12 +48,14 @@ app.directive('modal', ['primaryFactory', '$timeout', '$rootScope', function (pr
 	    			
 	    			scope.result = data;
 	    			
-	    			autoClose(data.success);
+	    			autoCloseModal(data.success);
+	    			autoCloseAlert();
+	    			
 	    			acknowledge(data.success, scope.user, data.userKey);
 	        	});
 	        };
 	        
-	        var autoClose = function(success){
+	        var autoCloseModal = function(success){
 	            
 	        	if(success===false)
 	        		return;
@@ -61,8 +63,15 @@ app.directive('modal', ['primaryFactory', '$timeout', '$rootScope', function (pr
 	        	$timeout(function(){
 	        		
 	        		$(element).modal('hide');
-	        		
 	            }, 500);
+	        };
+	        
+	        var autoCloseAlert = function(){
+	            
+	        	$timeout(function(){
+	        		
+	        		scope.result = undefined;
+	            }, 1000);
 	        };
 	        
 	        var acknowledge = function(success, user, userKey){
@@ -89,25 +98,19 @@ app.directive('modal', ['primaryFactory', '$timeout', '$rootScope', function (pr
 	    		clearForm();
 	    	});
 	    
-	        scope.register = function(user, password){
-	        	
-	        	clearForm();
-	        	
-	        	scope.user = user;
-	        	scope.password = password;
+	        scope.register = function(){
 	        	
 	        	var payload = {
-	        		user : scope.user, 
-	        		password : scope.password
-        		};
+        			user : scope.user, 
+        			password : scope.password
+	        	};
 	        	
 	        	primaryFactory.register(payload).success(function (data) {
 	    			
 	    			scope.result = data;
 	    			
-	    			autoClose(data.success);
+	    			autoCloseModal(data.success);
 	    			acknowledge(data.success, scope.user, data.userKey);
-	    			
 	        	});
 	        };
 	    }

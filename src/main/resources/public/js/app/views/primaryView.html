@@ -43,6 +43,12 @@
   			<strong>{{result.message}}</strong>
 		</div>
 		
+		<div data-ng-show="!userKey" style="background-color:DarkGray !important" class="jumbotron">
+			<div class="text-center" data-ng-show="!userKey">
+				<img style="opacity: 0.4" title="JunkStash" src="/images/JunkStash.png"/>
+			</div>
+		</div>
+		
 		<div data-ng-show="userKey" class="input-group" style="padding-bottom: 20px">	
 			<input 
 				type="text" 
@@ -114,6 +120,11 @@
     				<i class="fa fa-cog fa-spin fa-4x"></i>
    				</div>
    			</div>
+		</div>
+		
+		<div style="text-align:right">
+			<h6>JunkStash© 2016</h6>
+			<h6>Version 1.0</h6>
 		</div>
 		
 	</div>

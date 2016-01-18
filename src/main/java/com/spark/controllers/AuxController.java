@@ -229,51 +229,61 @@ public class AuxController {
 		 
 		 Spark.post("/register", new Route() {
 		     	
-		     	@Override
-		         public Object handle(Request request, Response response) {
-		            
-		     		JsonObject payload = new JsonObject();
-		     		
-		         	String data = request.body();
+	     	 @Override
+	         public Object handle(Request request, Response response) {
+	            
+	     		JsonObject payload = new JsonObject();
+	     		
+	         	String data = request.body();
+	         	
+	         	if(data.isEmpty()){
 		         	
-		         	if(data.isEmpty()){
-			         	
-		         		payload.add("message", new JsonPrimitive("Request Was Empty"));
-			         	payload.add("success", new JsonPrimitive(false));
-		         		
-		         		return payload;
-		         	}
+	         		payload.add("message", new JsonPrimitive("Request Was Empty"));
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
+	         	}
+	         	
+	         	System.out.println("Server Recieved Payload : "+data);
+	         	
+	         	JsonParser jsonParser = new JsonParser();
+	         	JsonObject json = jsonParser.parse(data).getAsJsonObject();
+	         	
+	         	System.out.println("Server Creating Account For User "+json.get("user").getAsString());
+	         	
+	         	String user = json.get("user").getAsString();
+	         	String password = json.get("password").getAsString();
+	         	
+	         	boolean userFound = userService.userExists(user, password);
+	         	
+	         	if(userFound){
+	         		
+	         		payload.add("message", new JsonPrimitive("Failure Creating User Account : User Already Exists"));
+	         		payload.add("userKey", new JsonObject());
+		         	payload.add("success", new JsonPrimitive(false));
+	         			         		
+	         		return payload;
+	         	}
+	         	
+	         	if(userService.createUser(user, password)){
+
+	         		String userKey = userService.getUserKey(user, password);
+	         		
+	         		payload.add("message", new JsonPrimitive("Account Created"));
+	         		payload.add("userKey", new JsonPrimitive(userKey));
+		         	payload.add("success", new JsonPrimitive(true));
+	         		
+	         		return payload;
+	         	}
+	         	else{
+	         		
+	         		payload.add("message", new JsonPrimitive("Failure Creating User Account"));
+	         		payload.add("userKey", new JsonObject());
+		         	payload.add("success", new JsonPrimitive(false));
 		         	
-		         	System.out.println("Server Recieved Payload : "+data);
-		         	
-		         	JsonParser jsonParser = new JsonParser();
-		         	JsonObject json = jsonParser.parse(data).getAsJsonObject();
-		         	
-		         	System.out.println("Server Creating Account For User "+json.get("user").getAsString());
-		         	
-		         	String userName = json.get("user").getAsString();
-		         	String userPassword = json.get("password").getAsString();
-		         	
-		         	String userKey = userService.getUserKey(userName, userPassword);
-		         	boolean userFound = StringUtils.isEmpty(userKey);
-		         	
-		         	if(userFound){
-		         		
-		         		payload.add("message", new JsonPrimitive("Account Created"));
-		         		payload.add("userKey", new JsonPrimitive(userKey));
-			         	payload.add("success", new JsonPrimitive(true));
-		         		
-		         		return payload;
-		         	}
-		         	else{
-			         	
-		         		payload.add("message", new JsonPrimitive("Failure Creating User Account"));
-		         		payload.add("userKey", new JsonObject());
-			         	payload.add("success", new JsonPrimitive(false));
-		         		
-		         		return payload;
-		         	}	
-		          }
+		         	return payload;
+	         	}
+	          }
 	     });
 		 
 		 Spark.post("/remove/:userKey", new Route() {
