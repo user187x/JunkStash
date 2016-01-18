@@ -35,8 +35,8 @@ app.factory('primaryFactory', ['$http', function($http) {
     	return $http.post('/login', payload);
     };
     
-    var logOut = function (payload) {
-    	return $http.post('/logOut', payload);
+    var logout = function (payload) {
+    	return $http.post('/logout', payload);
     };
     
     var register = function(payload){
@@ -45,7 +45,7 @@ app.factory('primaryFactory', ['$http', function($http) {
     
     return {
     	login    : login,
-    	logOut   : logOut,
+    	logout   : logout,
     	register : register,
     	search   : search,
     	submit   : submit,

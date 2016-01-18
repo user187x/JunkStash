@@ -104,7 +104,7 @@ app.controller('primaryController', ['$scope', 'primaryFactory', '$rootScope' ,f
 			userKey : $scope.userKey
 		}
 		
-		primaryFactory.logOut(payload).success(function (data) {
+		primaryFactory.logout(payload).success(function (data) {
 			
 			$scope.result = data;
 			

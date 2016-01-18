@@ -12,6 +12,7 @@ app.directive('modal', ['primaryFactory', '$timeout', '$rootScope', function (pr
 	    	scope.user = undefined;
 	    	scope.password = undefined;
 	    	scope.userKey = undefined;
+	    	scope.result = undefined;
 	    	
 	        scope.$watch(attrs.visible, function(value){
 	          
@@ -78,8 +79,10 @@ app.directive('modal', ['primaryFactory', '$timeout', '$rootScope', function (pr
 	        
 	        var clearForm = function(){
 	        	
-	        	scope.user = undefined;
-	        	scope.password = undefined;
+		    	scope.user = undefined;
+		    	scope.password = undefined;
+		    	scope.userKey = undefined;
+		    	scope.result = undefined;
 	        };
 	        
 	    	$rootScope.$on('user-logout', function (event, args) {
