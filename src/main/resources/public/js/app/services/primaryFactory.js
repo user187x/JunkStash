@@ -35,12 +35,17 @@ app.factory('primaryFactory', ['$http', function($http) {
     	return $http.post('/login', payload);
     };
     
+    var logOut = function (payload) {
+    	return $http.post('/logOut', payload);
+    };
+    
     var register = function(payload){
     	return $http.post('/register', payload);
     };
     
     return {
     	login    : login,
+    	logOut   : logOut,
     	register : register,
     	search   : search,
     	submit   : submit,

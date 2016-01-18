@@ -9,42 +9,46 @@ app.directive('modal', ['primaryFactory', '$timeout', '$rootScope', function (pr
 	    templateUrl: '/js/app/views/login.html',	   
 	    link: function postLink(scope, element, attrs) {
     
+	    	scope.user = undefined;
+	    	scope.password = undefined;
+	    	scope.userKey = undefined;
+	    	
 	        scope.$watch(attrs.visible, function(value){
 	          
-	        	if(value == true){
-	        		clearForm();
+	        	if(value == true)
 	        		$(element).modal('show');
-	        	}
-	        	else{
+	        	else
 	        		$(element).modal('hide');
-	        	}
 	        });
 	
 	        $(element).on('shown.bs.modal', function(){
+	        	
 	        	scope.$apply(function(){
+	        		clearForm();
 	        		scope.$parent[attrs.visible] = true;
 		        });
 	        });
 	
 	        $(element).on('hidden.bs.modal', function(){
+	        	
 	        	scope.$apply(function(){
 	        		scope.$parent[attrs.visible] = false;
 		        });
 	        });
 	        
-	        scope.submit = function(user, password){
+	        scope.submit = function(){
 	        	
-	        	clearForm();
+	        	var payload = {
+        			user : scope.user, 
+        			password : scope.password
+	        	};
 	        	
-	        	scope.userId = user;
-	        	scope.userPassword = password;
-	        	
-	        	var payload = {user : scope.userId, password : scope.userPassword};
 	        	primaryFactory.login(payload).success(function (data) {
 	    			
 	    			scope.result = data;
+	    			
 	    			autoClose(data.success);
-	    			acknowledge(data.success);
+	    			acknowledge(data.success, scope.user, data.userKey);
 	        	});
 	        };
 	        
@@ -54,40 +58,53 @@ app.directive('modal', ['primaryFactory', '$timeout', '$rootScope', function (pr
 	        		return;
 	        	
 	        	$timeout(function(){
+	        		
 	        		$(element).modal('hide');
+	        		
 	            }, 500);
 	        };
 	        
-	        var acknowledge = function(success){
+	        var acknowledge = function(success, user, userKey){
 
 	        	if(success===false)
 	        		return;
 	        	
 	        	$rootScope.$broadcast('user-login', {
-	        		user : scope.userId
+	        		
+	        		user : scope.user,
+	        		userKey : userKey
 	        	});
 	        };
 	        
 	        var clearForm = function(){
-	        	scope.userId = undefined;
-	        	scope.userPassword = undefined;
+	        	
+	        	scope.user = undefined;
+	        	scope.password = undefined;
 	        };
+	        
+	    	$rootScope.$on('user-logout', function (event, args) {
+	    		clearForm();
+	    	});
 	    
 	        scope.register = function(user, password){
 	        	
 	        	clearForm();
 	        	
-	        	scope.userId = user;
-	        	scope.userPassword = password;
+	        	scope.user = user;
+	        	scope.password = password;
 	        	
-	        	var payload = {user : scope.userId, password : scope.userPassword};
+	        	var payload = {
+	        		user : scope.user, 
+	        		password : scope.password
+        		};
+	        	
 	        	primaryFactory.register(payload).success(function (data) {
 	    			
 	    			scope.result = data;
 	    			
-	    			
 	    			autoClose(data.success);
-	    			acknowledge(data.success);
+	    			acknowledge(data.success, scope.user, data.userKey);
+	    			
 	        	});
 	        };
 	    }

@@ -20,7 +20,7 @@
 				        <span class="glyphicon glyphicon-user" style="padding-right:10px"></span> {{user}}
 				        <span class="caret"></span></a>
 				        <ul class="dropdown-menu">
-				        	<li>
+				        	<li data-ng-click="logout()">
 				          		<a ><span class="glyphicon glyphicon-log-out"></span> Logout</a>
 				        	</li>
 				        </ul>
@@ -43,7 +43,7 @@
   			<strong>{{result.message}}</strong>
 		</div>
 		
-		<div class="input-group" style="padding-bottom: 20px">	
+		<div data-ng-show="userKey" class="input-group" style="padding-bottom: 20px">	
 			<input 
 				type="text" 
 				class="form-control" 
@@ -55,20 +55,24 @@
 			</span>
 		</div>
 		
-		{{totalSpaceNormalized}} Used
-		Max Space {{maxSpaceNormalized}}
+		 <div data-ng-show="userKey" class="row">
+		  <div class="col-sm-2"><i class="fa fa-database" style="padding-right:10px"></i>Used {{totalSpaceNormalized}}</div>
+		  <div class="col-sm-8"></div>
+		  <div class="col-sm-2" style="text-align:right">Total {{maxSpaceNormalized}}</div>
+		</div>
 		
-		 <div class="progress">
+		 <div data-ng-show="userKey" class="progress">
   			<div class="progress-bar progress-bar-striped active" 
   					role="progressbar"
   					aria-valuenow="0" 
   					aria-valuemin="0" 
   					aria-valuemax="{{maxSpace}}" 
   					style='width:{{percentUsed}}%'>
+  					{{percentUsed | number:0}}%
   			</div>
 		</div>
 		
-		<table class="table table-striped table-hover" style="border: 2px solid #ccc">
+		<table data-ng-show="userKey" class="table table-striped table-hover" style="border: 2px solid #ccc">
 	    	<thead>
 		        <tr>
 		    		<th>Download</th>
@@ -97,7 +101,7 @@
 			</tbody>
 		</table>
 		
-		<div style="margin-bottom:10px; text-align:center;">
+		<div data-ng-show="userKey" style="margin-bottom:10px; text-align:center;">
 			<div data-ng-show="!loading">
    				<span class="btn btn-default btn-file">
     				Browse <input type="file" data-file-model="uploadFile">

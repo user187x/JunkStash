@@ -7,6 +7,7 @@ app.controller('primaryController', ['$scope', 'primaryFactory', '$rootScope' ,f
 	$scope.loading = false;
     $scope.showModal = false;
     $scope.user = undefined;
+    $scope.userKey = undefined;
     
     $scope.totalSpace = undefined;
     $scope.totalSpaceNormalized = undefined;
@@ -93,7 +94,35 @@ app.controller('primaryController', ['$scope', 'primaryFactory', '$rootScope' ,f
 	};
 	
 	
+	$scope.logout = function(){
+		
+		if($scope.userKey===undefined)
+			return;
+		
+		var payload = {
+			user : $scope.user,
+			userKey : $scope.userKey
+		}
+		
+		primaryFactory.logOut(payload).success(function (data) {
+			
+			$scope.result = data;
+			
+			$scope.user = undefined;
+			$scope.userKey = undefined;
+			$scope.messages = undefined;
+			
+			$rootScope.$broadcast('user-logout', function (event, args) {});
+			
+			$scope.refresh();
+		});
+	};
+	
 	$scope.refresh = function(){
+		
+		if($scope.userKey===undefined)
+			return;
+		
 		$scope.getAll();
 		$scope.getTotalDiskSpace();
 	};
@@ -112,7 +141,11 @@ app.controller('primaryController', ['$scope', 'primaryFactory', '$rootScope' ,f
 	};
 	
 	$rootScope.$on('user-login', function (event, args) {
+		
 		$scope.user = args.user;
+		$scope.userKey = args.userKey;
+		
+		$scope.refresh();
 	});
 	
 }]);

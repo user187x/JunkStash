@@ -6,6 +6,7 @@ import java.util.Date;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.Part;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,8 @@ public class AuxController {
 	
 		 Spark.get("/getAll", new Route() {
 	
+			//TODO Need to get UserKey
+			 
 				@Override
 				public Object handle(Request request, Response response) throws Exception {
 					
@@ -70,7 +73,9 @@ public class AuxController {
 	     });
 		 
 		 Spark.get("/getTotalDiskSpace", new Route() {
-				
+			
+			//TODO Need to get UserKey
+			 
 				@Override
 				public Object handle(Request request, Response response) throws Exception {
 					
@@ -100,6 +105,8 @@ public class AuxController {
 		 
 		 Spark.get("/download/:fileId", new Route() {
 				
+			//TODO Need to get UserKey
+			 
 				@Override
 				public Object handle(Request request, Response response) throws Exception {
 					
@@ -152,11 +159,13 @@ public class AuxController {
 		         	String userName = json.get("user").getAsString();
 		         	String userPassword = json.get("password").getAsString();
 		         	
-		         	boolean userFound = userService.getUser(userName, userPassword);
+		         	String userKey = userService.getUserKey(userName, userPassword);
+		         	boolean userFound = StringUtils.isNotEmpty(userKey);
 		         	
 		         	if(userFound){
 		         		
 		         		payload.add("message", new JsonPrimitive("User Found"));
+		         		payload.add("userKey", new JsonPrimitive(userKey));
 			         	payload.add("success", new JsonPrimitive(true));
 		         		
 		         		return payload;
@@ -164,6 +173,53 @@ public class AuxController {
 		         	else{
 			         	
 		         		payload.add("message", new JsonPrimitive("User Not Found"));
+		         		payload.add("userKey", new JsonObject());
+			         	payload.add("success", new JsonPrimitive(false));
+		         		
+		         		return payload;
+		         	}	
+		          }
+	     });
+		 
+		 Spark.post("/logOut", new Route() {
+		     	
+		     	@Override
+		         public Object handle(Request request, Response response) {
+		            
+		     		JsonObject payload = new JsonObject();
+		     		
+		         	String data = request.body();
+		         	
+		         	if(data.isEmpty()){
+			         	
+		         		payload.add("message", new JsonPrimitive("Request Was Empty"));
+			         	payload.add("success", new JsonPrimitive(false));
+		         		
+		         		return payload;
+		         	}
+		         	
+		         	System.out.println("Server Recieved Payload : "+data);
+		         	
+		         	JsonParser jsonParser = new JsonParser();
+		         	JsonObject json = jsonParser.parse(data).getAsJsonObject();
+		         	
+		         	System.out.println("Server Looking Up User "+json.get("user").getAsString());
+		         	
+		         	String user = json.get("user").getAsString();
+		         	String userKey = json.get("userKey").getAsString();
+		        
+		         	boolean keyRemoved = userService.removeUserIdentifier(user, userKey);
+		         	
+		         	if(keyRemoved){
+		         		
+		         		payload.add("message", new JsonPrimitive("User Successfuly Logged Out"));
+			         	payload.add("success", new JsonPrimitive(true));
+		         		
+		         		return payload;
+		         	}
+		         	else{
+			         	
+		         		payload.add("message", new JsonPrimitive("User Failed Loggin Out"));
 			         	payload.add("success", new JsonPrimitive(false));
 		         		
 		         		return payload;
@@ -198,11 +254,13 @@ public class AuxController {
 		         	String userName = json.get("user").getAsString();
 		         	String userPassword = json.get("password").getAsString();
 		         	
-		         	boolean userFound = userService.register(userName, userPassword);
+		         	String userKey = userService.getUserKey(userName, userPassword);
+		         	boolean userFound = StringUtils.isEmpty(userKey);
 		         	
 		         	if(userFound){
 		         		
 		         		payload.add("message", new JsonPrimitive("Account Created"));
+		         		payload.add("userKey", new JsonPrimitive(userKey));
 			         	payload.add("success", new JsonPrimitive(true));
 		         		
 		         		return payload;
@@ -210,6 +268,7 @@ public class AuxController {
 		         	else{
 			         	
 		         		payload.add("message", new JsonPrimitive("Failure Creating User Account"));
+		         		payload.add("userKey", new JsonObject());
 			         	payload.add("success", new JsonPrimitive(false));
 		         		
 		         		return payload;
@@ -240,6 +299,8 @@ public class AuxController {
 		         	System.out.println("Server Attempting To Remove File : "+json.get("name").getAsString());
 		         	
 		         	String fileId = json.get("id").getAsString();
+		         	
+		         	//TODO Need to get UserKey
 		         			
 		         	boolean removed = databaseService.remove(fileId);
 		         	
@@ -262,6 +323,8 @@ public class AuxController {
 		 
 		 Spark.post("/upload", new Route() {
 		     	
+			 	//TODO Need to get UserKey
+			 
 			 	JsonObject payload = new JsonObject();
 			 
 		     	@Override
@@ -307,6 +370,8 @@ public class AuxController {
 	     
 		 Spark.post("/search", new Route() {
 	     	
+			//TODO Need to get UserKey
+			 
 	     	@Override
 	         public Object handle(Request request, Response response) {
 	             

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.mongodb.client.FindIterable;
 import com.spark.config.DatabaseConfig;
+import com.spark.util.UserUtils;
 
 @Service
 public class UserService {
@@ -13,7 +14,7 @@ public class UserService {
 	@Autowired
 	private DatabaseConfig databaseService;
 	
-	public boolean getUser(String user, String password){
+	public boolean userExists(String user, String password){
 		
 		Document query = new Document();
 		query.append("user", user);
@@ -23,19 +24,82 @@ public class UserService {
 		
 		if(results.iterator().hasNext())
 			return true;
-		
 		else
 			return false;
 	}
 	
-	public boolean register(String user, String password){
+	public String getUserKey(String user, String password){
+		
+		if(!userExists(user, password))
+			return null;
+		
+		return addUserIdentifier(user, password);
+	}
+	
+	public String register(String user, String password){
 		
 		Document document = new Document();
 		document.append("user", user);
 		document.append("password", password);
 		
+		String key = UserUtils.createSecureIdentifier();
+		document.append("userKey", key);
+		
 		databaseService.getUserCollection().insertOne(document);
 		
-		return getUser(user, password);
+		if(!userExists(user, password))
+			return null;
+		
+		return key;
+	}
+	
+	private String addUserIdentifier(String user, String password){
+		
+		Document match = new Document();
+		match.append("user", user);
+		match.append("password", password);;
+		
+		String passwordHash = UserUtils.createSecureIdentifier();
+		
+		Document update = new Document();
+		update.append("$set", new Document("userKey", passwordHash));
+		
+		databaseService.getUserCollection().updateOne(match, update);
+		
+		return passwordHash;
+	}
+	
+	private boolean userKeyExists(String user, String userKey){
+		
+		Document query = new Document();
+		query.append("user", user);
+		query.append("userKey", userKey);
+		
+		FindIterable<Document> results = databaseService.getUserCollection().find(query);
+		
+		if(results.iterator().hasNext())
+			return true;
+		else
+			return false;
+	}
+	
+	public boolean removeUserIdentifier(String user, String userKey){
+		
+		if(!userKeyExists(user, userKey))
+			return false;
+		
+		Document match = new Document();
+		match.append("user", user);
+		match.append("userKey", userKey);;
+		
+		Document update = new Document();
+		update.append("$unset", new Document("userKey", 1));
+		
+		databaseService.getUserCollection().updateOne(match, update);
+		
+		if(!userKeyExists(user, userKey))
+			return true;
+		else
+			return false;
 	}
 }
