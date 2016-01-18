@@ -86,7 +86,7 @@
 	    	<tbody>
 				<tr data-ng-repeat="message in messages | filter:inputData">
 					<td style="padding-left:20px">
-						<a href="download/{{message.id}}" download="{{message.name}}">
+						<a href="download/{{message.id}}/{{userKey}}" download="{{message.name}}">
 							<i class="fa fa-arrow-circle-down" style="cursor:pointer"></i>
 						</a>
 					</td>

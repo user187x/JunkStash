@@ -1,4 +1,4 @@
-app.controller('primaryController', ['$scope', 'primaryFactory', '$rootScope' ,function($scope, primaryFactory, $rootScope) {
+app.controller('primaryController', ['$scope', 'primaryFactory', '$timeout','$rootScope' ,function($scope, primaryFactory, $timeout, $rootScope) {
 	
 	$scope.messages = [];
 	$scope.inputData = undefined;
@@ -20,29 +20,11 @@ app.controller('primaryController', ['$scope', 'primaryFactory', '$rootScope' ,f
         $scope.showModal = !$scope.showModal;
     };
 	
-	$scope.search = function postData(data) { 		
-		
-		primaryFactory.search($scope.inputData).success(function (data) {
-			$scope.result = data;
-		});
-	};
-	
-	$scope.submit = function postData(data) { 		
-		
-		primaryFactory.submit($scope.inputData).success(function (data) {
-			
-			$scope.result = data;
-			
-			$scope.clear();
-			$scope.refresh();
-		});
-	};
-	
-	$scope.upload = function postData() { 		
+	$scope.upload = function(data) { 		
 		
 		$scope.loading = true;
 		
-		primaryFactory.upload($scope.uploadFile)
+		primaryFactory.upload($scope.uploadFile, $scope.userKey)
 			.success(function (data) {
 			
 				$scope.result = data;
@@ -59,11 +41,11 @@ app.controller('primaryController', ['$scope', 'primaryFactory', '$rootScope' ,f
 			});
 	};
 	
-	$scope.getAll = function postData(data) { 		
+	$scope.listAllFiles = function(data) { 		
 		
 		$scope.messages = [];
 		
-		primaryFactory.getAll().success(function (data) {
+		primaryFactory.getFiles($scope.userKey).success(function (data) {
 			
 		    angular.forEach(data.payload, function(value, key) {
 		        
@@ -80,9 +62,9 @@ app.controller('primaryController', ['$scope', 'primaryFactory', '$rootScope' ,f
 		});
 	};
 	
-	$scope.getTotalDiskSpace = function postData(data) { 		
+	$scope.getTotalDiskSpace = function(data) { 		
 		
-		primaryFactory.getTotalDiskSpace().success(function (data) {
+		primaryFactory.getTotalDiskSpace($scope.userKey).success(function (data) {
 			
 			$scope.totalSpace = data.payload.size;
 			$scope.totalSpaceNormalized = data.payload.normalized;
@@ -92,7 +74,6 @@ app.controller('primaryController', ['$scope', 'primaryFactory', '$rootScope' ,f
 			
 		});
 	};
-	
 	
 	$scope.logout = function(){
 		
@@ -123,18 +104,21 @@ app.controller('primaryController', ['$scope', 'primaryFactory', '$rootScope' ,f
 		if($scope.userKey===undefined)
 			return;
 		
-		$scope.getAll();
+		$scope.listAllFiles();
 		$scope.getTotalDiskSpace();
+		
+		autoCloseAlert();
 	};
 	
 	$scope.clear = function(){
+		
 		$scope.inputData = undefined;
 		$scope.result = undefined;
 	};
 	
-	$scope.remove = function remove(data){
+	$scope.remove = function(data){
 		
-		primaryFactory.remove(data).success(function (data) {
+		primaryFactory.remove(data, $scope.userKey).success(function (data) {
 			$scope.result = data;
 			$scope.refresh();
 		});
@@ -147,5 +131,12 @@ app.controller('primaryController', ['$scope', 'primaryFactory', '$rootScope' ,f
 		
 		$scope.refresh();
 	});
+	
+	var autoCloseAlert = function(){
+        
+    	$timeout(function(){
+    		$scope.result.success = undefined;
+    	}, 1000);
+    };
 	
 }]);

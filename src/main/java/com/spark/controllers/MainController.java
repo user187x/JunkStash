@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Controller;
 
-import com.spark.services.DatabaseService;
+import com.spark.services.FileService;
 
 import spark.Request;
 import spark.Response;
@@ -18,7 +18,7 @@ import spark.Spark;
 public class MainController {
 	
 	@Autowired
-	private DatabaseService databaseService;
+	private FileService databaseService;
 	
 	public MainController(){
 		setUpRoutes();

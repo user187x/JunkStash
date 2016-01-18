@@ -28,6 +28,19 @@ public class UserService {
 			return false;
 	}
 	
+	public String getUserId (String userKey){
+		
+		Document query = new Document();
+		query.append("userKey", userKey);
+		
+		FindIterable<Document> results = databaseService.getUserCollection().find(query);
+		
+		if(results.iterator().hasNext())
+			return results.iterator().next().getString("user");
+		else
+			return null;
+	}
+	
 	public String getUserKey(String user, String password){
 		
 		if(!userExists(user, password))

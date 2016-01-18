@@ -22,14 +22,17 @@ import com.mongodb.client.result.UpdateResult;
 import com.spark.config.DatabaseConfig;
 
 @Service
-public class DatabaseService {
+public class FileService {
 	
 	@Autowired
 	private DatabaseConfig databaseService;
 	
+	@Autowired
+	private UserService userService;
+	
 	private static String cachedIndex;
 	
-	public DatabaseService() throws Exception{
+	public FileService() throws Exception{
 		cacheResource();
 	}
 		
@@ -61,7 +64,9 @@ public class DatabaseService {
 			return false;
 	}
 	
-	public boolean remove(String fileId){
+	public boolean remove(String fileId, String userId){
+		
+		//TODO Make sure this is owner
 		
 		try{
 			getGridFSBucket().delete(new ObjectId(fileId));
@@ -73,9 +78,12 @@ public class DatabaseService {
 		return true;
 	}
 	
-	public JsonArray getAllDocuments(){
+	public JsonArray getAllFiles(String userId){
 		
-		MongoCursor<Document> cursor = databaseService.getFileCollection().find().iterator();
+		Document match = new Document();
+		match.append("owner", userId);
+		
+		MongoCursor<Document> cursor = databaseService.getFileCollection().find(match).iterator();
 		
 		JsonArray jsonArray = new JsonArray();
 		
@@ -115,9 +123,14 @@ public class DatabaseService {
 		return jsonArray;
 	}
 	
-	public JsonObject getTotalDiskSpace(){
+	public JsonObject getTotalDiskSpace(String userKey){
 		
-		MongoCursor<Document> cursor = databaseService.getFileCollection().find().iterator();
+		String userId = userService.getUserId(userKey);
+		
+		Document match = new Document();
+		match.append("owner", userId);
+		
+		MongoCursor<Document> cursor = databaseService.getFileCollection().find(match).iterator();
 		
 		JsonObject json = new JsonObject();
 		long totalSize = 0;
@@ -145,6 +158,22 @@ public class DatabaseService {
 		
 		Document update = new Document();
 		update.append("$set", new Document("type", fileType));
+		
+		UpdateResult results = databaseService.getFileCollection().updateOne(query, update);
+		
+		if(results.getModifiedCount()>0)
+			return true;
+		else
+			return false;
+	}
+	
+	public boolean setFileOwner(String fileId, String userId){
+		
+		Document query = new Document();
+		query.append("_id", new ObjectId(fileId));
+		
+		Document update = new Document();
+		update.append("$set", new Document("owner", userId));
 		
 		UpdateResult results = databaseService.getFileCollection().updateOne(query, update);
 		

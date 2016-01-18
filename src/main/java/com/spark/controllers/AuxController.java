@@ -17,7 +17,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
-import com.spark.services.DatabaseService;
+import com.spark.services.FileService;
 import com.spark.services.UserService;
 
 import spark.Request;
@@ -30,7 +30,7 @@ import spark.Spark;
 public class AuxController {
 
 	@Autowired
-	private DatabaseService databaseService;
+	private FileService databaseService;
 	
 	@Autowired
 	private UserService userService;
@@ -41,190 +41,190 @@ public class AuxController {
 	
 	private void setUpRoutes(){
 	
-		 Spark.get("/getAll", new Route() {
-	
-			//TODO Need to get UserKey
+		 Spark.get("/getFiles/:userKey", new Route() {
 			 
-				@Override
-				public Object handle(Request request, Response response) throws Exception {
-					
-					JsonObject payload = new JsonObject();
-					
-					System.out.println("User Request at Path : ("+request.pathInfo()+") "+new Date());
-					
-					JsonArray jsonArray = databaseService.getAllDocuments();
-					
-					if(jsonArray.isJsonNull() || !jsonArray.iterator().hasNext()){
-						
-						payload.add("message", new JsonPrimitive("Request Was Empty"));
-			         	payload.add("success", new JsonPrimitive(false));
-		         		
-		         		return payload;
-					}
-					else{
-						
-						payload.add("message", new JsonPrimitive("Successfully Found "+jsonArray.size()));
-			         	payload.add("success", new JsonPrimitive(true));
-			         	payload.add("payload", jsonArray);
-			         	
-			         	return payload;
-					}
-				}
-	     });
-		 
-		 Spark.get("/getTotalDiskSpace", new Route() {
-			
-			//TODO Need to get UserKey
-			 
-				@Override
-				public Object handle(Request request, Response response) throws Exception {
-					
-					JsonObject payload = new JsonObject();
-					
-					System.out.println("User Request at Path : ("+request.pathInfo()+") "+new Date());
-					
-					JsonObject totalSize = databaseService.getTotalDiskSpace();
-					
-					if(totalSize == null || totalSize.isJsonNull()){
-						
-						payload.add("message", new JsonPrimitive("Space Was Empty"));
-			         	payload.add("success", new JsonPrimitive(false));
-		         		
-		         		return payload;
-					}
-					else{
-						
-						payload.add("message", new JsonPrimitive("Total Space Used "+totalSize.get("normalized")));
-			         	payload.add("success", new JsonPrimitive(true));
-			         	payload.add("payload", totalSize);
-			         	
-			         	return payload;
-					}
-				}
-	     });
-		 
-		 Spark.get("/download/:fileId", new Route() {
+			@Override
+			public Object handle(Request request, Response response) throws Exception {
 				
-			//TODO Need to get UserKey
-			 
-				@Override
-				public Object handle(Request request, Response response) throws Exception {
+				JsonObject payload = new JsonObject();
+				
+				System.out.println("User Request at Path : ("+request.pathInfo()+") "+new Date());
+				
+				String userKey = request.params(":userKey");
+				String userId = userService.getUserId(userKey);
+				
+				JsonArray jsonArray = databaseService.getAllFiles(userId);
+				
+				if(jsonArray.isJsonNull() || !jsonArray.iterator().hasNext()){
 					
-					String fileId = request.params(":fileId");
-					
-					if(fileId == null || fileId.isEmpty()){
-						
-						System.out.println("User Request To Download File With ID : "+fileId);
-						
-						JsonObject payload = new JsonObject();
-						payload.add("message", new JsonPrimitive("Request Was Empty"));
-			         	payload.add("success", new JsonPrimitive(false));
-		         		
-		         		return payload;
-					}
-					else{
-						
-						ObjectId objectId = new ObjectId(fileId);
-						databaseService.getGridFSBucket().downloadToStream(objectId, response.raw().getOutputStream());
-			         	
-			         	return response.raw();
-					}
+					payload.add("message", new JsonPrimitive("Request Was Empty"));
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
 				}
+				else{
+					
+					payload.add("message", new JsonPrimitive("Successfully Found "+jsonArray.size()));
+		         	payload.add("success", new JsonPrimitive(true));
+		         	payload.add("payload", jsonArray);
+		         	
+		         	return payload;
+				}
+			}
+	     });
+		 
+		 Spark.get("/getTotalDiskSpace/:userKey", new Route() {
+			
+			@Override
+			public Object handle(Request request, Response response) throws Exception {
+				
+				JsonObject payload = new JsonObject();
+				
+				System.out.println("User Request at Path : ("+request.pathInfo()+") "+new Date());
+				
+				String userKey = request.params(":userKey");
+				
+				JsonObject totalSize = databaseService.getTotalDiskSpace(userKey);
+				
+				if(totalSize == null || totalSize.isJsonNull()){
+					
+					payload.add("message", new JsonPrimitive("Space Was Empty"));
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
+				}
+				else{
+					
+					payload.add("message", new JsonPrimitive("Total Space Used "+totalSize.get("normalized")));
+		         	payload.add("success", new JsonPrimitive(true));
+		         	payload.add("payload", totalSize);
+		         	
+		         	return payload;
+				}
+			}
+	     });
+		 
+		 Spark.get("/download/:fileId/:userKey", new Route() {
+			
+			@Override
+			public Object handle(Request request, Response response) throws Exception {
+				
+				String fileId = request.params(":fileId");
+				String userKey = request.params(":userKey");
+				
+				if(fileId == null || fileId.isEmpty() || userKey == null || userKey.isEmpty()){
+					
+					System.out.println("User Request To Download File With ID : "+fileId);
+					
+					JsonObject payload = new JsonObject();
+					payload.add("message", new JsonPrimitive("Request Was Empty"));
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
+				}
+				else{
+					
+					ObjectId objectId = new ObjectId(fileId);
+					databaseService.getGridFSBucket().downloadToStream(objectId, response.raw().getOutputStream());
+		         	
+		         	return response.raw();
+				}
+			}
 	     });
 		 
 		 Spark.post("/login", new Route() {
 		     	
-		     	@Override
-		         public Object handle(Request request, Response response) {
-		            
-		     		JsonObject payload = new JsonObject();
-		     		
-		         	String data = request.body();
+	     	 @Override
+	         public Object handle(Request request, Response response) {
+	            
+	     		JsonObject payload = new JsonObject();
+	     		
+	         	String data = request.body();
+	         	
+	         	if(data.isEmpty()){
 		         	
-		         	if(data.isEmpty()){
-			         	
-		         		payload.add("message", new JsonPrimitive("Request Was Empty"));
-			         	payload.add("success", new JsonPrimitive(false));
-		         		
-		         		return payload;
-		         	}
+	         		payload.add("message", new JsonPrimitive("Request Was Empty"));
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
+	         	}
+	         	
+	         	System.out.println("Server Recieved Payload : "+data);
+	         	
+	         	JsonParser jsonParser = new JsonParser();
+	         	JsonObject json = jsonParser.parse(data).getAsJsonObject();
+	         	
+	         	System.out.println("Server Looking Up User "+json.get("user").getAsString());
+	         	
+	         	String userName = json.get("user").getAsString();
+	         	String userPassword = json.get("password").getAsString();
+	         	
+	         	String userKey = userService.getUserKey(userName, userPassword);
+	         	boolean userFound = StringUtils.isNotEmpty(userKey);
+	         	
+	         	if(userFound){
+	         		
+	         		payload.add("message", new JsonPrimitive("User Found"));
+	         		payload.add("userKey", new JsonPrimitive(userKey));
+		         	payload.add("success", new JsonPrimitive(true));
+	         		
+	         		return payload;
+	         	}
+	         	else{
 		         	
-		         	System.out.println("Server Recieved Payload : "+data);
-		         	
-		         	JsonParser jsonParser = new JsonParser();
-		         	JsonObject json = jsonParser.parse(data).getAsJsonObject();
-		         	
-		         	System.out.println("Server Looking Up User "+json.get("user").getAsString());
-		         	
-		         	String userName = json.get("user").getAsString();
-		         	String userPassword = json.get("password").getAsString();
-		         	
-		         	String userKey = userService.getUserKey(userName, userPassword);
-		         	boolean userFound = StringUtils.isNotEmpty(userKey);
-		         	
-		         	if(userFound){
-		         		
-		         		payload.add("message", new JsonPrimitive("User Found"));
-		         		payload.add("userKey", new JsonPrimitive(userKey));
-			         	payload.add("success", new JsonPrimitive(true));
-		         		
-		         		return payload;
-		         	}
-		         	else{
-			         	
-		         		payload.add("message", new JsonPrimitive("User Not Found"));
-		         		payload.add("userKey", new JsonObject());
-			         	payload.add("success", new JsonPrimitive(false));
-		         		
-		         		return payload;
-		         	}	
-		          }
+	         		payload.add("message", new JsonPrimitive("User Not Found"));
+	         		payload.add("userKey", new JsonObject());
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
+	         	}	
+	          }
 	     });
 		 
 		 Spark.post("/logout", new Route() {
 		     	
-		     	@Override
-		         public Object handle(Request request, Response response) {
-		            
-		     		JsonObject payload = new JsonObject();
-		     		
-		         	String data = request.body();
+	     	 @Override
+	         public Object handle(Request request, Response response) {
+	            
+	     		JsonObject payload = new JsonObject();
+	     		
+	         	String data = request.body();
+	         	
+	         	if(data.isEmpty()){
 		         	
-		         	if(data.isEmpty()){
-			         	
-		         		payload.add("message", new JsonPrimitive("Request Was Empty"));
-			         	payload.add("success", new JsonPrimitive(false));
-		         		
-		         		return payload;
-		         	}
+	         		payload.add("message", new JsonPrimitive("Request Was Empty"));
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
+	         	}
+	         	
+	         	System.out.println("Server Recieved Payload : "+data);
+	         	
+	         	JsonParser jsonParser = new JsonParser();
+	         	JsonObject json = jsonParser.parse(data).getAsJsonObject();
+	         	
+	         	System.out.println("Server Looking Up User "+json.get("user").getAsString());
+	         	
+	         	String user = json.get("user").getAsString();
+	         	String userKey = json.get("userKey").getAsString();
+	        
+	         	boolean keyRemoved = userService.removeUserIdentifier(user, userKey);
+	         	
+	         	if(keyRemoved){
+	         		
+	         		payload.add("message", new JsonPrimitive("User Successfuly Logged Out"));
+		         	payload.add("success", new JsonPrimitive(true));
+	         		
+	         		return payload;
+	         	}
+	         	else{
 		         	
-		         	System.out.println("Server Recieved Payload : "+data);
-		         	
-		         	JsonParser jsonParser = new JsonParser();
-		         	JsonObject json = jsonParser.parse(data).getAsJsonObject();
-		         	
-		         	System.out.println("Server Looking Up User "+json.get("user").getAsString());
-		         	
-		         	String user = json.get("user").getAsString();
-		         	String userKey = json.get("userKey").getAsString();
-		        
-		         	boolean keyRemoved = userService.removeUserIdentifier(user, userKey);
-		         	
-		         	if(keyRemoved){
-		         		
-		         		payload.add("message", new JsonPrimitive("User Successfuly Logged Out"));
-			         	payload.add("success", new JsonPrimitive(true));
-		         		
-		         		return payload;
-		         	}
-		         	else{
-			         	
-		         		payload.add("message", new JsonPrimitive("User Failed Loggin Out"));
-			         	payload.add("success", new JsonPrimitive(false));
-		         		
-		         		return payload;
-		         	}	
-		          }
+	         		payload.add("message", new JsonPrimitive("User Failed Loggin Out"));
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
+	         	}	
+	          }
 	     });
 		 
 		 Spark.post("/register", new Route() {
@@ -276,12 +276,23 @@ public class AuxController {
 		          }
 	     });
 		 
-		 Spark.post("/remove", new Route() {
+		 Spark.post("/remove/:userKey", new Route() {
 		     	
 		     	@Override
 		         public Object handle(Request request, Response response) {
 		             
 		     		JsonObject payload = new JsonObject();
+		     		
+		     		String userKey = request.params(":userKey");
+		     		String userId = userService.getUserId(userKey);
+		     		
+		     		if(StringUtils.isEmpty(userId)){
+		     			
+		     			payload.add("message", new JsonPrimitive("Failure Remove File : Unable to find owner"));
+			         	payload.add("success", new JsonPrimitive(false));
+		         		
+		         		return payload;
+		     		}
 		     		
 		         	String data = request.body();
 		         	
@@ -299,10 +310,8 @@ public class AuxController {
 		         	System.out.println("Server Attempting To Remove File : "+json.get("name").getAsString());
 		         	
 		         	String fileId = json.get("id").getAsString();
-		         	
-		         	//TODO Need to get UserKey
 		         			
-		         	boolean removed = databaseService.remove(fileId);
+		         	boolean removed = databaseService.remove(fileId, userId);
 		         	
 		         	if(removed){
 		         		
@@ -321,16 +330,23 @@ public class AuxController {
 		          }
 	     });
 		 
-		 Spark.post("/upload", new Route() {
-		     	
-			 	//TODO Need to get UserKey
-			 
+		 Spark.post("/upload/:userKey", new Route() {
+		     
 			 	JsonObject payload = new JsonObject();
 			 
 		     	@Override
 		         public Object handle(Request request, Response response) {
 		            
+		     		String userKey = request.params(":userKey");
 		     		String fileName = null;
+		     		
+		     		if(StringUtils.isEmpty(userService.getUserId(userKey))){
+		     			
+		     			payload.add("message", new JsonPrimitive("Failure Uploading File : Unable to find owner"));
+			         	payload.add("success", new JsonPrimitive(false));
+		         		
+		         		return payload;
+		     		}
 		     		
 		     		try{
 		     			
@@ -348,6 +364,9 @@ public class AuxController {
 			            ObjectId fileId = databaseService.getGridFSBucket().uploadFromStream(fileName, fileStream);
 			            
 			            databaseService.setFileType(fileId.toString(), fileType);
+			            
+			            String userId = userService.getUserId(userKey);
+			            databaseService.setFileOwner(fileId.toString(), userId);
 		     		}
 		     		
 		     		catch(Exception e){

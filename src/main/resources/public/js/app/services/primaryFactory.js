@@ -1,34 +1,26 @@
 app.factory('primaryFactory', ['$http', function($http) {
     
-    var search = function (payload) {
-    	return $http.post('/search', payload);
-    };
-    
-    var submit = function (payload) {
-    	return $http.post('/submit', payload);
-    };
-    
-    var upload = function (payload){
+    var upload = function (payload, userKey){
     	
     	var formData = new FormData();
     	formData.append('file', payload);
     	
-	    return $http.post('/upload', formData, {
+	    return $http.post('/upload/'+userKey, formData, {
 	        headers: {'Content-Type': undefined },
 	        transformRequest: angular.identity
 	    });
     };
     
-    var remove = function (payload) {
-    	return $http.post('/remove', payload);
+    var remove = function (payload, userKey) {
+    	return $http.post('/remove/'+userKey, payload);
     };
     
-    var getAll = function () {
-    	return $http.get('/getAll');
+    var getFiles = function (userKey) {
+    	return $http.get('/getFiles/'+userKey);
     };
     
-    var getTotalDiskSpace = function () {
-    	return $http.get('/getTotalDiskSpace');
+    var getTotalDiskSpace = function (userKey) {
+    	return $http.get('/getTotalDiskSpace/'+userKey);
     };
 
     var login = function(payload){
@@ -44,14 +36,12 @@ app.factory('primaryFactory', ['$http', function($http) {
     };
     
     return {
-    	login    : login,
-    	logout   : logout,
+    	login : login,
+    	logout : logout,
     	register : register,
-    	search   : search,
-    	submit   : submit,
-    	upload   : upload,
-    	remove   : remove,
-    	getAll   : getAll,
+    	upload : upload,
+    	remove : remove,
+    	getFiles : getFiles,
     	getTotalDiskSpace : getTotalDiskSpace
     };
     
