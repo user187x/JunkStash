@@ -11,8 +11,12 @@ app.factory('primaryFactory', ['$http', function($http) {
 	    });
     };
     
-    var remove = function (payload, userKey) {
-    	return $http.post('/remove/'+userKey, payload);
+    var removeFile = function (payload, userKey) {
+    	return $http.post('/removeFile/'+userKey, payload);
+    };
+    
+    var removeUser = function (payload, userKey) {
+    	return $http.post('/removeUser/'+userKey, payload);
     };
     
     var getFiles = function (userKey) {
@@ -48,7 +52,8 @@ app.factory('primaryFactory', ['$http', function($http) {
     	logout : logout,
     	register : register,
     	upload : upload,
-    	remove : remove,
+    	removeFile : removeFile,
+    	removeUser : removeUser,
     	approve : approve,
     	getFiles : getFiles,
     	getUsers : getUsers,

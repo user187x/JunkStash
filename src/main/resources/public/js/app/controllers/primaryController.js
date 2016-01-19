@@ -1,10 +1,12 @@
 app.controller('primaryController', ['$scope', 'primaryFactory', '$timeout','$rootScope' ,function($scope, primaryFactory, $timeout, $rootScope) {
 	
-	$scope.messages = [];
+	$scope.files = [];
 	$scope.users = [];
 	$scope.admin = false;
 	
-	$scope.inputData = undefined;
+	$scope.fileSearch = undefined;
+	$scope.userSearch = undefined;
+	
 	$scope.result = undefined;
 	$scope.uploadFile = undefined;
 	$scope.loading = false;
@@ -46,20 +48,21 @@ app.controller('primaryController', ['$scope', 'primaryFactory', '$timeout','$ro
 	
 	$scope.listAllFiles = function(data) { 		
 		
-		$scope.messages = [];
+		$scope.files = [];
 		
 		primaryFactory.getFiles($scope.userKey).success(function (data) {
 			
 		    angular.forEach(data.payload, function(value, key) {
 		        
-		    	$scope.messages.push({ 
+		    	$scope.files.push({ 
     				
 		    		message : value.message,
     				time : value.time,
     				id : value.id,
     				name : value.name,
     				type : value.type,
-    				size : value.size
+    				size : value.size,
+    				owner : value.owner
 				});
 		    });
 		});
@@ -121,7 +124,7 @@ app.controller('primaryController', ['$scope', 'primaryFactory', '$timeout','$ro
 			
 			$scope.user = undefined;
 			$scope.userKey = undefined;
-			$scope.messages = undefined;
+			$scope.files = undefined;
 			$scope.admin = undefined;
 			
 			$rootScope.$broadcast('user-logout', function (event, args) {});
@@ -146,21 +149,30 @@ app.controller('primaryController', ['$scope', 'primaryFactory', '$timeout','$ro
 	
 	$scope.clear = function(){
 		
-		$scope.inputData = undefined;
+		$scope.fileSearch = undefined;
+		$scope.userSearch = undefined;
 		$scope.result = undefined;
 	};
 	
-	$scope.remove = function(data){
+	$scope.removeFile = function(data){
 		
-		primaryFactory.remove(data, $scope.userKey).success(function (data) {
+		primaryFactory.removeFile(data, $scope.userKey).success(function (data) {
+			$scope.result = data;
+			$scope.refresh();
+		});
+	};
+	
+	$scope.removeUser = function(data){
+		
+		console.log('Here...'+data+' here again '+JSON.stringify(data));
+		
+		primaryFactory.removeUser(data, $scope.userKey).success(function (data) {
 			$scope.result = data;
 			$scope.refresh();
 		});
 	};
 	
 	$scope.approve = function(data){
-		
-		console.log('Here...'+data+' here again '+JSON.stringify(data));
 		
 		primaryFactory.approve(data, $scope.userKey).success(function (data) {
 			$scope.result = data;

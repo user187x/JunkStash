@@ -388,7 +388,7 @@ public class AuxController {
 	          }
 	     });
 		 
-		 Spark.post("/remove/:userKey", new Route() {
+		 Spark.post("/removeFile/:userKey", new Route() {
 		     	
 	     	 @Override
 	         public Object handle(Request request, Response response) {
@@ -435,6 +435,61 @@ public class AuxController {
 	         	else{
 		         	
 	         		payload.add("message", new JsonPrimitive("Entry Failed To Remove"));
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
+	         	}
+	          }
+	     });
+		 
+		 Spark.post("/removeUser/:userKey", new Route() {
+		     	
+	     	 @Override
+	         public Object handle(Request request, Response response) {
+	             
+	     		JsonObject payload = new JsonObject();
+	     		
+	     		String userKey = request.params(":userKey");
+	     		String actionUserId = userService.getUserId(userKey);
+	     		
+	     		if(StringUtils.isEmpty(actionUserId)){
+	     			
+	     			payload.add("message", new JsonPrimitive("Failure Remove User : Unable to find owner"));
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
+	     		}
+	     		
+	         	String targetUser = request.body();
+	         	
+	         	if(targetUser.isEmpty()){
+		         	
+	         		payload.add("message", new JsonPrimitive("Request Was Empty"));
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
+	         	}
+	         	
+	         	if(!userService.isUserAdmin(actionUserId)){
+	         		
+	         		payload.add("message", new JsonPrimitive("Failure Remove User : Admin Priveledge Only"));
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
+	         	}
+	         			
+	         	boolean removed = userService.removeUser(actionUserId, targetUser);
+	         	
+	         	if(removed){
+	         		
+	         		payload.add("message", new JsonPrimitive("User Successfully Removed"));
+		         	payload.add("success", new JsonPrimitive(true));
+	         		
+	         		return payload;
+	         	}
+	         	else{
+		         	
+	         		payload.add("message", new JsonPrimitive("User Failed To Remove"));
 		         	payload.add("success", new JsonPrimitive(false));
 	         		
 	         		return payload;

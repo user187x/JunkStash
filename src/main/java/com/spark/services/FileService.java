@@ -25,6 +25,7 @@ import com.spark.config.DatabaseConfig;
 public class FileService {
 	
 	public static final long FIFTY_MB = 52428800;
+	public static final long MAX_SERER_SIZE = 1073741824;
 	
 	@Autowired
 	private DatabaseConfig databaseService;
@@ -66,26 +67,45 @@ public class FileService {
 			return false;
 	}
 	
-	public boolean remove(String fileId, String userId){
-		
-		//TODO Make sure this is owner
-		
-		try{
-			getGridFSBucket().delete(new ObjectId(fileId));
-		}
-		catch(Exception e){
-			return false;
-		}
-		
-		return true;
-	}
-	
-	public JsonArray getAllFiles(String userId){
+	public boolean isUserOwner(String userId, String fileId){
 		
 		Document match = new Document();
 		match.append("owner", userId);
+		match.append("_id", fileId);
 		
 		MongoCursor<Document> cursor = databaseService.getFileCollection().find(match).iterator();
+		
+		if(cursor.hasNext())
+			return true;
+		else
+			return false;
+	}
+	
+	public boolean remove(String fileId, String userId){
+		
+		if(isUserOwner(userId, fileId) || userService.isUserAdmin(userId)){
+		
+			try{
+				getGridFSBucket().delete(new ObjectId(fileId));
+			}
+			catch(Exception e){
+				return false;
+			}
+			
+			return true;
+		}
+		
+		return false;
+	}
+	
+	public JsonArray getAllFiles(String userId){
+	
+		MongoCursor<Document> cursor = null;
+		
+		if(userService.isUserAdmin(userId))
+			cursor = databaseService.getFileCollection().find().iterator();
+		else
+			cursor = databaseService.getFileCollection().find(new Document("owner", userId)).iterator();
 		
 		JsonArray jsonArray = new JsonArray();
 		
@@ -98,6 +118,7 @@ public class FileService {
 			String id = result.get("_id").toString();
 			String name = result.getString("filename");
 			String time = result.getDate("uploadDate").toString();
+			String owner = result.getString("owner");
 			long size = result.getLong("length");
 			
 			JsonObject json = new JsonObject();
@@ -117,6 +138,9 @@ public class FileService {
 			if(StringUtils.isNotEmpty(name))
 				json.add("name", new JsonPrimitive(name));
 			
+			if(StringUtils.isNotEmpty(owner))
+				json.add("owner", new JsonPrimitive(owner));
+			
 			json.add("size", new JsonPrimitive(FileUtils.byteCountToDisplaySize(size)));
 			
 			jsonArray.add(json);
@@ -129,10 +153,12 @@ public class FileService {
 		
 		String userId = userService.getUserId(userKey);
 		
-		Document match = new Document();
-		match.append("owner", userId);
+		MongoCursor<Document> cursor = null;
 		
-		MongoCursor<Document> cursor = databaseService.getFileCollection().find(match).iterator();
+		if(userService.isUserAdmin(userId))
+			cursor = databaseService.getFileCollection().find().iterator();
+		else
+			cursor = databaseService.getFileCollection().find(new Document("owner", userId)).iterator();
 		
 		JsonObject json = new JsonObject();
 		long totalSize = 0;
@@ -147,8 +173,15 @@ public class FileService {
 		
 		json.add("size", new JsonPrimitive(totalSize));
 		json.add("normalized", new JsonPrimitive(FileUtils.byteCountToDisplaySize(totalSize)));
-		json.add("maxSpaceNormalized", new JsonPrimitive(FileUtils.byteCountToDisplaySize(FIFTY_MB)));
-		json.add("maxSpace", new JsonPrimitive(FIFTY_MB));
+		
+		if(userService.isUserAdmin(userId)){
+			json.add("maxSpaceNormalized", new JsonPrimitive(FileUtils.byteCountToDisplaySize(MAX_SERER_SIZE)));
+			json.add("maxSpace", new JsonPrimitive(MAX_SERER_SIZE));
+		}
+		else{
+			json.add("maxSpaceNormalized", new JsonPrimitive(FileUtils.byteCountToDisplaySize(FIFTY_MB)));
+			json.add("maxSpace", new JsonPrimitive(FIFTY_MB));
+		}
 		
 		return json;
 	}

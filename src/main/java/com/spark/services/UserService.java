@@ -1,5 +1,6 @@
 package com.spark.services;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.mongodb.Block;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCursor;
 import com.spark.config.DatabaseConfig;
@@ -107,6 +109,52 @@ public class UserService {
 			return null;
 		
 		return addUserIdentifier(user, password);
+	}
+	
+	public boolean removeUser(String actionUser, String targetUser){
+		
+		ArrayList<String> fileIds = getUserFileIds(targetUser);
+		
+		if(!fileIds.isEmpty()){
+			for(String fileId : fileIds){
+				if(fileService.remove(fileId, actionUser)==false)
+					return false;
+			}
+		}
+		
+		if(!userExists(targetUser))
+			return false;
+		
+		databaseService.getUserCollection().deleteOne(new Document("user", targetUser));
+		
+		if(userExists(targetUser))
+			return true;
+		else
+			return false;
+	}
+	
+	public ArrayList<String> getUserFileIds(String userId){
+		
+		Document query = new Document();
+		query.append("owner", userId);
+		
+		FindIterable<Document> results = databaseService.getFileCollection().find(query);
+		
+		ArrayList<String> fileIds = new ArrayList<>();
+		
+		results.forEach(new Block<Document>() {
+		    
+			@Override
+		    public void apply(final Document document) {
+		    	
+				String fileId = document.get("_id").toString();
+				
+				fileIds.add(fileId);
+		    }
+		});
+		
+		return fileIds;
+
 	}
 	
 	public boolean isUserAdmin(String user){
