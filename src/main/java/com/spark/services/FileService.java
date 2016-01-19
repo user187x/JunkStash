@@ -153,6 +153,31 @@ public class FileService {
 		return json;
 	}
 	
+	public JsonObject getUserDiskSpace(String userId){
+		
+		Document match = new Document();
+		match.append("owner", userId);
+		
+		MongoCursor<Document> cursor = databaseService.getFileCollection().find(match).iterator();
+		
+		JsonObject json = new JsonObject();
+		long totalSize = 0;
+		
+		while(cursor.hasNext()){
+			
+			Document result = cursor.next();
+
+			long size = result.getLong("length");
+			totalSize += size;
+		}
+		
+		json.add("size", new JsonPrimitive(totalSize));
+		json.add("normalized", new JsonPrimitive(FileUtils.byteCountToDisplaySize(totalSize)));
+		
+		return json;
+	}
+	
+	
 	public boolean setFileType(String fileId, String fileType){
 		
 		Document query = new Document();

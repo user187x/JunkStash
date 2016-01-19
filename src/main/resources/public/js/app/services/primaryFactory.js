@@ -19,6 +19,10 @@ app.factory('primaryFactory', ['$http', function($http) {
     	return $http.get('/getFiles/'+userKey);
     };
     
+    var getUsers = function (userKey) {
+    	return $http.get('/getUsers/'+userKey);
+    };
+    
     var getTotalDiskSpace = function (userKey) {
     	return $http.get('/getTotalDiskSpace/'+userKey);
     };
@@ -31,6 +35,10 @@ app.factory('primaryFactory', ['$http', function($http) {
     	return $http.post('/logout', payload);
     };
     
+    var approve = function(payload, userKey) {
+    	return $http.post('/approve/'+userKey, payload);
+    };
+    
     var register = function(payload){
     	return $http.post('/register', payload);
     };
@@ -41,7 +49,9 @@ app.factory('primaryFactory', ['$http', function($http) {
     	register : register,
     	upload : upload,
     	remove : remove,
+    	approve : approve,
     	getFiles : getFiles,
+    	getUsers : getUsers,
     	getTotalDiskSpace : getTotalDiskSpace
     };
     

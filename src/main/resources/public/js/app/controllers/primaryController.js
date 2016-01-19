@@ -1,6 +1,9 @@
 app.controller('primaryController', ['$scope', 'primaryFactory', '$timeout','$rootScope' ,function($scope, primaryFactory, $timeout, $rootScope) {
 	
 	$scope.messages = [];
+	$scope.users = [];
+	$scope.admin = false;
+	
 	$scope.inputData = undefined;
 	$scope.result = undefined;
 	$scope.uploadFile = undefined;
@@ -62,6 +65,33 @@ app.controller('primaryController', ['$scope', 'primaryFactory', '$timeout','$ro
 		});
 	};
 	
+	$scope.listAllUsers = function(data) { 		
+		
+		$scope.users = [];
+		
+		primaryFactory.getUsers($scope.userKey).success(function (data) {
+			
+		    angular.forEach(data.payload, function(value, key) {
+		        
+		    	$scope.users.push({ 
+    				
+		    		user : value.user,
+    				status : value.status,
+    				added : value.added,
+    				space : value.space
+				});
+		    });
+		});
+	};
+	
+	$scope.approve = function(date){
+		
+		primaryFactory.approve(data, $scope.userKey).success(function (data) {
+			$scope.result = data;
+			$scope.refresh();
+		});
+	};
+	
 	$scope.getTotalDiskSpace = function(data) { 		
 		
 		primaryFactory.getTotalDiskSpace($scope.userKey).success(function (data) {
@@ -92,6 +122,7 @@ app.controller('primaryController', ['$scope', 'primaryFactory', '$timeout','$ro
 			$scope.user = undefined;
 			$scope.userKey = undefined;
 			$scope.messages = undefined;
+			$scope.admin = undefined;
 			
 			$rootScope.$broadcast('user-logout', function (event, args) {});
 			
@@ -107,6 +138,7 @@ app.controller('primaryController', ['$scope', 'primaryFactory', '$timeout','$ro
 			return;
 		
 		$scope.listAllFiles();
+		$scope.listAllUsers();
 		$scope.getTotalDiskSpace();
 		
 		autoCloseAlert();
@@ -126,10 +158,21 @@ app.controller('primaryController', ['$scope', 'primaryFactory', '$timeout','$ro
 		});
 	};
 	
+	$scope.approve = function(data){
+		
+		console.log('Here...'+data+' here again '+JSON.stringify(data));
+		
+		primaryFactory.approve(data, $scope.userKey).success(function (data) {
+			$scope.result = data;
+			$scope.refresh();
+		});
+	};
+	
 	$rootScope.$on('user-login', function (event, args) {
 		
 		$scope.user = args.user;
 		$scope.userKey = args.userKey;
+		$scope.admin = args.admin;
 		
 		$scope.refresh();
 	});

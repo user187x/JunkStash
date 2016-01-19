@@ -40,6 +40,107 @@ public class AuxController {
 	
 	private void setUpRoutes(){
 	
+		 Spark.get("/getUsers/:userKey", new Route() {
+			 
+			@Override
+			public Object handle(Request request, Response response) throws Exception {
+				
+				JsonObject payload = new JsonObject();
+				
+				System.out.println("User Request at Path : ("+request.pathInfo()+") "+new Date());
+				
+				String userKey = request.params(":userKey");
+				String userId = userService.getUserId(userKey);
+				
+				if(userKey == null || userKey.isEmpty()){
+					
+					payload.add("message", new JsonPrimitive("Request Was Empty"));
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
+				}
+				
+				boolean isUserAdmin = userService.isUserAdmin(userId);
+				
+				if(isUserAdmin==false){
+					
+					payload.add("message", new JsonPrimitive("Only admins can access this service"));
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
+				}
+				
+				JsonArray jsonArray = userService.getAllUsers(userId);
+				
+				payload.add("message", new JsonPrimitive("Successfully Retrieved Users : Total "+jsonArray.size()));
+	         	payload.add("success", new JsonPrimitive(true));
+	         	payload.add("payload", jsonArray);
+	         	
+	         	return payload;
+				
+			}
+	     });
+
+		 Spark.post("/approve/:userKey", new Route() {
+		     	
+	     	 @Override
+	         public Object handle(Request request, Response response) {
+	             
+	     		JsonObject payload = new JsonObject();
+	     		
+	     		String userKey = request.params(":userKey");
+	     		String userId = userService.getUserId(userKey);
+	     		
+	     		if(StringUtils.isEmpty(userId)){
+	     			
+	     			payload.add("message", new JsonPrimitive("Failure Remove File : Unable to find owner"));
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
+	     		}
+	     		
+	         	String userToApprove = request.body();
+	         	
+	         	if(userToApprove.isEmpty()){
+		         	
+	         		payload.add("message", new JsonPrimitive("Request Was Empty"));
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
+	         	}
+	         	
+	         	System.out.println("Server Attempting Approve : "+userToApprove);
+	         	
+	         	
+	         	boolean isAdmin = userService.isUserAdmin(userId);
+	         	
+	         	if(isAdmin==false){
+	         		
+	         		payload.add("message", new JsonPrimitive("Only Admins Can Take Action"));
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
+	         	}
+	         	
+	         	boolean userApproved = userService.approveUser(userToApprove);
+	         	
+	         	if(userApproved){
+	         		
+	         		payload.add("message", new JsonPrimitive("User Has Been Successfully Approved"));
+		         	payload.add("success", new JsonPrimitive(true));
+	         		
+	         		return payload;
+	         	}
+	         	else{
+		         	
+	         		payload.add("message", new JsonPrimitive("Failure Approving User"));
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
+	         	}
+	          }
+	     });
+		 
 		 Spark.get("/getFiles/:userKey", new Route() {
 			 
 			@Override
@@ -160,12 +261,14 @@ public class AuxController {
 	         	
 	         	String userKey = userService.getUserKey(userName, userPassword);
 	         	boolean userFound = StringUtils.isNotEmpty(userKey);
+	         	boolean isAdmin = userService.isUserAdmin(userName);
 	         	
 	         	if(userFound){
 	         		
 	         		payload.add("message", new JsonPrimitive("User Found"));
 	         		payload.add("userKey", new JsonPrimitive(userKey));
 		         	payload.add("success", new JsonPrimitive(true));
+		         	payload.add("admin", new JsonPrimitive(isAdmin));
 	         		
 	         		return payload;
 	         	}
@@ -253,7 +356,7 @@ public class AuxController {
 	         	String user = json.get("user").getAsString();
 	         	String password = json.get("password").getAsString();
 	         	
-	         	boolean userFound = userService.userExists(user, password);
+	         	boolean userFound = userService.userExists(user);
 	         	
 	         	if(userFound){
 	         		
@@ -287,56 +390,56 @@ public class AuxController {
 		 
 		 Spark.post("/remove/:userKey", new Route() {
 		     	
-		     	@Override
-		         public Object handle(Request request, Response response) {
-		             
-		     		JsonObject payload = new JsonObject();
-		     		
-		     		String userKey = request.params(":userKey");
-		     		String userId = userService.getUserId(userKey);
-		     		
-		     		if(StringUtils.isEmpty(userId)){
-		     			
-		     			payload.add("message", new JsonPrimitive("Failure Remove File : Unable to find owner"));
-			         	payload.add("success", new JsonPrimitive(false));
-		         		
-		         		return payload;
-		     		}
-		     		
-		         	String data = request.body();
+	     	 @Override
+	         public Object handle(Request request, Response response) {
+	             
+	     		JsonObject payload = new JsonObject();
+	     		
+	     		String userKey = request.params(":userKey");
+	     		String userId = userService.getUserId(userKey);
+	     		
+	     		if(StringUtils.isEmpty(userId)){
+	     			
+	     			payload.add("message", new JsonPrimitive("Failure Remove File : Unable to find owner"));
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
+	     		}
+	     		
+	         	String data = request.body();
+	         	
+	         	if(data.isEmpty()){
 		         	
-		         	if(data.isEmpty()){
-			         	
-		         		payload.add("message", new JsonPrimitive("Request Was Empty"));
-			         	payload.add("success", new JsonPrimitive(false));
-		         		
-		         		return payload;
-		         	}
+	         		payload.add("message", new JsonPrimitive("Request Was Empty"));
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
+	         	}
+	         	
+	         	JsonParser jsonParser = new JsonParser();
+	         	JsonObject json = jsonParser.parse(data).getAsJsonObject();
+	         	
+	         	System.out.println("Server Attempting To Remove File : "+json.get("name").getAsString());
+	         	
+	         	String fileId = json.get("id").getAsString();
+	         			
+	         	boolean removed = fileService.remove(fileId, userId);
+	         	
+	         	if(removed){
+	         		
+	         		payload.add("message", new JsonPrimitive("Entry Successfully Removed"));
+		         	payload.add("success", new JsonPrimitive(true));
+	         		
+	         		return payload;
+	         	}
+	         	else{
 		         	
-		         	JsonParser jsonParser = new JsonParser();
-		         	JsonObject json = jsonParser.parse(data).getAsJsonObject();
-		         	
-		         	System.out.println("Server Attempting To Remove File : "+json.get("name").getAsString());
-		         	
-		         	String fileId = json.get("id").getAsString();
-		         			
-		         	boolean removed = fileService.remove(fileId, userId);
-		         	
-		         	if(removed){
-		         		
-		         		payload.add("message", new JsonPrimitive("Entry Successfully Removed"));
-			         	payload.add("success", new JsonPrimitive(true));
-		         		
-		         		return payload;
-		         	}
-		         	else{
-			         	
-		         		payload.add("message", new JsonPrimitive("Entry Failed To Remove"));
-			         	payload.add("success", new JsonPrimitive(false));
-		         		
-		         		return payload;
-		         	}
-		          }
+	         		payload.add("message", new JsonPrimitive("Entry Failed To Remove"));
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
+	         	}
+	          }
 	     });
 		 
 		 Spark.post("/upload/:userKey", new Route() {
@@ -352,6 +455,16 @@ public class AuxController {
 	     		if(StringUtils.isEmpty(userService.getUserId(userKey))){
 	     			
 	     			payload.add("message", new JsonPrimitive("Failure Uploading File : Unable to find owner"));
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
+	     		}
+	     		
+	     		String userId = userService.getUserId(userKey);
+	     		
+	     		if(!userService.isUserApproved(userId)){
+	     			
+	     			payload.add("message", new JsonPrimitive("Account Approval Is Needed"));
 		         	payload.add("success", new JsonPrimitive(false));
 	         		
 	         		return payload;
@@ -388,8 +501,6 @@ public class AuxController {
 		            ObjectId fileId = fileService.getGridFSBucket().uploadFromStream(fileName, fileStream);
 		            
 		            fileService.setFileType(fileId.toString(), fileType);
-		            
-		            String userId = userService.getUserId(userKey);
 		            fileService.setFileOwner(fileId.toString(), userId);
 	     		}
 	     		

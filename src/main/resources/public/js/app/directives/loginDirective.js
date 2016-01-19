@@ -11,6 +11,7 @@ app.directive('modal', ['primaryFactory', '$timeout', '$rootScope', function (pr
     
 	    	scope.user = undefined;
 	    	scope.password = undefined;
+	    	scope.admin = undefined;
 	    	scope.userKey = undefined;
 	    	scope.result = undefined;
 	    	
@@ -51,7 +52,7 @@ app.directive('modal', ['primaryFactory', '$timeout', '$rootScope', function (pr
 	    			autoCloseModal(data.success);
 	    			autoCloseAlert();
 	    			
-	    			acknowledge(data.success, scope.user, data.userKey);
+	    			acknowledge(data.success, scope.user, data.userKey, data.admin);
 	        	});
 	        };
 	        
@@ -74,7 +75,7 @@ app.directive('modal', ['primaryFactory', '$timeout', '$rootScope', function (pr
 	            }, 1000);
 	        };
 	        
-	        var acknowledge = function(success, user, userKey){
+	        var acknowledge = function(success, user, userKey, admin){
 
 	        	if(success===false)
 	        		return;
@@ -82,7 +83,8 @@ app.directive('modal', ['primaryFactory', '$timeout', '$rootScope', function (pr
 	        	$rootScope.$broadcast('user-login', {
 	        		
 	        		user : scope.user,
-	        		userKey : userKey
+	        		userKey : userKey,
+	        		admin : admin
 	        	});
 	        };
 	        
@@ -110,7 +112,7 @@ app.directive('modal', ['primaryFactory', '$timeout', '$rootScope', function (pr
 	    			scope.result = data;
 	    			
 	    			autoCloseModal(data.success);
-	    			acknowledge(data.success, scope.user, data.userKey);
+	    			acknowledge(data.success, scope.user, data.userKey, false);
 	        	});
 	        };
 	    }
