@@ -68,13 +68,13 @@
 		</div>
 		
 		 <div data-ng-show="userKey" class="progress">
-  			<div class="progress-bar progress-bar-striped active" 
-  					role="progressbar"
-  					aria-valuenow="0" 
-  					aria-valuemin="0" 
-  					aria-valuemax="{{maxSpace}}" 
-  					style='width:{{percentUsed}}%'>
-  					{{percentUsed | number:0}}%
+  			<div 	data-ng-class="{'progress-bar progress-bar-striped active progress-bar-danger' : percentUsed>90, 'progress-bar progress-bar-striped active' : percentUsed<90, 'progress-bar progress-bar-striped active progress-bar-warning' : percentUsed>60 && percentUsed<90}" 
+					role="progressbar"
+					aria-valuenow="0" 
+					aria-valuemin="0" 
+					aria-valuemax="{{maxSpace}}" 
+					style='width:{{percentUsed}}%'>
+					{{percentUsed | number:0}}%
   			</div>
 		</div>
 		

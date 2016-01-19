@@ -7,7 +7,6 @@ import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.Part;
 
 import org.apache.commons.lang3.StringUtils;
-import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
@@ -30,7 +29,7 @@ import spark.Spark;
 public class AuxController {
 
 	@Autowired
-	private FileService databaseService;
+	private FileService fileService;
 	
 	@Autowired
 	private UserService userService;
@@ -53,7 +52,7 @@ public class AuxController {
 				String userKey = request.params(":userKey");
 				String userId = userService.getUserId(userKey);
 				
-				JsonArray jsonArray = databaseService.getAllFiles(userId);
+				JsonArray jsonArray = fileService.getAllFiles(userId);
 				
 				if(jsonArray.isJsonNull() || !jsonArray.iterator().hasNext()){
 					
@@ -84,7 +83,7 @@ public class AuxController {
 				
 				String userKey = request.params(":userKey");
 				
-				JsonObject totalSize = databaseService.getTotalDiskSpace(userKey);
+				JsonObject totalSize = fileService.getTotalDiskSpace(userKey);
 				
 				if(totalSize == null || totalSize.isJsonNull()){
 					
@@ -125,7 +124,7 @@ public class AuxController {
 				else{
 					
 					ObjectId objectId = new ObjectId(fileId);
-					databaseService.getGridFSBucket().downloadToStream(objectId, response.raw().getOutputStream());
+					fileService.getGridFSBucket().downloadToStream(objectId, response.raw().getOutputStream());
 		         	
 		         	return response.raw();
 				}
@@ -321,7 +320,7 @@ public class AuxController {
 		         	
 		         	String fileId = json.get("id").getAsString();
 		         			
-		         	boolean removed = databaseService.remove(fileId, userId);
+		         	boolean removed = fileService.remove(fileId, userId);
 		         	
 		         	if(removed){
 		         		
@@ -342,100 +341,73 @@ public class AuxController {
 		 
 		 Spark.post("/upload/:userKey", new Route() {
 		     
-			 	JsonObject payload = new JsonObject();
-			 
-		     	@Override
-		         public Object handle(Request request, Response response) {
-		            
-		     		String userKey = request.params(":userKey");
-		     		String fileName = null;
-		     		
-		     		if(StringUtils.isEmpty(userService.getUserId(userKey))){
-		     			
-		     			payload.add("message", new JsonPrimitive("Failure Uploading File : Unable to find owner"));
-			         	payload.add("success", new JsonPrimitive(false));
-		         		
-		         		return payload;
-		     		}
-		     		
-		     		try{
-		     			
-			            MultipartConfigElement multipartConfigElement = new MultipartConfigElement("/tmp");
-			            request.raw().setAttribute("org.eclipse.jetty.multipartConfig", multipartConfigElement);
-			            
-			            Part filePart = request.raw().getPart("file");
-			           
-			            fileName = filePart.getSubmittedFileName();
-			            String fileType = filePart.getContentType();
-			            
-			            System.out.println("Upload FileType : "+fileType);
-			            
-			            InputStream fileStream = filePart.getInputStream();
-			            ObjectId fileId = databaseService.getGridFSBucket().uploadFromStream(fileName, fileStream);
-			            
-			            databaseService.setFileType(fileId.toString(), fileType);
-			            
-			            String userId = userService.getUserId(userKey);
-			            databaseService.setFileOwner(fileId.toString(), userId);
-		     		}
-		     		
-		     		catch(Exception e){
-		     			
-		     			payload.add("message", new JsonPrimitive("Failed Uploading File "+e.getMessage()));
-			         	payload.add("success", new JsonPrimitive(false));
-		         		
-		         		return payload;
-		     		}
-		         	
-		     		System.out.println("Successfully File Upload : "+fileName);
-		     		
-		     		payload.add("message", new JsonPrimitive("Successfully Uploaded File"));
-		         	payload.add("success", new JsonPrimitive(true));
-		         	
-		         	return payload;
-		     	}
-		         	
-	     });
-	     
-		 Spark.post("/search", new Route() {
-	     	
-			//TODO Need to get UserKey
-			 
-	     	@Override
+		 	 JsonObject payload = new JsonObject();
+		 
+	     	 @Override
 	         public Object handle(Request request, Response response) {
-	             
-	     		JsonObject payload = new JsonObject();
+	            
+	     		String userKey = request.params(":userKey");
+	     		String fileName = null;
 	     		
-	         	String data = request.body();
-	         	
-	         	if(data.isEmpty()){
-		         	
-	         		payload.add("message", new JsonPrimitive("Request Was Empty"));
+	     		if(StringUtils.isEmpty(userService.getUserId(userKey))){
+	     			
+	     			payload.add("message", new JsonPrimitive("Failure Uploading File : Unable to find owner"));
 		         	payload.add("success", new JsonPrimitive(false));
 	         		
 	         		return payload;
-	         	}
-	         	
-	         	System.out.println("Server Recieved Payload : "+data);
-	         	
-	         	Document document = databaseService.find(data);
-	      	
-	         	if(document.isEmpty()){
-	         		
-	         		payload.add("message", new JsonPrimitive("No Entry Found"));
+	     		}
+	     		
+	     		JsonObject diskSpace = fileService.getTotalDiskSpace(userKey);
+	     		long spaceUsed = diskSpace.get("size").getAsLong();
+	     		long totalSpace = diskSpace.get("maxSpace").getAsLong();
+	     		long totalRemaining = (totalSpace - spaceUsed);
+	     		
+	     		try{
+	     			
+		            MultipartConfigElement multipartConfigElement = new MultipartConfigElement("/tmp");
+		            request.raw().setAttribute("org.eclipse.jetty.multipartConfig", multipartConfigElement);
+		            
+		            Part filePart = request.raw().getPart("file");
+		           
+		            fileName = filePart.getSubmittedFileName();
+		            String fileType = filePart.getContentType();
+		            
+		            long fileSize = filePart.getSize();
+		            
+		            if(fileSize>totalRemaining){
+		            	
+		            	payload.add("message", new JsonPrimitive("File Size Exceeds The Account Space Available"));
+			         	payload.add("success", new JsonPrimitive(false));
+		         		
+		         		return payload;
+		            }
+		            
+		            System.out.println("Upload FileType : "+fileType);
+		            
+		            InputStream fileStream = filePart.getInputStream();
+		            ObjectId fileId = fileService.getGridFSBucket().uploadFromStream(fileName, fileStream);
+		            
+		            fileService.setFileType(fileId.toString(), fileType);
+		            
+		            String userId = userService.getUserId(userKey);
+		            fileService.setFileOwner(fileId.toString(), userId);
+	     		}
+	     		
+	     		catch(Exception e){
+	     			
+	     			payload.add("message", new JsonPrimitive("Failed Uploading File "+e.getMessage()));
 		         	payload.add("success", new JsonPrimitive(false));
 	         		
 	         		return payload;
-	         	}
-	         	else{
-	         		
-	         		payload.add("message", new JsonPrimitive("Entry Found : "+document.getDate("time")));
-		         	payload.add("success", new JsonPrimitive(true));
-	         		
-	         		return payload;
-	         		
-	         	}
-	          }
+	     		}
+	         	
+	     		System.out.println("Successfully File Upload : "+fileName);
+	     		
+	     		payload.add("message", new JsonPrimitive("Successfully Uploaded File"));
+	         	payload.add("success", new JsonPrimitive(true));
+	         	
+	         	return payload;
+	     	} 	
 	     });
 	}
 }

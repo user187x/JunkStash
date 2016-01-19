@@ -24,6 +24,8 @@ import com.spark.config.DatabaseConfig;
 @Service
 public class FileService {
 	
+	public static final long FIFTY_MB = 52428800;
+	
 	@Autowired
 	private DatabaseConfig databaseService;
 	
@@ -145,8 +147,8 @@ public class FileService {
 		
 		json.add("size", new JsonPrimitive(totalSize));
 		json.add("normalized", new JsonPrimitive(FileUtils.byteCountToDisplaySize(totalSize)));
-		json.add("maxSpaceNormalized", new JsonPrimitive(FileUtils.byteCountToDisplaySize(52428800L)));
-		json.add("maxSpace", new JsonPrimitive(52428800));
+		json.add("maxSpaceNormalized", new JsonPrimitive(FileUtils.byteCountToDisplaySize(FIFTY_MB)));
+		json.add("maxSpace", new JsonPrimitive(FIFTY_MB));
 		
 		return json;
 	}
