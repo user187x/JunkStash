@@ -8,11 +8,10 @@ app.config([ '$routeProvider', '$locationProvider' , function($routeProvider, $l
 		controller : 'primaryController'
 	})
 	.otherwise({
-		
 		redirectTo : '/'
 	});
 	
-	// 	Turns on Pretty URL HTML5 
-	//	$locationProvider.html5Mode(true).hashPrefix('!');
+	//	Turns on Pretty URL HTML5 
+	$locationProvider.html5Mode(true).hashPrefix('!');
 	
 } ]);
