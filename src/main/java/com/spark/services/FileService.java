@@ -1,9 +1,10 @@
 package com.spark.services;
 
-import java.io.File;
-import java.net.URL;
+import java.io.InputStream;
+import java.io.StringWriter;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -277,10 +278,14 @@ public class FileService {
 	
 	private void cacheResource() throws Exception{
 		
-		URL indexFile = getClass().getClassLoader().getResource("index.html");
-		cachedIndex = FileUtils.readFileToString(new File(indexFile.toURI()));
+		InputStream inputStream = getClass().getResourceAsStream("/index.html");
 		
-		System.out.println("Resource Cached : "+indexFile);
+		StringWriter writer = new StringWriter();
+		IOUtils.copy(inputStream, writer);
+		
+		cachedIndex = writer.toString();
+		
+		System.out.println("Resource Cached...");
 	}
 	
 	public String getIndex(){
