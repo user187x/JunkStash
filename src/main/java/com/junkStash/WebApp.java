@@ -4,7 +4,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 import com.junkStash.config.WebAppConfig;
 
-@ComponentScan({"com.spark"})
+@ComponentScan({"com.junkStash"})
 public class WebApp {
 	
 	public static final int DEFAULT_PORT = 4567;

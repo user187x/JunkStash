@@ -27,7 +27,7 @@ public class FileService {
 	
 	public static final long FIFTY_MB = 52428800;
 	public static final long MAX_SERER_SIZE = 1073741824;
-	
+
 	@Autowired
 	private DatabaseConfig databaseService;
 	
@@ -36,7 +36,7 @@ public class FileService {
 	
 	private static String cachedIndex;
 	
-	public FileService() throws Exception{
+	public FileService(){
 		cacheResource();
 	}
 		
@@ -276,16 +276,22 @@ public class FileService {
 			return null;
 	}
 	
-	private void cacheResource() throws Exception{
+	public static void cacheResource(){
 		
-		InputStream inputStream = getClass().getResourceAsStream("/index.html");
+		InputStream inputStream = FileService.class.getResourceAsStream("/index.html");
 		
 		StringWriter writer = new StringWriter();
-		IOUtils.copy(inputStream, writer);
 		
-		cachedIndex = writer.toString();
+		try{
+			IOUtils.copy(inputStream, writer);
+			cachedIndex = writer.toString();
+		}
+		catch(Exception e){
+			System.out.println("Failure Caching Resource File : index.html");
+			System.exit(1);
+		}
 		
-		System.out.println("Resource Cached...");
+		System.out.println("Resource Cached : "+cachedIndex.getBytes().length+" Bytes");
 	}
 	
 	public String getIndex(){

@@ -11,7 +11,7 @@ app.config([ '$routeProvider', '$locationProvider' , function($routeProvider, $l
 		redirectTo : '/'
 	});
 	
-	//	Turns on Pretty URL HTML5 
+	//Turns on Pretty URL HTML5 
 	$locationProvider.html5Mode(true).hashPrefix('!');
 	
 } ]);
