@@ -1,4 +1,4 @@
-package com.spark.services;
+package com.junkStash.services;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -11,11 +11,11 @@ import org.springframework.stereotype.Service;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.junkStash.config.DatabaseConfig;
+import com.junkStash.util.UserUtils;
 import com.mongodb.Block;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCursor;
-import com.spark.config.DatabaseConfig;
-import com.spark.util.UserUtils;
 
 @Service
 public class UserService {

@@ -1,4 +1,4 @@
-package com.spark.services;
+package com.junkStash.services;
 
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -14,13 +14,13 @@ import org.springframework.stereotype.Service;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.junkStash.config.DatabaseConfig;
 import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.result.UpdateResult;
-import com.spark.config.DatabaseConfig;
 
 @Service
 public class FileService {

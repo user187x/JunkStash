@@ -1,4 +1,4 @@
-package com.spark.controllers;
+package com.junkStash.controllers;
 
 import java.io.InputStream;
 import java.util.Date;
@@ -16,8 +16,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
-import com.spark.services.FileService;
-import com.spark.services.UserService;
+import com.junkStash.services.FileService;
+import com.junkStash.services.UserService;
 
 import spark.Request;
 import spark.Response;

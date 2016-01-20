@@ -1,4 +1,4 @@
-package com.spark.controllers;
+package com.junkStash.controllers;
 
 import java.util.Date;
 
@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Controller;
 
-import com.spark.services.FileService;
+import com.junkStash.services.FileService;
 
 import spark.Request;
 import spark.Response;

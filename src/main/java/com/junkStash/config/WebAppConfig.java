@@ -1,19 +1,19 @@
-package com.spark.config;
+package com.junkStash.config;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import com.spark.WebApp;
-import com.spark.controllers.AuxController;
-import com.spark.controllers.MainController;
+import com.junkStash.WebApp;
+import com.junkStash.controllers.AuxController;
+import com.junkStash.controllers.MainController;
 
 import spark.Spark;
 
 public class WebAppConfig {
 
-	public WebAppConfig() {
+	public WebAppConfig(int port) {
 		
 		Spark.staticFileLocation("/public");
-		Spark.port(4567);
+		Spark.port(port);
 		
 		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(WebApp.class);	
 		ctx.registerShutdownHook();

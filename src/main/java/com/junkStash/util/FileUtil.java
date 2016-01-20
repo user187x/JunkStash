@@ -1,4 +1,4 @@
-package com.spark.util;
+package com.junkStash.util;
 
 import java.io.File;
 import java.io.InputStream;

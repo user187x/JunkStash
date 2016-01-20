@@ -1,4 +1,4 @@
-package com.spark.config;
+package com.junkStash.config;
 
 import java.net.UnknownHostException;
 
