@@ -1,5 +1,6 @@
-# SparkServer
+http://www.junkstash.com/
 
+# JunkStash Webapp
 * Java 8
 * Spark 2.3
 * Spring 4.2
@@ -7,7 +8,6 @@
 * Angular 1.4.8
 
 # To Run
-
 * Simply execute Webapp.java
 * Open browser to : localhost:4567
 
