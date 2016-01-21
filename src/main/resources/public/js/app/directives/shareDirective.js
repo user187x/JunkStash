@@ -1,4 +1,4 @@
-app.directive('sharemodal', ['primaryFactory', '$timeout', '$rootScope', function (primaryFactory, $timeout, $rootScope) {
+app.directive('sharemodal', ['homeFactory', '$timeout', '$rootScope', function (homeFactory, $timeout, $rootScope) {
 	
 	return {
 	    
@@ -76,7 +76,7 @@ app.directive('sharemodal', ['primaryFactory', '$timeout', '$rootScope', functio
 	        
 	        scope.searchUser = function(){
 	        	
-	        	primaryFactory.searchUser(scope.shareUser).success(function (data) {
+	        	homeFactory.searchUser(scope.shareUser).success(function (data) {
 	    			
 	    			scope.result = data;
 	    			autoCloseAlert();
@@ -91,7 +91,7 @@ app.directive('sharemodal', ['primaryFactory', '$timeout', '$rootScope', functio
         			fileId : scope.fileId
 	        	};
 	        	
-	        	primaryFactory.shareFile(payload, userKey).success(function (data) {
+	        	homeFactory.shareFile(payload, userKey).success(function (data) {
 	    			
 	    			scope.result = data;
 	    			

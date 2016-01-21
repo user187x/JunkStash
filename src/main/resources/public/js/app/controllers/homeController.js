@@ -1,4 +1,4 @@
-app.controller('primaryController', ['$scope', 'primaryFactory', '$timeout','$rootScope' ,function($scope, primaryFactory, $timeout, $rootScope) {
+app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScope' ,function($scope, homeFactory, $timeout, $rootScope) {
 	
 	$scope.files = [];
 	$scope.users = [];
@@ -38,7 +38,7 @@ app.controller('primaryController', ['$scope', 'primaryFactory', '$timeout','$ro
 		
 		$scope.loading = true;
 		
-		primaryFactory.upload($scope.uploadFile, $scope.userKey)
+		homeFactory.upload($scope.uploadFile, $scope.userKey)
 			.success(function (data) {
 			
 				$scope.result = data;
@@ -59,7 +59,7 @@ app.controller('primaryController', ['$scope', 'primaryFactory', '$timeout','$ro
 		
 		$scope.files = [];
 		
-		primaryFactory.getFiles($scope.userKey).success(function (data) {
+		homeFactory.getFiles($scope.userKey).success(function (data) {
 			
 		    angular.forEach(data.payload, function(value, key) {
 		        
@@ -81,7 +81,7 @@ app.controller('primaryController', ['$scope', 'primaryFactory', '$timeout','$ro
 		
 		$scope.users = [];
 		
-		primaryFactory.getUsers($scope.userKey).success(function (data) {
+		homeFactory.getUsers($scope.userKey).success(function (data) {
 			
 		    angular.forEach(data.payload, function(value, key) {
 		        
@@ -98,7 +98,7 @@ app.controller('primaryController', ['$scope', 'primaryFactory', '$timeout','$ro
 	
 	$scope.approve = function(date){
 		
-		primaryFactory.approve(data, $scope.userKey).success(function (data) {
+		homeFactory.approve(data, $scope.userKey).success(function (data) {
 			$scope.result = data;
 			$scope.refresh();
 		});
@@ -106,7 +106,7 @@ app.controller('primaryController', ['$scope', 'primaryFactory', '$timeout','$ro
 	
 	$scope.getTotalDiskSpace = function(data) { 		
 		
-		primaryFactory.getTotalDiskSpace($scope.userKey).success(function (data) {
+		homeFactory.getTotalDiskSpace($scope.userKey).success(function (data) {
 			
 			$scope.totalSpace = data.payload.size;
 			$scope.totalSpaceNormalized = data.payload.normalized;
@@ -127,7 +127,7 @@ app.controller('primaryController', ['$scope', 'primaryFactory', '$timeout','$ro
 			userKey : $scope.userKey
 		}
 		
-		primaryFactory.logout(payload).success(function (data) {
+		homeFactory.logout(payload).success(function (data) {
 			
 			$scope.result = data;
 			
@@ -165,7 +165,7 @@ app.controller('primaryController', ['$scope', 'primaryFactory', '$timeout','$ro
 	
 	$scope.removeFile = function(data){
 		
-		primaryFactory.removeFile(data, $scope.userKey).success(function (data) {
+		homeFactory.removeFile(data, $scope.userKey).success(function (data) {
 			$scope.result = data;
 			$scope.refresh();
 		});
@@ -173,7 +173,7 @@ app.controller('primaryController', ['$scope', 'primaryFactory', '$timeout','$ro
 	
 	$scope.removeUser = function(data){
 		
-		primaryFactory.removeUser(data, $scope.userKey).success(function (data) {
+		homeFactory.removeUser(data, $scope.userKey).success(function (data) {
 			$scope.result = data;
 			$scope.refresh();
 		});
@@ -181,7 +181,7 @@ app.controller('primaryController', ['$scope', 'primaryFactory', '$timeout','$ro
 	
 	$scope.approve = function(data){
 		
-		primaryFactory.approve(data, $scope.userKey).success(function (data) {
+		homeFactory.approve(data, $scope.userKey).success(function (data) {
 			$scope.result = data;
 			$scope.refresh();
 		});

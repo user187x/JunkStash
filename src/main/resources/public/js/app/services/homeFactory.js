@@ -1,4 +1,4 @@
-app.factory('primaryFactory', ['$http', function($http) {
+app.factory('homeFactory', ['$http', function($http) {
     
     var upload = function (payload, userKey){
     	

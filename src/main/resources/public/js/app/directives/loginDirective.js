@@ -1,4 +1,4 @@
-app.directive('loginmodal', ['primaryFactory', '$timeout', '$rootScope', function (primaryFactory, $timeout, $rootScope) {
+app.directive('loginmodal', ['homeFactory', '$timeout', '$rootScope', function (homeFactory, $timeout, $rootScope) {
 	
 	return {
 	    
@@ -45,7 +45,7 @@ app.directive('loginmodal', ['primaryFactory', '$timeout', '$rootScope', functio
         			password : scope.password
 	        	};
 	        	
-	        	primaryFactory.login(payload).success(function (data) {
+	        	homeFactory.login(payload).success(function (data) {
 	    			
 	    			scope.result = data;
 	    			
@@ -107,7 +107,7 @@ app.directive('loginmodal', ['primaryFactory', '$timeout', '$rootScope', functio
         			password : scope.password
 	        	};
 	        	
-	        	primaryFactory.register(payload).success(function (data) {
+	        	homeFactory.register(payload).success(function (data) {
 	    			
 	    			scope.result = data;
 	    			
