@@ -1,6 +1,7 @@
 <div data-ng-controller="primaryController" data-ng-init="refresh()">
 
-	<modal visible="showModal"></modal>
+	<loginmodal visible="showLoginModal"></loginmodal>
+	<sharemodal visible="showShareModal"></sharemodal>
 	
 	<div class="jumbotron">
 		
@@ -11,7 +12,7 @@
 		    	</div>
 		    	<ul class="nav navbar-nav navbar-right">
 		      		<li>
-		      			<a data-ng-show="!user" data-ng-click="toggleModal()">
+		      			<a data-ng-show="!user" data-ng-click="toggleLoginModal()">
 		      				<span class="glyphicon glyphicon-log-in"></span> Login
 		      			</a>
 	      			</li>
@@ -103,6 +104,7 @@
 		            <th>Uploaded</th>
 		            <th>Size</th>
 		            <th data-ng-if="admin">Owner</th>
+		            <th>Share</th>
 		            <th>Remove</th>
 		        </tr>
 	    	</thead>
@@ -118,9 +120,15 @@
 					<td>{{file.time}}</td>
 					<td>{{file.size}}</td>
 					<td data-ng-if="admin">{{file.owner}}</td>
-					<td data-ng-click="removeFile(file)" style="text-align:center">
-						<i class="fa fa-trash-o" style="cursor: pointer; color:balck"></i>
+					
+					<td data-ng-click="toggleShareModal()" style="text-align:center">
+						<i class="fa fa-share-alt" style="cursor:pointer; color:balck"></i>
 					</td>
+					
+					<td data-ng-click="removeFile(file)" style="text-align:center">
+						<i class="fa fa-trash-o" style="cursor:pointer; color:balck"></i>
+					</td>
+					
 				</tr>
 			</tbody>
 		</table>

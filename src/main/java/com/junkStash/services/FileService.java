@@ -276,6 +276,22 @@ public class FileService {
 			return null;
 	}
 	
+	public String getFileOwner(String fileId){
+		
+		ObjectId objectId = new ObjectId(fileId);
+		
+		Document query = new Document();
+		query.append("_id", objectId);
+		
+		FindIterable<Document> results = databaseService.getFileCollection().find(query);
+		
+		if(results.iterator().hasNext())
+			return results.iterator().next().getString("owner");
+		
+		else
+			return null;
+	}
+	
 	public static void cacheResource(){
 		
 		InputStream inputStream = FileService.class.getResourceAsStream("/index.html");

@@ -16,6 +16,7 @@ import com.junkStash.util.UserUtils;
 import com.mongodb.Block;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCursor;
+import com.mongodb.client.result.UpdateResult;
 
 @Service
 public class UserService {
@@ -154,7 +155,39 @@ public class UserService {
 		});
 		
 		return fileIds;
-
+	}
+	
+	//TODO Working Here.....
+	public boolean shareFile(String userId, String fileId){
+		
+		String fileOwner = fileService.getFileOwner(fileId);
+		
+		Document match = new Document();
+		match.append("user", userId);
+		
+		Document update = new Document();
+		update.append("shared", new Document("$addToSet", new Document("_id", fileId)).append("owner", fileOwner));
+		
+		UpdateResult results = databaseService.getUserCollection().updateOne(match, update);
+		
+		if(results.getModifiedCount()>0)
+			return true;
+		else
+			return false;
+	}
+	
+	public boolean userHasFileAccess(String userId, String fileId){
+		
+		Document match = new Document();
+		match.append("user", userId);
+		match.append("shared", new Document("$elemMatch", new Document("_id", fileId)));
+		
+		FindIterable<Document> results = databaseService.getUserCollection().find(match);
+		
+		if(results.iterator().hasNext())
+			return true;
+		else
+			return false;
 	}
 	
 	public boolean isUserAdmin(String user){

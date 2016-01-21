@@ -1,4 +1,4 @@
-app.directive('loginmodal', ['primaryFactory', '$timeout', '$rootScope', function (primaryFactory, $timeout, $rootScope) {
+app.directive('sharemodal', ['primaryFactory', '$timeout', '$rootScope', function (primaryFactory, $timeout, $rootScope) {
 	
 	return {
 	    
@@ -6,14 +6,12 @@ app.directive('loginmodal', ['primaryFactory', '$timeout', '$rootScope', functio
 	    transclude: true,
 	    replace:true,
 	    scope:true,
-	    templateUrl: '/js/app/views/login.html',	   
+	    templateUrl: '/js/app/views/share.html',	   
 	    link: function postLink(scope, element, attrs) {
-    
-	    	scope.user = undefined;
-	    	scope.password = undefined;
-	    	scope.admin = undefined;
-	    	scope.userKey = undefined;
-	    	scope.result = undefined;
+    	    	
+	    	scope.userKey;
+	    	scope.user;
+	    	scope.fileId;
 	    	
 	        scope.$watch(attrs.visible, function(value){
 	          
@@ -37,24 +35,6 @@ app.directive('loginmodal', ['primaryFactory', '$timeout', '$rootScope', functio
 	        		scope.$parent[attrs.visible] = false;
 		        });
 	        });
-	        
-	        scope.submit = function(){
-	        	
-	        	var payload = {
-        			user : scope.user, 
-        			password : scope.password
-	        	};
-	        	
-	        	primaryFactory.login(payload).success(function (data) {
-	    			
-	    			scope.result = data;
-	    			
-	    			autoCloseModal(data.success);
-	    			autoCloseAlert();
-	    			
-	    			acknowledge(data.success, scope.user, data.userKey, data.admin);
-	        	});
-	        };
 	        
 	        var autoCloseModal = function(success){
 	            
@@ -82,32 +62,36 @@ app.directive('loginmodal', ['primaryFactory', '$timeout', '$rootScope', functio
 	        	
 	        	$rootScope.$broadcast('user-login', {
 	        		
-	        		user : scope.user,
-	        		userKey : userKey,
-	        		admin : admin
+	        		shareUser : scope.shareUser,
+        			userKey : scope.userKey
 	        	});
 	        };
 	        
 	        var clearForm = function(){
 	        	
-		    	scope.user = undefined;
-		    	scope.password = undefined;
+		    	scope.shareUser = undefined;
 		    	scope.userKey = undefined;
 		    	scope.result = undefined;
 	        };
 	        
-	    	$rootScope.$on('user-logout', function (event, args) {
-	    		clearForm();
-	    	});
-	    
-	        scope.register = function(){
+	        scope.searchUser = function(){
+	        	
+	        	primaryFactory.searchUser(scope.shareUser).success(function (data) {
+	    			
+	    			scope.result = data;
+	    			autoCloseAlert();
+	        	});
+	        };
+	        
+	        scope.shareFile = function(){
 	        	
 	        	var payload = {
-        			user : scope.user, 
-        			password : scope.password
+        			
+	        		user : scope.user,
+        			fileId : scope.fileId
 	        	};
 	        	
-	        	primaryFactory.register(payload).success(function (data) {
+	        	primaryFactory.shareFile(payload, userKey).success(function (data) {
 	    			
 	    			scope.result = data;
 	    			

@@ -11,6 +11,10 @@ app.factory('primaryFactory', ['$http', function($http) {
 	    });
     };
     
+    var shareFile = function (payload, userKey) {
+    	return $http.post('/shareFile/'+userKey, payload);
+    };
+    
     var removeFile = function (payload, userKey) {
     	return $http.post('/removeFile/'+userKey, payload);
     };
@@ -21,6 +25,10 @@ app.factory('primaryFactory', ['$http', function($http) {
     
     var getFiles = function (userKey) {
     	return $http.get('/getFiles/'+userKey);
+    };
+    
+    var searchUser = function (userId) {
+    	return $http.get('/whoIs/'+userId);
     };
     
     var getUsers = function (userKey) {
@@ -53,10 +61,12 @@ app.factory('primaryFactory', ['$http', function($http) {
     	register : register,
     	upload : upload,
     	removeFile : removeFile,
+    	shareFile : shareFile,
     	removeUser : removeUser,
     	approve : approve,
     	getFiles : getFiles,
     	getUsers : getUsers,
+    	searchUser : searchUser,
     	getTotalDiskSpace : getTotalDiskSpace
     };
     

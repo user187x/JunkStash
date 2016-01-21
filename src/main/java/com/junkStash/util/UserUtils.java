@@ -5,9 +5,7 @@ import java.security.SecureRandom;
 
 public class UserUtils {
     
-	static SecureRandom random = new SecureRandom();
-	
 	public static String createSecureIdentifier(){
-		return new BigInteger(130, random).toString(32);
+		return new BigInteger(130, new SecureRandom()).toString(32);
 	}
 }

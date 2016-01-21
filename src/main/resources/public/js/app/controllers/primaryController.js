@@ -2,6 +2,7 @@ app.controller('primaryController', ['$scope', 'primaryFactory', '$timeout','$ro
 	
 	$scope.files = [];
 	$scope.users = [];
+	
 	$scope.admin = false;
 	
 	$scope.fileSearch = undefined;
@@ -10,7 +11,10 @@ app.controller('primaryController', ['$scope', 'primaryFactory', '$timeout','$ro
 	$scope.result = undefined;
 	$scope.uploadFile = undefined;
 	$scope.loading = false;
-    $scope.showModal = false;
+	
+    $scope.showLoginModal = false;
+    $scope.showShareModal = false;
+    
     $scope.user = undefined;
     $scope.userKey = undefined;
     
@@ -20,11 +24,16 @@ app.controller('primaryController', ['$scope', 'primaryFactory', '$timeout','$ro
     $scope.maxSpace = undefined;
     $scope.percentUsed = undefined;
     
-    $scope.toggleModal = function(){
+    $scope.toggleLoginModal = function(){
     	
-        $scope.showModal = !$scope.showModal;
+        $scope.showLoginModal = !$scope.showLoginModal;
     };
 	
+    $scope.toggleShareModal = function(){
+    	
+        $scope.showShareModal = !$scope.showShareModal;
+    };
+    
 	$scope.upload = function(data) { 		
 		
 		$scope.loading = true;
@@ -103,7 +112,7 @@ app.controller('primaryController', ['$scope', 'primaryFactory', '$timeout','$ro
 			$scope.totalSpaceNormalized = data.payload.normalized;
 			$scope.maxSpace = data.payload.maxSpace;
 			$scope.maxSpaceNormalized = data.payload.maxSpaceNormalized;
-			$scope.percentUsed = ($scope.totalSpace/$scope.maxSpace)*100;
+			$scope.percentUsed = (($scope.totalSpace/$scope.maxSpace)*100);
 			
 		});
 	};
@@ -163,8 +172,6 @@ app.controller('primaryController', ['$scope', 'primaryFactory', '$timeout','$ro
 	};
 	
 	$scope.removeUser = function(data){
-		
-		console.log('Here...'+data+' here again '+JSON.stringify(data));
 		
 		primaryFactory.removeUser(data, $scope.userKey).success(function (data) {
 			$scope.result = data;

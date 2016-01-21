@@ -81,6 +81,36 @@ public class AuxController {
 			}
 	     });
 
+		 Spark.get("/whoIs/:userId", new Route() {
+			 
+			@Override
+			public Object handle(Request request, Response response) throws Exception {
+				
+				JsonObject payload = new JsonObject();
+				
+				System.out.println("User Request at Path : ("+request.pathInfo()+") "+new Date());
+				
+				String userId = request.params(":userId");
+				
+				if(userId == null || userId.isEmpty()){
+					
+					payload.add("message", new JsonPrimitive("Request Was Empty"));
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
+				}
+				
+				boolean userExists = userService.userExists(userId);
+				
+				payload.add("message", new JsonPrimitive("Successfully Found Users "+userId));
+	         	payload.add("success", new JsonPrimitive(true));
+	         	payload.add("payload", new JsonPrimitive(userExists));
+	         	
+	         	return payload;
+				
+			}
+	     });
+		 
 		 Spark.post("/approve/:userKey", new Route() {
 		     	
 	     	 @Override
@@ -229,6 +259,65 @@ public class AuxController {
 		         	
 		         	return response.raw();
 				}
+			}
+	     });
+		 
+		 Spark.get("/shareFile/:userKey", new Route() {
+				
+			@Override
+			public Object handle(Request request, Response response) throws Exception {
+				
+				String userKey = request.params(":userKey");
+				
+				String data = request.body();
+				
+	         	JsonParser jsonParser = new JsonParser();
+	         	JsonObject json = jsonParser.parse(data).getAsJsonObject();
+	         	
+	         	String userId = json.get("user").getAsString();
+	         	String fileId = json.get("fileId").getAsString();
+				
+				if(fileId == null || fileId.isEmpty() || userId == null || userId.isEmpty()){
+					
+					System.out.println("User Request To Download File With ID : "+fileId);
+					
+					JsonObject payload = new JsonObject();
+					
+					payload.add("message", new JsonPrimitive("Request Was Empty"));
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
+				}
+				
+				String allegedOwnersUserId = userService.getUserId(userKey);
+				JsonObject payload = new JsonObject();
+				
+				if(!fileService.isUserOwner(allegedOwnersUserId, fileId) || !userService.isUserAdmin(allegedOwnersUserId)){
+					
+					payload.add("message", new JsonPrimitive("Only file owners can share this file"));
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
+				}
+				
+				boolean shareSuccess = userService.shareFile(userId, fileId);
+				
+	         	if(shareSuccess){
+	         		
+	         		payload.add("message", new JsonPrimitive("Successfully Shared File : "+fileId));
+		         	payload.add("success", new JsonPrimitive(true));
+	         		
+	         		return payload;
+	         	}
+	         	else{
+		         	
+	         		payload.add("message", new JsonPrimitive("Failure Sharing File : "+fileId));
+	         		payload.add("userKey", new JsonObject());
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
+	         	}	
+				
 			}
 	     });
 		 
