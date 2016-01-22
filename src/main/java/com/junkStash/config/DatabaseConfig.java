@@ -1,6 +1,7 @@
 package com.junkStash.config;
 
 import java.net.UnknownHostException;
+import java.util.Date;
 
 import org.bson.Document;
 import org.springframework.stereotype.Component;
@@ -14,8 +15,9 @@ import com.mongodb.client.gridfs.GridFSBuckets;
 @Component
 public class DatabaseConfig {
 
-	public static final String GRID_FS = "fileStore";
+	public static final Date systemStart = new Date();
 	
+	public static final String GRID_FS = "fileStore";	
 	public static final String USER_COLLECTION = "users";
 	public static final String FILE_COLLECTION = "fileStore.files";
 	public static final String DATABASE = "webapp";
@@ -23,8 +25,18 @@ public class DatabaseConfig {
 	private static MongoClient mongoClient;
     
 	public DatabaseConfig() throws UnknownHostException {
+		
 		mongoClient = new MongoClient("localhost", 27017);
-		System.out.println("Database Service Initialized...");
+		
+		if(mongoClient==null){
+			
+			System.out.println("Unalbe to connect to database. System terminating...");
+			System.exit(1);
+		}
+		else{
+			System.out.println("Database Service Initialized...");
+			System.out.println("JunkStash Started "+systemStart);
+		}
 	}
 	
      public MongoDatabase getMongoDatabase() {

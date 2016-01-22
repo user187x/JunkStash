@@ -3,8 +3,9 @@ package com.junkStash.config;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import com.junkStash.WebApp;
-import com.junkStash.controllers.AuxController;
-import com.junkStash.controllers.MainController;
+import com.junkStash.controllers.FileAccessController;
+import com.junkStash.controllers.IndexController;
+import com.junkStash.controllers.UserAccessController;
 
 import spark.Spark;
 
@@ -19,12 +20,13 @@ public class WebAppConfig {
 		ctx.registerShutdownHook();
 		ctx.close();
 		
-		RegisterControllers();
+		initializeControllers();
 	}
 	
-	private void RegisterControllers() {
+	private void initializeControllers() {
 		
-		new MainController();
-		new AuxController();
+		new IndexController();
+		new UserAccessController();
+		new FileAccessController();
     }
 }

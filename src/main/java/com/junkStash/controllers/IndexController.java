@@ -1,7 +1,5 @@
 package com.junkStash.controllers;
 
-import java.util.Date;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Controller;
@@ -15,25 +13,25 @@ import spark.Spark;
 
 @Controller
 @Configurable
-public class MainController {
+public class IndexController {
 	
 	@Autowired
 	private FileService databaseService;
 	
-	public MainController(){
+	public IndexController(){
 		setUpRoutes();
 	}
 	
 	public void setUpRoutes(){
 		
+		Spark.before((request, response) -> {
+			//Do authentication here
+		}); 
+		
 		 Spark.get("/", new Route() {
 				
 				@Override
-				public Object handle(Request request, Response response) throws Exception {
-					
-					String message = "User Request at Path : ("+request.pathInfo()+") "+new Date();
-					System.out.println(message);
-					
+				public Object handle(Request request, Response response) throws Exception {					
 					return databaseService.getIndex();
 				}
 	     });

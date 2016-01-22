@@ -11,13 +11,12 @@ public class WebApp {
 	
 	public static void main(String[] args) {
 		
+		System.out.println("Starting JunkStash.... ");
+		
 		try{
-			
 			new WebAppConfig(Integer.parseInt(args[0]));
 		}
 		catch(Exception e){
-			
-			System.out.println("Using Default Port "+DEFAULT_PORT);
 			new WebAppConfig(DEFAULT_PORT);
 		}
     }   

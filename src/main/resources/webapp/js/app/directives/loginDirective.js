@@ -14,6 +14,12 @@ app.directive('loginmodal', ['homeFactory', '$timeout', '$rootScope', function (
 	    	scope.admin = undefined;
 	    	scope.userKey = undefined;
 	    	scope.result = undefined;
+	    	scope.registeringUser = false;
+	    	scope.enabled = false;
+	    	
+	        scope.toggleRegister = function(){
+	            scope.registeringUser = !scope.registeringUser;
+	        };
 	    	
 	        scope.$watch(attrs.visible, function(value){
 	          
@@ -94,7 +100,16 @@ app.directive('loginmodal', ['homeFactory', '$timeout', '$rootScope', function (
 		    	scope.password = undefined;
 		    	scope.userKey = undefined;
 		    	scope.result = undefined;
+		    	scope.registeringUser = false;
 	        };
+	        
+	        scope.isEnabled = function(){
+	        	
+	        	if(password===undefined)
+	        		return false;
+	        		
+	        	scope.enabled = password===passwordconfirm;
+	        }
 	        
 	    	$rootScope.$on('user-logout', function (event, args) {
 	    		clearForm();
