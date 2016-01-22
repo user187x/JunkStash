@@ -12,7 +12,7 @@ public class WebAppConfig {
 
 	public WebAppConfig(int port) {
 		
-		Spark.staticFileLocation("/public");
+		Spark.staticFileLocation("/webapp");
 		Spark.port(port);
 		
 		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(WebApp.class);	

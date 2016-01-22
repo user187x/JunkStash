@@ -27,7 +27,7 @@
  				
  				<form role="form">
 			    	<div class="form-group">
-			      		<label for="userId">User ID</label>
+			      		<label data-uib-tooltip="JunkStash User ID/email" for="userId">User ID</label>
 			      		<input type="text" class="form-control" data-ng-model="user" placeholder="User ID" />
 			    	</div>
 			    
@@ -47,11 +47,14 @@
 		  				<i class="fa fa-user-plus">&nbsp;Register</i>
 	  			</button>
 				
-				<button type="submit" class="btn btn-primary" data-ng-click="submit()">login</button>
+				<button type="submit"
+						class="btn btn-primary" 
+						data-ng-click="submit()">login
+				</button>
 		    	<button class="btn btn-danger" data-dismiss="modal">close</button>
 		    	
 		  	</div>
  			
  		</div>
  	</div>
-</div>'
+</div>
