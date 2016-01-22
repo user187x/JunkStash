@@ -8,14 +8,10 @@ app.directive('sharemodal', ['homeFactory', '$timeout', '$rootScope', function (
 	    scope:true,
 	    templateUrl: '/js/app/views/share.html',	   
 	    link: function postLink(scope, element, attrs) {
-    	    	
-	    	scope.userKey;
-	    	scope.user;
-	    	scope.fileId;
 	    	
 	        scope.$watch(attrs.visible, function(value){
 	          
-	        	if(value == true)
+	        	if(value == true)       		
 	        		$(element).modal('show');
 	        	else
 	        		$(element).modal('hide');
@@ -24,7 +20,6 @@ app.directive('sharemodal', ['homeFactory', '$timeout', '$rootScope', function (
 	        $(element).on('shown.bs.modal', function(){
 	        	
 	        	scope.$apply(function(){
-	        		clearForm();
 	        		scope.$parent[attrs.visible] = true;
 		        });
 	        });
@@ -42,7 +37,6 @@ app.directive('sharemodal', ['homeFactory', '$timeout', '$rootScope', function (
 	        		return;
 	        	
 	        	$timeout(function(){
-	        		
 	        		$(element).modal('hide');
 	            }, 500);
 	        };
@@ -50,21 +44,8 @@ app.directive('sharemodal', ['homeFactory', '$timeout', '$rootScope', function (
 	        var autoCloseAlert = function(){
 	            
 	        	$timeout(function(){
-	        		
 	        		scope.result = undefined;
 	            }, 1000);
-	        };
-	        
-	        var acknowledge = function(success, user, userKey, admin){
-
-	        	if(success===false)
-	        		return;
-	        	
-	        	$rootScope.$broadcast('user-login', {
-	        		
-	        		shareUser : scope.shareUser,
-        			userKey : scope.userKey
-	        	});
 	        };
 	        
 	        var clearForm = function(){
@@ -76,6 +57,8 @@ app.directive('sharemodal', ['homeFactory', '$timeout', '$rootScope', function (
 	        
 	        scope.searchUser = function(){
 	        	
+	        	console('Form User......'+scope.shareUser);
+	        	
 	        	homeFactory.searchUser(scope.shareUser).success(function (data) {
 	    			
 	    			scope.result = data;
@@ -86,17 +69,15 @@ app.directive('sharemodal', ['homeFactory', '$timeout', '$rootScope', function (
 	        scope.shareFile = function(){
 	        	
 	        	var payload = {
-        			
-	        		user : scope.user,
-        			fileId : scope.fileId
+	        		user : scope.shareUser,
+        			fileId : scope.selectedFile
 	        	};
 	        	
-	        	homeFactory.shareFile(payload, userKey).success(function (data) {
+	        	homeFactory.shareFile(payload, scope.userKey).success(function (data) {
 	    			
 	    			scope.result = data;
 	    			
 	    			autoCloseModal(data.success);
-	    			acknowledge(data.success, scope.user, data.userKey, false);
 	        	});
 	        };
 	    }

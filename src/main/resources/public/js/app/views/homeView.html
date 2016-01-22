@@ -121,7 +121,8 @@
 					<td>{{file.size}}</td>
 					<td data-ng-if="admin">{{file.owner}}</td>
 					
-					<td data-ng-click="toggleShareModal()" style="text-align:center">
+					<td data-ng-click="toggleShareModal(file)" style="text-align:center">
+						<i data-ng-if="file.shared" class="fa fa-share-square"></i>
 						<i class="fa fa-share-alt" style="cursor:pointer; color:balck"></i>
 					</td>
 					

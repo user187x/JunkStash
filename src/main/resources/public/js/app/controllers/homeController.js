@@ -17,6 +17,7 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
     
     $scope.user = undefined;
     $scope.userKey = undefined;
+    $scope.selectedFile = undefined;
     
     $scope.totalSpace = undefined;
     $scope.totalSpaceNormalized = undefined;
@@ -29,8 +30,9 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
         $scope.showLoginModal = !$scope.showLoginModal;
     };
 	
-    $scope.toggleShareModal = function(){
+    $scope.toggleShareModal = function(file){
     	
+    	$scope.selectedFile = file.id;
         $scope.showShareModal = !$scope.showShareModal;
     };
     
@@ -71,6 +73,7 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
     				name : value.name,
     				type : value.type,
     				size : value.size,
+    				shared : value.shared,
     				owner : value.owner
 				});
 		    });
@@ -135,6 +138,7 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
 			$scope.userKey = undefined;
 			$scope.files = undefined;
 			$scope.admin = undefined;
+			$scope.selectedFile = undefined;
 			
 			$rootScope.$broadcast('user-logout', function (event, args) {});
 			
@@ -161,6 +165,7 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
 		$scope.fileSearch = undefined;
 		$scope.userSearch = undefined;
 		$scope.result = undefined;
+		$scope.selectedFile = undefined;
 	};
 	
 	$scope.removeFile = function(data){

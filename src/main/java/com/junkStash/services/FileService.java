@@ -2,6 +2,7 @@ package com.junkStash.services;
 
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.util.ArrayList;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -15,6 +16,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.junkStash.config.DatabaseConfig;
+import com.mongodb.Block;
 import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCursor;
@@ -92,14 +94,77 @@ public class FileService {
 			catch(Exception e){
 				return false;
 			}
-			
 			return true;
 		}
-		
 		return false;
 	}
 	
-	public JsonArray getAllFiles(String userId){
+	public boolean removeShared(String userId, String fileId){
+		
+		if(isUserOwner(userId, fileId) || userService.isUserAdmin(userId) || isFileShared(userId, fileId)){
+			if(userService.removeShare(userId, fileId))
+				return true;
+			else
+				return false;
+		}
+		return false;
+	}
+	
+	public boolean isFileShared(String userId, String fileId){
+		
+		if(isUserOwner(userId, fileId))
+			return false;
+		else if(userService.userHasFileAccess(userId, fileId))
+			return true;
+		else
+			return false;
+	}
+	
+	public JsonObject getFile(String fileId, boolean markShared){
+		
+		Document match = new Document();
+		match.append("_id", new ObjectId(fileId));
+		
+		FindIterable<Document> cursor = databaseService.getFileCollection().find(match);
+			
+		Document result = cursor.first();
+		
+		String messsage = result.getString("message");
+		String type = result.getString("type");
+		String id = result.get("_id").toString();
+		String name = result.getString("filename");
+		String time = result.getDate("uploadDate").toString();
+		String owner = result.getString("owner");
+		long size = result.getLong("length");
+		
+		JsonObject json = new JsonObject();
+		
+		if(StringUtils.isNotEmpty(messsage))
+			json.add("message", new JsonPrimitive(messsage));
+		
+		if(StringUtils.isNotEmpty(time))
+			json.add("time", new JsonPrimitive(time));
+		
+		if(StringUtils.isNotEmpty(type))
+			json.add("type", new JsonPrimitive(type));
+		
+		if(StringUtils.isNotEmpty(id))
+			json.add("id", new JsonPrimitive(id));
+		
+		if(StringUtils.isNotEmpty(name))
+			json.add("name", new JsonPrimitive(name));
+		
+		if(StringUtils.isNotEmpty(owner))
+			json.add("owner", new JsonPrimitive(owner));
+		
+		json.add("shared", new JsonPrimitive(markShared));
+		
+		json.add("size", new JsonPrimitive(FileUtils.byteCountToDisplaySize(size)));
+		
+		return json;	
+	}
+	
+	public JsonArray getFiles(String userId){
 	
 		MongoCursor<Document> cursor = null;
 		
@@ -142,12 +207,44 @@ public class FileService {
 			if(StringUtils.isNotEmpty(owner))
 				json.add("owner", new JsonPrimitive(owner));
 			
+			json.add("shared", new JsonPrimitive(false));
 			json.add("size", new JsonPrimitive(FileUtils.byteCountToDisplaySize(size)));
 			
 			jsonArray.add(json);
 		}
 		
-		return jsonArray;
+		return addSharedFiles(userId, jsonArray);
+	}
+	
+	public JsonArray addSharedFiles(String userId, JsonArray files){
+		
+		Document query = new Document();
+		query.append("user", userId);
+		
+		FindIterable<Document> results = databaseService.getUserCollection().find(query);
+		
+		results.forEach(new Block<Document>() {
+		    
+			@Override
+		    public void apply(final Document document) {
+		    	
+				@SuppressWarnings("unchecked")
+				ArrayList<Document> shared = (ArrayList<Document>) document.get("shared");
+				
+				if(shared==null || shared.isEmpty())
+					return;
+				
+				for(Document id : shared){
+					
+					String fileId = id.getString("_id");
+					JsonObject file = getFile(fileId, true);
+					
+					files.add(file);
+				}
+		    }
+		});
+		
+		return files;
 	}
 	
 	public JsonObject getTotalDiskSpace(String userKey){

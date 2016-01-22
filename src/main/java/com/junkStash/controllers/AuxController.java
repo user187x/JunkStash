@@ -183,7 +183,7 @@ public class AuxController {
 				String userKey = request.params(":userKey");
 				String userId = userService.getUserId(userKey);
 				
-				JsonArray jsonArray = fileService.getAllFiles(userId);
+				JsonArray jsonArray = fileService.getFiles(userId);
 				
 				if(jsonArray.isJsonNull() || !jsonArray.iterator().hasNext()){
 					
@@ -262,12 +262,10 @@ public class AuxController {
 			}
 	     });
 		 
-		 Spark.get("/shareFile/:userKey", new Route() {
+		 Spark.post("/shareFile/:userKey", new Route() {
 				
 			@Override
 			public Object handle(Request request, Response response) throws Exception {
-				
-				String userKey = request.params(":userKey");
 				
 				String data = request.body();
 				
@@ -276,6 +274,9 @@ public class AuxController {
 	         	
 	         	String userId = json.get("user").getAsString();
 	         	String fileId = json.get("fileId").getAsString();
+	         	
+	        	String actionUserKey = request.params(":userKey");
+				String actionUserId = userService.getUserId(actionUserKey);
 				
 				if(fileId == null || fileId.isEmpty() || userId == null || userId.isEmpty()){
 					
@@ -289,35 +290,55 @@ public class AuxController {
 	         		return payload;
 				}
 				
-				String allegedOwnersUserId = userService.getUserId(userKey);
 				JsonObject payload = new JsonObject();
 				
-				if(!fileService.isUserOwner(allegedOwnersUserId, fileId) || !userService.isUserAdmin(allegedOwnersUserId)){
+				if(!userService.userExists(userId)){
 					
-					payload.add("message", new JsonPrimitive("Only file owners can share this file"));
+					payload.add("message", new JsonPrimitive("Unknown System User"));
 		         	payload.add("success", new JsonPrimitive(false));
 	         		
 	         		return payload;
 				}
 				
-				boolean shareSuccess = userService.shareFile(userId, fileId);
+				boolean isActionUserOwner = fileService.isUserOwner(actionUserId, fileId);
+				boolean isActionUserAdmin = userService.isUserAdmin(actionUserId);
+				boolean isFileSharedWith = userService.userHasFileAccess(userId, fileId);
 				
-	         	if(shareSuccess){
-	         		
-	         		payload.add("message", new JsonPrimitive("Successfully Shared File : "+fileId));
-		         	payload.add("success", new JsonPrimitive(true));
-	         		
-	         		return payload;
-	         	}
-	         	else{
-		         	
-	         		payload.add("message", new JsonPrimitive("Failure Sharing File : "+fileId));
-	         		payload.add("userKey", new JsonObject());
+				if(isFileSharedWith){
+					
+					payload.add("message", new JsonPrimitive("User Already Has Access To This File"));
 		         	payload.add("success", new JsonPrimitive(false));
 	         		
 	         		return payload;
-	         	}	
+				}
 				
+				if(isActionUserOwner || isActionUserAdmin){
+					
+					boolean shareSuccess = userService.shareFile(userId, fileId);
+					
+		         	if(shareSuccess){
+		         		
+		         		payload.add("message", new JsonPrimitive("Successfully Shared File : "+fileId));
+			         	payload.add("success", new JsonPrimitive(true));
+		         		
+		         		return payload;
+		         	}
+		         	else{
+			         	
+		         		payload.add("message", new JsonPrimitive("Failure Sharing File : "+fileId));
+		         		payload.add("userKey", new JsonObject());
+			         	payload.add("success", new JsonPrimitive(false));
+		         		
+		         		return payload;
+		         	}
+				}
+				else{
+					
+					payload.add("message", new JsonPrimitive("Only file owners can share this file"));
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
+				}	
 			}
 	     });
 		 
@@ -511,8 +532,14 @@ public class AuxController {
 	         	System.out.println("Server Attempting To Remove File : "+json.get("name").getAsString());
 	         	
 	         	String fileId = json.get("id").getAsString();
-	         			
-	         	boolean removed = fileService.remove(fileId, userId);
+	         	
+	         	boolean isSharedFile = fileService.isFileShared(userId, fileId);
+	         	boolean removed;
+	         	
+	         	if(isSharedFile)
+	         		removed = fileService.removeShared(userId, fileId);
+	         	else
+	         		removed = fileService.remove(fileId, userId);
 	         	
 	         	if(removed){
 	         		

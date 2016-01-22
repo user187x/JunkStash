@@ -157,16 +157,13 @@ public class UserService {
 		return fileIds;
 	}
 	
-	//TODO Working Here.....
 	public boolean shareFile(String userId, String fileId){
-		
-		String fileOwner = fileService.getFileOwner(fileId);
 		
 		Document match = new Document();
 		match.append("user", userId);
 		
 		Document update = new Document();
-		update.append("shared", new Document("$addToSet", new Document("_id", fileId)).append("owner", fileOwner));
+		update.append("$addToSet", new Document("shared", new Document("_id", fileId)));
 		
 		UpdateResult results = databaseService.getUserCollection().updateOne(match, update);
 		
@@ -176,18 +173,38 @@ public class UserService {
 			return false;
 	}
 	
+	public boolean removeShare(String userId, String fileId){
+		
+		Document match = new Document();
+		match.append("user", userId);
+		
+		Document update = new Document();
+		update.append("$pull", new Document("shared", new Document("_id", fileId)));
+		
+		UpdateResult results = databaseService.getUserCollection().updateOne(match, update);
+		
+		if(results.getModifiedCount()>0)
+			return true;
+		else
+			return false;
+	}
+	
+	
 	public boolean userHasFileAccess(String userId, String fileId){
 		
 		Document match = new Document();
 		match.append("user", userId);
-		match.append("shared", new Document("$elemMatch", new Document("_id", fileId)));
+		
+		Document elemMatch = new Document();
+		elemMatch.append("$elemMatch", new Document("_id", new Document("shared.$._id", fileId)));
 		
 		FindIterable<Document> results = databaseService.getUserCollection().find(match);
+		Document document = results.first();
 		
-		if(results.iterator().hasNext())
-			return true;
-		else
+		if(document == null || document.isEmpty())
 			return false;
+		else
+			return true;
 	}
 	
 	public boolean isUserAdmin(String user){
