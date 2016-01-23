@@ -157,13 +157,18 @@ public class UserService {
 		return fileIds;
 	}
 	
-	public boolean shareFile(String userId, String fileId){
+	public boolean shareFile(String userId, String actionUserId, String fileId){
+		
+		Document shareInfo = new Document();
+		shareInfo.append("_id", fileId);
+		shareInfo.append("sharerId", actionUserId);
+		shareInfo.append("shareDate", new Date());
 		
 		Document match = new Document();
 		match.append("user", userId);
 		
 		Document update = new Document();
-		update.append("$addToSet", new Document("shared", new Document("_id", fileId)));
+		update.append("$addToSet", new Document("shared", shareInfo));
 		
 		UpdateResult results = databaseService.getUserCollection().updateOne(match, update);
 		
@@ -194,9 +199,7 @@ public class UserService {
 		
 		Document match = new Document();
 		match.append("user", userId);
-		
-		Document elemMatch = new Document();
-		elemMatch.append("$elemMatch", new Document("_id", new Document("shared.$._id", fileId)));
+		match.append("shared", new Document("$elemMatch", new Document("_id", fileId)));
 		
 		FindIterable<Document> results = databaseService.getUserCollection().find(match);
 		Document document = results.first();

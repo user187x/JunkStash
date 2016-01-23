@@ -103,17 +103,15 @@ public class FileAccessController {
 				}
 		     });
 			 
-		 Spark.get("/download/:fileId/:userKey", new Route() {
+		 Spark.get("/download/:userKey/:fileId", new Route() {
 			
 			@Override
 			public Object handle(Request request, Response response) throws Exception {
 				
-				String fileId = request.params(":fileId");
-				String userKey = request.params(":userKey");
+	         	String userKey = request.params(":userKey");
+	         	String fileId = request.params(":fileId");
 				
 				if(fileId == null || fileId.isEmpty() || userKey == null || userKey.isEmpty()){
-					
-					System.out.println("User Request To Download File With ID : "+fileId);
 					
 					JsonObject payload = new JsonObject();
 					payload.add("message", new JsonPrimitive("Request Was Empty"));
@@ -121,13 +119,31 @@ public class FileAccessController {
 	         		
 	         		return payload;
 				}
-				else{
+			
+				boolean fileExists = fileService.exists(fileId);
+				
+				if(!fileExists){
 					
-					ObjectId objectId = new ObjectId(fileId);
-					fileService.getGridFSBucket().downloadToStream(objectId, response.raw().getOutputStream());
-		         	
-		         	return response.raw();
+					JsonObject payload = new JsonObject();
+					payload.add("message", new JsonPrimitive("File No Longer Exists"));
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
 				}
+				
+				String fileName = fileService.getFileName(fileId);
+				
+				System.out.println("Request To Download File : "+fileName);
+
+				ObjectId objectId = new ObjectId(fileId);
+				fileService.getGridFSBucket().downloadToStream(objectId, response.raw().getOutputStream());
+	         	
+				String mimeType = fileService.getFile(fileId, null).get("type").getAsString();
+
+				response.header("Content-Disposition", "attachment; filename=" + fileName);
+				response.type(mimeType);
+				
+	         	return response.raw();
 			}
 	     });
 		 
@@ -183,7 +199,7 @@ public class FileAccessController {
 					
 					if(isActionUserOwner || isActionUserAdmin){
 						
-						boolean shareSuccess = userService.shareFile(userId, fileId);
+						boolean shareSuccess = userService.shareFile(userId, actionUserId, fileId);
 						
 			         	if(shareSuccess){
 			         		

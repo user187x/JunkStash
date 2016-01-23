@@ -3,6 +3,7 @@ package com.junkStash.services;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Date;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -120,7 +121,7 @@ public class FileService {
 			return false;
 	}
 	
-	public JsonObject getFile(String fileId, boolean markShared){
+	public JsonObject getFile(String fileId, Document shareInfo){
 		
 		Document match = new Document();
 		match.append("_id", new ObjectId(fileId));
@@ -157,8 +158,22 @@ public class FileService {
 		if(StringUtils.isNotEmpty(owner))
 			json.add("owner", new JsonPrimitive(owner));
 		
-		json.add("shared", new JsonPrimitive(markShared));
+		JsonObject shareDetails = new JsonObject();
 		
+		if(shareInfo!=null){
+			
+			String sharerId = shareInfo.getString("sharerId");
+			Date shareDate = shareInfo.getDate("shareDate");
+			
+			shareDetails.add("shared", new JsonPrimitive(true));
+			shareDetails.add("sharer", new JsonPrimitive(sharerId));
+			shareDetails.add("shareDate", new JsonPrimitive(shareDate.toString()));
+		}
+		else{
+			shareDetails.add("shared", new JsonPrimitive(false));
+		}
+		
+		json.add("shared", shareDetails);
 		json.add("size", new JsonPrimitive(FileUtils.byteCountToDisplaySize(size)));
 		
 		return json;	
@@ -207,13 +222,42 @@ public class FileService {
 			if(StringUtils.isNotEmpty(owner))
 				json.add("owner", new JsonPrimitive(owner));
 			
-			json.add("shared", new JsonPrimitive(false));
+			JsonObject shareInfo = new JsonObject();
+			shareInfo.add("shared", new JsonPrimitive(false));
+			
+			json.add("shared", shareInfo);
 			json.add("size", new JsonPrimitive(FileUtils.byteCountToDisplaySize(size)));
 			
 			jsonArray.add(json);
 		}
 		
+		pruneOrphanedSharedFiles(userId);
+		
 		return addSharedFiles(userId, jsonArray);
+	}
+	
+	public void pruneOrphanedSharedFiles(String userId){
+		
+		Document query = new Document();
+		query.append("user", userId);
+		
+		FindIterable<Document> results = databaseService.getUserCollection().find(query);
+		
+		Document user = results.first();
+		
+		if(user.get("shared")==null)
+			return;
+		
+		ArrayList<Document> sharedFiles = (ArrayList<Document>) user.get("shared");
+		
+		for(Document share : sharedFiles){
+			
+			String fileId = share.getString("_id");
+			
+			if(!exists(fileId)){
+				removeShared(userId, fileId);
+			}
+		}
 	}
 	
 	public JsonArray addSharedFiles(String userId, JsonArray files){
@@ -237,7 +281,7 @@ public class FileService {
 				for(Document id : shared){
 					
 					String fileId = id.getString("_id");
-					JsonObject file = getFile(fileId, true);
+					JsonObject file = getFile(fileId, id);
 					
 					files.add(file);
 				}

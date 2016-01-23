@@ -73,7 +73,9 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
     				name : value.name,
     				type : value.type,
     				size : value.size,
-    				shared : value.shared,
+    				shared : value.shared.shared,
+    				sharer : value.shared.sharer,
+    				shareDate : value.shared.shareDate,
     				owner : value.owner
 				});
 		    });
@@ -175,7 +177,7 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
 			$scope.refresh();
 		});
 	};
-	
+		
 	$scope.removeUser = function(data){
 		
 		homeFactory.removeUser(data, $scope.userKey).success(function (data) {

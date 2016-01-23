@@ -20,7 +20,7 @@ public class DatabaseConfig {
 	public static final String GRID_FS = "fileStore";	
 	public static final String USER_COLLECTION = "users";
 	public static final String FILE_COLLECTION = "fileStore.files";
-	public static final String DATABASE = "webapp";
+	public static final String DATABASE = "junkstash";
 	
 	private static MongoClient mongoClient;
     

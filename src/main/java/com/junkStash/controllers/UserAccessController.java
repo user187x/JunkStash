@@ -102,7 +102,6 @@ public class UserAccessController {
 			}
 	     });
 		 
-		 
 		 Spark.get("/userExists/:userId", new Route() {
 			 
 			@Override
