@@ -31,6 +31,10 @@ app.factory('homeFactory', ['$http', function($http) {
     	return $http.get('/whoIs/'+userId);
     };
     
+    var userExists = function (userId) {
+    	return $http.get('/userExists/'+userId);
+    };
+    
     var getUsers = function (userKey) {
     	return $http.get('/getUsers/'+userKey);
     };
@@ -47,8 +51,8 @@ app.factory('homeFactory', ['$http', function($http) {
     	return $http.post('/logout', payload);
     };
     
-    var approve = function(payload, userKey) {
-    	return $http.post('/approve/'+userKey, payload);
+    var approveUser = function(payload, userKey) {
+    	return $http.post('/approveUser/'+userKey, payload);
     };
     
     var register = function(payload){
@@ -63,9 +67,10 @@ app.factory('homeFactory', ['$http', function($http) {
     	removeFile : removeFile,
     	shareFile : shareFile,
     	removeUser : removeUser,
-    	approve : approve,
+    	approveUser : approveUser,
     	getFiles : getFiles,
     	getUsers : getUsers,
+    	userExists : userExists,
     	searchUser : searchUser,
     	getTotalDiskSpace : getTotalDiskSpace
     };

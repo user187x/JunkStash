@@ -102,7 +102,35 @@ public class UserAccessController {
 			}
 	     });
 		 
-		 Spark.post("/approve/:userKey", new Route() {
+		 
+		 Spark.get("/userExists/:userId", new Route() {
+			 
+			@Override
+			public Object handle(Request request, Response response) throws Exception {
+				
+				JsonObject payload = new JsonObject();
+				
+				System.out.println("User Request at Path : ("+request.pathInfo()+") "+new Date());
+				
+				String userId = request.params(":userId");
+				
+				if(userId == null || userId.isEmpty()){
+					
+					payload.add("message", new JsonPrimitive("Request Was Empty"));
+	         		
+	         		return payload;
+				}
+				
+				boolean userExists = userService.userExists(userId);
+				
+	         	payload.add("exists", new JsonPrimitive(userExists));
+	         	
+	         	return payload;
+				
+			}
+	     });
+		 
+		 Spark.post("/approveUser/:userKey", new Route() {
 		     	
 	     	 @Override
 	         public Object handle(Request request, Response response) {
@@ -284,7 +312,17 @@ public class UserAccessController {
 	         	System.out.println("Server Creating Account For User "+json.get("user").getAsString());
 	         	
 	         	String user = json.get("user").getAsString();
-	         	String password = json.get("password").getAsString();
+	         	String password1 = json.get("password1").getAsString();
+	         	String password2 = json.get("password2").getAsString();
+	         	
+	         	if(!password1.equals(password2)){
+	         		
+	         		payload.add("message", new JsonPrimitive("Failure Creating User Account : Passwords Don't Match"));
+	         		payload.add("userKey", new JsonObject());
+		         	payload.add("success", new JsonPrimitive(false));
+	         			         		
+	         		return payload;
+	         	}
 	         	
 	         	boolean userFound = userService.userExists(user);
 	         	
@@ -297,9 +335,9 @@ public class UserAccessController {
 	         		return payload;
 	         	}
 	         	
-	         	if(userService.createUser(user, password)){
+	         	if(userService.createUser(user, password1)){
 
-	         		String userKey = userService.getUserKey(user, password);
+	         		String userKey = userService.getUserKey(user, password1);
 	         		
 	         		payload.add("message", new JsonPrimitive("Account Created"));
 	         		payload.add("userKey", new JsonPrimitive(userKey));

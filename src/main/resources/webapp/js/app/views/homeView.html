@@ -122,7 +122,10 @@
 					<td data-ng-if="admin">{{file.owner}}</td>
 					
 					<td data-ng-click="toggleShareModal(file)" style="text-align:center">
-						<i data-ng-if="file.shared" class="fa fa-share-square"></i>
+						<i data-ng-if="file.shared"
+							data-uib-tooltip="Shared By {{sharer}}" 
+							class="fa fa-share-square">
+						</i>
 						<i class="fa fa-share-alt" style="cursor:pointer; color:balck"></i>
 					</td>
 					
@@ -183,7 +186,7 @@
 					<td>{{user.added}}</td>
 					<td>{{user.space}}</td>
 					<td>
-						<i data-ng-click="approve(user.user)" 
+						<i data-ng-click="approveUser(user.user)" 
 							class="fa fa-thumbs-o-up"
 							title="Approve User" 
 							style="cursor: pointer; padding-right:10px;"></i>

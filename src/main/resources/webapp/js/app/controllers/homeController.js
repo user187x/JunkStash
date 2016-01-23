@@ -184,9 +184,9 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
 		});
 	};
 	
-	$scope.approve = function(data){
+	$scope.approveUser = function(data){
 		
-		homeFactory.approve(data, $scope.userKey).success(function (data) {
+		homeFactory.approveUser(data, $scope.userKey).success(function (data) {
 			$scope.result = data;
 			$scope.refresh();
 		});

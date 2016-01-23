@@ -10,12 +10,14 @@ app.directive('loginmodal', ['homeFactory', '$timeout', '$rootScope', function (
 	    link: function postLink(scope, element, attrs) {
     
 	    	scope.user = undefined;
-	    	scope.password = undefined;
+	    	scope.password1 = undefined;
+	    	scope.password2 = undefined;
 	    	scope.admin = undefined;
 	    	scope.userKey = undefined;
 	    	scope.result = undefined;
 	    	scope.registeringUser = false;
 	    	scope.enabled = false;
+	    	scope.userExists = false;
 	    	
 	        scope.toggleRegister = function(){
 	            scope.registeringUser = !scope.registeringUser;
@@ -48,7 +50,8 @@ app.directive('loginmodal', ['homeFactory', '$timeout', '$rootScope', function (
 	        	
 	        	var payload = {
         			user : scope.user, 
-        			password : scope.password
+        			password1 : scope.password1,
+        			password2 : scope.password2
 	        	};
 	        	
 	        	homeFactory.login(payload).success(function (data) {
@@ -97,19 +100,34 @@ app.directive('loginmodal', ['homeFactory', '$timeout', '$rootScope', function (
 	        var clearForm = function(){
 	        	
 		    	scope.user = undefined;
-		    	scope.password = undefined;
+		    	scope.password1 = undefined;
+		    	scope.password2 = undefined;
 		    	scope.userKey = undefined;
 		    	scope.result = undefined;
 		    	scope.registeringUser = false;
+		    	scope.userExists = false;
 	        };
 	        
 	        scope.isEnabled = function(){
 	        	
-	        	if(password===undefined)
-	        		return false;
+	        	if(scope.password1===undefined || scope.password1==='')
+	        		scope.enabled = false;
+	        	
+	        	if(scope.registeringUser===true)
+		        	scope.enabled = scope.password1===scope.password2 && !scope.userExists
+	        };
+	        
+	        scope.checkUser = function(user){
+
+	        	if(user===undefined || user===''){
+	        		scope.enabled = false;
+	        		return;
+	        	}
 	        		
-	        	scope.enabled = password===passwordconfirm;
-	        }
+	        	homeFactory.userExists(user).success(function (data) {
+	    			scope.userExists = data.exists;
+	        	});
+	        };
 	        
 	    	$rootScope.$on('user-logout', function (event, args) {
 	    		clearForm();
