@@ -46,12 +46,11 @@ app.directive('loginmodal', ['homeFactory', '$timeout', '$rootScope', function (
 		        });
 	        });
 	        
-	        scope.submit = function(){
+	        scope.login = function(){
 	        	
 	        	var payload = {
-        			user : scope.user, 
-        			password1 : scope.password1,
-        			password2 : scope.password2
+        			user : scope.user,
+        			password : scope.password1
 	        	};
 	        	
 	        	homeFactory.login(payload).success(function (data) {
@@ -119,6 +118,8 @@ app.directive('loginmodal', ['homeFactory', '$timeout', '$rootScope', function (
 	        
 	        scope.checkUser = function(user){
 
+	        	scope.user = user;
+	        	
 	        	if(user===undefined || user===''){
 	        		scope.enabled = false;
 	        		return;
@@ -140,7 +141,8 @@ app.directive('loginmodal', ['homeFactory', '$timeout', '$rootScope', function (
 	        	
 	        	var payload = {
         			user : scope.user, 
-        			password : scope.password
+        			password1 : scope.password1,
+        			password2 : scope.password2
 	        	};
 	        	
 	        	homeFactory.register(payload).success(function (data) {
