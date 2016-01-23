@@ -126,6 +126,9 @@ app.directive('loginmodal', ['homeFactory', '$timeout', '$rootScope', function (
 	        		
 	        	homeFactory.userExists(user).success(function (data) {
 	    			scope.userExists = data.exists;
+	    			scope.result = data;
+	    			
+	    			scope.isEnabled();
 	        	});
 	        };
 	        

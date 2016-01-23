@@ -123,6 +123,15 @@ public class UserAccessController {
 				
 				boolean userExists = userService.userExists(userId);
 				
+				if(userExists){
+					payload.add("message", new JsonPrimitive("User Account Already Exists"));
+					payload.add("success", new JsonPrimitive(false));
+				}
+				else{
+					payload.add("message", new JsonPrimitive("User Account Doesn't Exist"));
+					payload.add("success", new JsonPrimitive(true));
+				}
+				
 	         	payload.add("exists", new JsonPrimitive(userExists));
 	         	
 	         	return payload;

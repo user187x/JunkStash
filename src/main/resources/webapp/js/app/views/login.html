@@ -36,14 +36,27 @@
 			    	</div>
 			    	
 			    	<div data-ng-if="registeringUser" class="form-group">
-			      		<label data-uib-tooltip="JunkStash User ID/email" for="userId">User</label>
-			      		<input type="text" 
-			      			class="form-control"
-			      			data-ng-model="user" 
-			      			data-ng-change="checkUser(user)"
-			      			placeholder="User ID" />
+			      		
+			      		<label data-uib-tooltip="JunkStash User ID/email" for="userId">User</label>			      			
+				      	<div class="input-group">
+	  						<input type="text" 
+		  						class="form-control" 
+		  						data-ng-model="user" 
+				      			data-ng-change="checkUser(user)"
+				      			placeholder="User ID">
+	  						<span data-ng-if="!userExists" class="input-group-addon" >
+	  							<i class="fa fa-circle-o-notch fa-spin"
+	  								style="color:green">
+	  							</i>
+	  						</span>
+	  						<span data-ng-if="userExists" class="input-group-addon" >
+	  							<i class="fa fa-circle-o-notch fa-spin"
+	  								style="color:red">
+	  							</i>
+	  						</span>
+						</div>	
 			    	</div>
-			    
+
 			    	<div class="form-group">
 			      		<label for="password1">Password</label>
 			      		<input type="password" 
@@ -70,8 +83,7 @@
 		  		<button 
 		  			data-ng-if="!registeringUser" 
 		  			class="btn btn-success pull-left"
-		  			data-ng-click="toggleRegister()"
-		  			data-uib-tooltip="Create Account">
+		  			data-ng-click="toggleRegister()">
 		  				<i class="fa fa-user-plus">&nbsp;Register</i>
 	  			</button>
 	  			
@@ -79,8 +91,7 @@
 		  			data-ng-disabled="!enabled"
 		  			data-ng-if="registeringUser" 
 		  			class="btn btn-success pull-left"
-		  			data-ng-click="register()"
-		  			data-uib-tooltip="Register User">
+		  			data-ng-click="register()">
 		  				<i class="fa fa-user-plus">&nbsp;Submit</i>
 	  			</button>
 	  			
