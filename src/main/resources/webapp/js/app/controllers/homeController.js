@@ -1,4 +1,5 @@
-app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScope' ,function($scope, homeFactory, $timeout, $rootScope) {
+app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScope' ,
+      function($scope, homeFactory, $timeout, $rootScope) {
 	
 	$scope.files = [];
 	$scope.users = [];

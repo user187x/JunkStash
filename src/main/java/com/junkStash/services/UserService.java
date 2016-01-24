@@ -5,6 +5,8 @@ import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
+import org.joda.time.DateTime;
+import org.joda.time.Days;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +28,9 @@ public class UserService {
 	
 	@Autowired
 	private FileService fileService;
+	
+	public static final int MAX_ATTEMPTS = 10;
+	public static final int DAY_LIMIT = 1;
 	
 	public boolean userExists(String user){
 		
@@ -110,6 +115,131 @@ public class UserService {
 			return null;
 		
 		return addUserIdentifier(user, password);
+	}
+	
+	public boolean isAuthenticated(String user, String password){
+	
+		Document query = new Document();
+		query.append("user", user);
+		query.append("password", password);
+		
+		FindIterable<Document> results = databaseService.getUserCollection().find(query);
+		
+		if(results.iterator().hasNext())
+			return true;
+		else
+			return false;
+	}
+	
+	public boolean hasExaustedLoginAttempts(String userId){
+		
+		incrementLoginAttempt(userId, new Date());
+		
+		int numberAttempts = getNumLoginAttempts(userId);
+		boolean enoughTimeBetweenAttempts = hasEnoughTimeHasLapsed(userId);
+		
+		if(numberAttempts<MAX_ATTEMPTS)
+			return false;
+		else if(numberAttempts==MAX_ATTEMPTS && enoughTimeBetweenAttempts)
+			return false;
+		else if(numberAttempts==MAX_ATTEMPTS && !enoughTimeBetweenAttempts)
+			return true;
+		else
+			return true;
+	}
+	
+	public boolean hasEnoughTimeHasLapsed(String userId){
+		
+		Date lastLoginAttemptTime = getLastLoginAttemptTime(userId);
+		DateTime last = new DateTime(lastLoginAttemptTime);
+		
+		DateTime now = new DateTime(new Date());
+		
+		int numberDays = Days.daysBetween(last, now).getDays();
+		
+		if(numberDays< DAY_LIMIT)
+			return false;
+		else
+			return true;
+	}
+	
+	public Date getLastLoginAttemptTime(String userId){
+		
+		Document query = new Document();
+		query.append("user", userId);
+		
+		FindIterable<Document> results = databaseService.getUserCollection().find(query);
+		
+		Document document = results.first();
+		
+		if(document.getDate("lastLoginAttempt")==null){
+			
+			Date now = new Date();
+			
+			Document match = new Document();
+			match.append("user", userId);
+			
+			Document update = new Document();
+			update.append("$set", new Document("lastLoginAttempt", now));
+			
+			databaseService.getUserCollection().updateOne(match, update);
+			
+			return now;
+		}
+		
+		return document.getDate("lastLoginAttempt");
+	}
+	
+	public int getNumLoginAttempts(String userId){
+		
+		Document query = new Document();
+		query.append("user", userId);
+		
+		FindIterable<Document> results = databaseService.getUserCollection().find(query);
+		
+		Document document = results.first();
+		
+		try{
+			
+			int count = document.getInteger("loginAttempts");
+			
+			return count;
+		}
+		catch(Exception e){
+			
+			Document match = new Document();
+			match.append("user", userId);
+			
+			Document update = new Document();
+			update.append("$set", new Document("loginAttempts", 0));
+			
+			databaseService.getUserCollection().updateOne(match, update);
+			
+			return 0;	
+		}
+	}
+	
+	public void incrementLoginAttempt(String userId, Date date){
+		
+		Document match = new Document();
+		match.append("user", userId);
+		
+		Document update = new Document();
+		update.append("$inc", new Document("loginAttempts", 1));
+		update.append("$set", new Document("lastLoginAttempt", date));
+		
+		databaseService.getUserCollection().updateOne(match, update);
+	}
+	
+	public void removeLoginAttempts(String userId){
+		
+		Document match = new Document();
+		match.append("user", userId);
+		
+		Document update = new Document();
+		update.append("$unset", new Document("loginAttempts", 1).append("lastLoginAttempt", 1));
+		
+		databaseService.getUserCollection().updateOne(match, update);
 	}
 	
 	public boolean removeUser(String actionUser, String targetUser){

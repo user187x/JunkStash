@@ -8,12 +8,18 @@
 		 <nav class="navbar navbar-inverse">
 		 	<div class="container-fluid">
 		    	<div class="navbar-header">
-		      		<a class="navbar-brand">JunkStash</a>
+		      		<a class="navbar-brand" 
+	      				title="JunkStash" 
+	      				data-toggle="popover" 
+	      				data-content="Login To Begin"
+	      				data-placement="left" 
+	      				data-trigger="hover">JunkStash</a>
 		    	</div>
 		    	<ul class="nav navbar-nav navbar-right">
 		      		<li>
 		      			<a data-ng-show="!user" data-ng-click="toggleLoginModal()">
-		      				<span class="glyphicon glyphicon-log-in"></span> Login
+		      				<span class="glyphicon glyphicon-log-in">
+		      				</span> Login
 		      			</a>
 	      			</li>
 	      			<li data-ng-show="user" class="dropdown">
@@ -127,18 +133,18 @@
 						<a href="/download/{{userKey}}/{{file.id}}" download="file.name">
 							<i class="fa fa-arrow-circle-down"
 								data-uib-tooltip="Download File"  
-								style="cursor:pointer; padding-left:10px;">
+								style="cursor:pointer; padding-right:10px;">
 							</i>
 						</a>
 						<i class="fa fa-share-alt" 
 							data-ng-click="toggleShareModal(file)"
 							data-uib-tooltip="Share File"  
-							style="cursor:pointer; color:balck; padding-left:10px">
+							style="cursor:pointer; color:balck; padding-right:10px">
 						</i>
 						<i class="fa fa-trash-o"
 							data-ng-click="removeFile(file)"
 							data-uib-tooltip="Delete File" 
-							style="cursor:pointer; color:balck; padding-left:10px">
+							style="cursor:pointer; color:balck; padding-right:10px">
 						</i>
 					</td>
 				</tr>
@@ -180,6 +186,7 @@
 		<table data-ng-show="admin" class="table table-striped table-hover" style="border: 2px solid #ccc">
 	    	<thead>
 		        <tr>
+		        	<th></th>
 		    		<th>User</th>
 		        	<th>Status</th>
 		        	<th>Added</th>
@@ -189,6 +196,7 @@
 	    	</thead>
 	    	<tbody>
 				<tr data-ng-repeat="user in users  | filter:userSearch">
+					<td></td>
 					<td><strong>{{user.user}}</strong></td>
 					<td>{{user.status}}</td>
 					<td>{{user.added}}</td>

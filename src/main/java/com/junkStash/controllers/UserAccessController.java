@@ -202,12 +202,12 @@ public class UserAccessController {
 		     	
 	     	 @Override
 	         public Object handle(Request request, Response response) {
-	            
+	     		 
 	     		JsonObject payload = new JsonObject();
 	     		
 	         	String data = request.body();
 	         	
-	         	if(data.isEmpty()){
+	         	if(data.isEmpty() || data.equals("{}")){
 		         	
 	         		payload.add("message", new JsonPrimitive("Request Was Empty"));
 		         	payload.add("success", new JsonPrimitive(false));
@@ -224,6 +224,38 @@ public class UserAccessController {
 	         	
 	         	String userName = json.get("user").getAsString();
 	         	String userPassword = json.get("password").getAsString();
+	         	
+	         	boolean userAccountExists = userService.userExists(userName);
+	         	
+	         	if(!userAccountExists){
+	         		
+	         		payload.add("message", new JsonPrimitive("User Not Found"));
+		         	payload.add("success", new JsonPrimitive(false));
+		         	
+		         	return payload;
+	         	}
+	         	
+         		boolean exceededLoginAttempts = userService.hasExaustedLoginAttempts(userName);
+         		
+	         	if(exceededLoginAttempts){
+	         		
+	         		payload.add("message", new JsonPrimitive("User Has Exhausted Login Attempts"));
+		         	payload.add("success", new JsonPrimitive(false));
+		         	
+		         	return payload;
+	         	}
+	         	
+	         	boolean authenticated = userService.isAuthenticated(userName, userPassword);
+	         	
+	         	if(!authenticated){
+	         		
+	         		payload.add("message", new JsonPrimitive("Wrong Password"));
+		         	payload.add("success", new JsonPrimitive(false));
+		         	
+		         	return payload;
+	         	}
+
+	         	userService.removeLoginAttempts(userName);
 	         	
 	         	String userKey = userService.getUserKey(userName, userPassword);
 	         	boolean userFound = StringUtils.isNotEmpty(userKey);
