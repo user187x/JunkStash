@@ -31,6 +31,10 @@ app.factory('homeFactory', ['$http', function($http) {
     	return $http.get('/whoIs/'+userId);
     };
     
+    var findUsers = function (userKey, searchUser) {
+    	return $http.get('/findUsers/'+userKey+'/'+searchUser);
+    };
+    
     var userExists = function (userId) {
     	return $http.get('/userExists/'+userId);
     };
@@ -72,6 +76,7 @@ app.factory('homeFactory', ['$http', function($http) {
     	getUsers : getUsers,
     	userExists : userExists,
     	searchUser : searchUser,
+    	findUsers : findUsers,
     	getTotalDiskSpace : getTotalDiskSpace
     };
     

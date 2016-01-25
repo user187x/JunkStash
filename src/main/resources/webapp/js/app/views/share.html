@@ -26,7 +26,14 @@
 				</div>
 
 		  		<div class="input-group">
-  					<input type="text" class="form-control" data-ng-model="shareUser" placeholder="User's ID" aria-describedby="basic-addon2">
+  					
+  					<input type="text" 
+  						class="form-control" 
+  						data-ng-model="shareUser"
+  						data-ng-change="findUsers()" 
+  						placeholder="User's ID" 
+  						aria-describedby="basic-addon2">
+  					
   					<span class="input-group-addon" id="basic-addon2">
   						<i data-ng-show="searching"
   							data-toggle="Search For User" 
@@ -50,10 +57,12 @@
   							style="cursor:pointer">
   						</i>
   					</span>
-				</div>
-		  		
-		  	</div>
-		  	
+				</div> 
+			
+			<div data-ng-repeat="value in users">
+  				<button type="button" data-ng-click="setUser(value.user)" class="btn btn-secondary">{{value.user}}</button>
+			</div>
+			
 		  	<div class="modal-footer">
 				
 				<button type="submit" class="btn btn-primary" data-ng-click="shareFile()">Share</button>

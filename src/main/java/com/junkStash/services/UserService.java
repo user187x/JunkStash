@@ -2,6 +2,7 @@ package com.junkStash.services;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
@@ -93,6 +94,31 @@ public class UserService {
 			return results.iterator().next().getString("user");
 		else
 			return null;
+	}
+	
+	public JsonArray findUsersLike(String user){
+		
+		Document match = new Document();
+		match.append("user",  Pattern.compile(user));
+		
+		MongoCursor<Document> cursor = databaseService.getUserCollection().find(match).iterator();
+		
+		JsonArray jsonArray = new JsonArray();
+		
+		while(cursor.hasNext()){
+			
+			Document result = cursor.next();
+			
+			String userId = result.getString("user");
+			JsonObject json = new JsonObject();
+			
+			if(StringUtils.isNotEmpty(userId))
+				json.add("user", new JsonPrimitive(userId));
+			
+			jsonArray.add(json);
+		}
+		
+		return jsonArray;
 	}
 	
 	public boolean createUser(String userId, String password){

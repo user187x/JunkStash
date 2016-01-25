@@ -57,10 +57,8 @@ public class FileService {
 	
 	public boolean exists(String fileId){
 		
-		ObjectId objectId = new ObjectId(fileId);
-		
 		Document query = new Document();
-		query.append("_id", objectId);
+		query.append("_id", new ObjectId(fileId));
 		
 		FindIterable<Document> results = databaseService.getFileCollection().find(query);
 		
@@ -75,7 +73,7 @@ public class FileService {
 		
 		Document match = new Document();
 		match.append("owner", userId);
-		match.append("_id", fileId);
+		match.append("_id", new ObjectId(fileId));
 		
 		MongoCursor<Document> cursor = databaseService.getFileCollection().find(match).iterator();
 		
@@ -85,11 +83,13 @@ public class FileService {
 			return false;
 	}
 	
-	public boolean isEnoughDiskspace(long size){
+	public boolean isDiskCapacityFull(long size){
 		
-		//TODO
+		//sum all users sizes
+		//subtract total server size
+		//check if new account is less than equal to remaining
 		
-		return true;
+		return false;
 	}
 	
 	public boolean remove(String fileId, String userId){
@@ -426,10 +426,8 @@ public class FileService {
 	
 	public String getFileOwner(String fileId){
 		
-		ObjectId objectId = new ObjectId(fileId);
-		
 		Document query = new Document();
-		query.append("_id", objectId);
+		query.append("_id", new ObjectId(fileId));
 		
 		FindIterable<Document> results = databaseService.getFileCollection().find(query);
 		

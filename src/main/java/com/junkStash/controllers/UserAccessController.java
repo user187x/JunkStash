@@ -106,6 +106,46 @@ public class UserAccessController {
 			}
 	     });
 		 
+		 Spark.get("/findUsers/:userKey/:searchUser", new Route() {
+			 
+			@Override
+			public Object handle(Request request, Response response) throws Exception {
+				
+				JsonObject payload = new JsonObject();
+				
+				String userKey = request.params(":userKey");
+				String searchUserId = request.params(":searchUser");
+				
+				if(searchUserId == null || searchUserId.isEmpty() || userKey == null || userKey.isEmpty()){
+					
+					payload.add("message", new JsonPrimitive("Request Parameters Were Missing"));
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
+				}
+				
+				String actionUser = userService.getUserId(userKey);
+				boolean userExists = userService.userExists(actionUser);
+				
+				if(!userExists){
+					
+					payload.add("message", new JsonPrimitive("Unknown User"));
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
+				}
+				
+				JsonArray jsonArray = userService.findUsersLike(searchUserId);
+				
+				payload.add("message", new JsonPrimitive("Successful Search Results"));
+	         	payload.add("success", new JsonPrimitive(true));
+	         	payload.add("payload", jsonArray);
+	         	
+	         	return payload;
+				
+			}
+	     });
+		 
 		 Spark.get("/userExists/:userId", new Route() {
 			 
 			@Override
@@ -338,7 +378,7 @@ public class UserAccessController {
 	            
 	     		JsonObject payload = new JsonObject();
 	     		
-	     		boolean capacityFull = fileService.isEnoughDiskspace(FileService.USER_SPACE_SIZE);
+	     		boolean capacityFull = fileService.isDiskCapacityFull(FileService.USER_SPACE_SIZE);
 	     		
 	     		if(capacityFull){
 		         	

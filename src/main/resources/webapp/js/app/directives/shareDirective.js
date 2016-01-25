@@ -55,16 +55,32 @@ app.directive('sharemodal', ['homeFactory', '$timeout', '$rootScope', function (
 		    	scope.result = undefined;
 	        };
 	        
-	        scope.searchUser = function(){
+	        scope.setUser = function(user){
 	        	
-	        	console('Form User......'+scope.shareUser);
-	        	
-	        	homeFactory.searchUser(scope.shareUser).success(function (data) {
+	        	scope.shareUser = user;
+	        	scope.shareFile();
+	        }
+	        
+	    	scope.findUsers = function() { 		
+	    		
+	    		if(scope.shareUser===undefined || scope.shareUser===''){
+	    			scope.users = [];
+	    			return;
+	    		}
+	    		
+	    		scope.users = [];
+	    		
+	    		homeFactory.findUsers(scope.userKey, scope.shareUser).success(function (data) {
 	    			
-	    			scope.result = data;
-	    			autoCloseAlert();
-	        	});
-	        };
+	    		    angular.forEach(data.payload, function(value, key) {
+	    		        
+	    		    	scope.users.push({ 
+	    		    		
+	    		    		user : value.user
+	    				});
+	    		    });
+	    		});
+	    	};
 	        
 	        scope.shareFile = function(){
 	        	
