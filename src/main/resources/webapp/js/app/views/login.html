@@ -44,13 +44,15 @@
 		  						data-ng-model="user" 
 				      			data-ng-change="checkUser(user)"
 				      			placeholder="User ID">
-	  						<span data-ng-if="!userExists" class="input-group-addon" >
+	  						<span data-ng-if="!userExists" 
+	  								data-uib-tooltip="Searching For Valid User ID" 
+	  								class="input-group-addon" >
 	  							<i class="fa fa-circle-o-notch fa-spin"
 	  								style="color:green">
 	  							</i>
 	  						</span>
 	  						<span data-ng-if="userExists" class="input-group-addon" >
-	  							<i class="fa fa-circle-o-notch fa-spin"
+	  							<i class="fa fa-times-circle"
 	  								style="color:red">
 	  							</i>
 	  						</span>

@@ -38,14 +38,14 @@ app.directive('sharemodal', ['homeFactory', '$timeout', '$rootScope', function (
 	        	
 	        	$timeout(function(){
 	        		$(element).modal('hide');
-	            }, 500);
+	            }, 800);
 	        };
 	        
 	        var autoCloseAlert = function(){
 	            
 	        	$timeout(function(){
 	        		scope.result = undefined;
-	            }, 1000);
+	            }, 2000);
 	        };
 	        
 	        var clearForm = function(){

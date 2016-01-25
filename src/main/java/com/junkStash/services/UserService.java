@@ -102,6 +102,7 @@ public class UserService {
 		document.append("password", password);
 		document.append("created", new Date());
 		document.append("status", "Pending");
+		document.append("diskSpace", FileService.USER_SPACE_SIZE);
 		
 		databaseService.getUserCollection().insertOne(document);
 		addUserIdentifier(userId, password);
@@ -131,7 +132,7 @@ public class UserService {
 			return false;
 	}
 	
-	public boolean hasExaustedLoginAttempts(String userId){
+	public boolean hasExhaustedLoginAttempts(String userId){
 		
 		incrementLoginAttempt(userId, new Date());
 		

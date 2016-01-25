@@ -72,7 +72,7 @@ app.directive('loginmodal', ['homeFactory', '$timeout', '$rootScope', function (
 	        	$timeout(function(){
 	        		
 	        		$(element).modal('hide');
-	            }, 500);
+	            }, 800);
 	        };
 	        
 	        var autoCloseAlert = function(){
@@ -80,7 +80,7 @@ app.directive('loginmodal', ['homeFactory', '$timeout', '$rootScope', function (
 	        	$timeout(function(){
 	        		
 	        		scope.result = undefined;
-	            }, 1000);
+	            }, 2000);
 	        };
 	        
 	        var acknowledge = function(success, user, userKey, admin){
@@ -130,6 +130,7 @@ app.directive('loginmodal', ['homeFactory', '$timeout', '$rootScope', function (
 	    			scope.result = data;
 	    			
 	    			scope.isEnabled();
+	    			autoCloseAlert();
 	        	});
 	        };
 	        

@@ -25,6 +25,12 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
     $scope.maxSpaceNormalized = undefined;
     $scope.maxSpace = undefined;
     $scope.percentUsed = undefined;
+    $scope.spinLogo = false;
+    
+    $scope.toggleSpin = function(){
+    	
+        $scope.spinLogo = !$scope.spinLogo;
+    };
     
     $scope.toggleLoginModal = function(){
     	

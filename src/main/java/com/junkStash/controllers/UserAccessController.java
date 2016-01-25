@@ -11,6 +11,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+import com.junkStash.services.FileService;
 import com.junkStash.services.UserService;
 
 import spark.Request;
@@ -24,6 +25,9 @@ public class UserAccessController {
 	
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private FileService fileService;
 	
 	public UserAccessController() {	
 		setUpRoutes();
@@ -235,11 +239,11 @@ public class UserAccessController {
 		         	return payload;
 	         	}
 	         	
-         		boolean exceededLoginAttempts = userService.hasExaustedLoginAttempts(userName);
+         		boolean exceededLoginAttempts = userService.hasExhaustedLoginAttempts(userName);
          		
 	         	if(exceededLoginAttempts){
 	         		
-	         		payload.add("message", new JsonPrimitive("User Has Exhausted Login Attempts"));
+	         		payload.add("message", new JsonPrimitive("Account Has Been Locked For 24 Hours"));
 		         	payload.add("success", new JsonPrimitive(false));
 		         	
 		         	return payload;
@@ -333,6 +337,16 @@ public class UserAccessController {
 	         public Object handle(Request request, Response response) {
 	            
 	     		JsonObject payload = new JsonObject();
+	     		
+	     		boolean capacityFull = fileService.isEnoughDiskspace(FileService.USER_SPACE_SIZE);
+	     		
+	     		if(capacityFull){
+		         	
+	         		payload.add("message", new JsonPrimitive("JunkStash Can No Longer Accept New Users"));
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
+	         	}
 	     		
 	         	String data = request.body();
 	         	

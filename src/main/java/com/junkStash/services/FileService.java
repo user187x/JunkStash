@@ -28,7 +28,7 @@ import com.mongodb.client.result.UpdateResult;
 @Service
 public class FileService {
 	
-	public static final long FIFTY_MB = 52428800;
+	public static final long USER_SPACE_SIZE = 52428800;
 	public static final long MAX_SERER_SIZE = 1073741824;
 
 	@Autowired
@@ -83,6 +83,13 @@ public class FileService {
 			return true;
 		else
 			return false;
+	}
+	
+	public boolean isEnoughDiskspace(long size){
+		
+		//TODO
+		
+		return true;
 	}
 	
 	public boolean remove(String fileId, String userId){
@@ -321,8 +328,8 @@ public class FileService {
 			json.add("maxSpace", new JsonPrimitive(MAX_SERER_SIZE));
 		}
 		else{
-			json.add("maxSpaceNormalized", new JsonPrimitive(FileUtils.byteCountToDisplaySize(FIFTY_MB)));
-			json.add("maxSpace", new JsonPrimitive(FIFTY_MB));
+			json.add("maxSpaceNormalized", new JsonPrimitive(FileUtils.byteCountToDisplaySize(USER_SPACE_SIZE)));
+			json.add("maxSpace", new JsonPrimitive(USER_SPACE_SIZE));
 		}
 		
 		return json;

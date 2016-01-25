@@ -11,7 +11,7 @@
 		      		<a class="navbar-brand" 
 	      				title="JunkStash" 
 	      				data-toggle="popover" 
-	      				data-content="Login To Begin"
+	      				data-content="Stash Your Junk"
 	      				data-placement="left" 
 	      				data-trigger="hover">JunkStash</a>
 		    	</div>
@@ -63,7 +63,12 @@
 		
 		<div data-ng-show="!userKey" style="background-color:DarkGray !important" class="jumbotron">
 			<div class="text-center" data-ng-show="!userKey">
-				<img id="logo" style="opacity: 0.4" title="JunkStash" src="/images/JunkStash.png"/>
+				<img 
+					data-ng-click="toggleSpin()" 
+					data-ng-class="spinLogo ? 'fa-spin' : ''" 
+					style="opacity: 0.4" 
+					data-uib-tooltip="JunkStash"
+					src="/images/JunkStash.png"/>
 			</div>
 		</div>
 		
