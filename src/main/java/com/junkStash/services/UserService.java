@@ -83,6 +83,21 @@ public class UserService {
 		return jsonArray;
 	}
 	
+	public long getTotalCapacityUsed(){
+		
+		MongoCursor<Document> cursor = databaseService.getUserCollection().find().iterator();
+		
+		long totalSize = 0;
+		
+		while(cursor.hasNext()){
+			
+			long userSpace = cursor.next().getLong("diskSpace");
+			totalSize =+userSpace;
+		}
+		
+		return totalSize;
+	}
+	
 	public String getUserId (String userKey){
 		
 		Document query = new Document();

@@ -83,13 +83,28 @@ public class FileService {
 			return false;
 	}
 	
-	public boolean isDiskCapacityFull(long size){
+	public boolean isDiskCapacityFull(){
 		
-		//sum all users sizes
-		//subtract total server size
-		//check if new account is less than equal to remaining
+		long userAllocatedSpace = userService.getTotalCapacityUsed();
+		long totalServerSpace = FileService.MAX_SERER_SIZE;
 		
-		return false;
+		if(userAllocatedSpace<=totalServerSpace)
+			return false;
+		else
+			return true;
+	}
+	
+	public boolean canServerAcceptSize(long userSpace){
+		
+		long userAllocatedSpace = userService.getTotalCapacityUsed();
+		long totalServerSpace = FileService.MAX_SERER_SIZE;
+		
+		long remainingServerSpace = totalServerSpace - userAllocatedSpace;
+		
+		if(remainingServerSpace>=userSpace)
+			return true;
+		else
+			return false;
 	}
 	
 	public boolean remove(String fileId, String userId){

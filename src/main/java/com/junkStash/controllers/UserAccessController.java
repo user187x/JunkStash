@@ -378,9 +378,9 @@ public class UserAccessController {
 	            
 	     		JsonObject payload = new JsonObject();
 	     		
-	     		boolean capacityFull = fileService.isDiskCapacityFull(FileService.USER_SPACE_SIZE);
+	     		boolean canServerAllocateSpace = fileService.canServerAcceptSize(FileService.USER_SPACE_SIZE);
 	     		
-	     		if(capacityFull){
+	     		if(!canServerAllocateSpace){
 		         	
 	         		payload.add("message", new JsonPrimitive("JunkStash Can No Longer Accept New Users"));
 		         	payload.add("success", new JsonPrimitive(false));

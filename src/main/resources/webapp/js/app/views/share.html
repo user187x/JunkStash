@@ -24,52 +24,35 @@
 		  			</button>
 		  			<strong>{{result.message}}</strong>
 				</div>
-
-		  		<div class="input-group">
-  					
-  					<input type="text" 
-  						class="form-control" 
-  						data-ng-model="shareUser"
-  						data-ng-change="findUsers()" 
-  						placeholder="User's ID" 
-  						aria-describedby="basic-addon2">
-  					
-  					<span class="input-group-addon" id="basic-addon2">
-  						<i data-ng-show="searching"
-  							data-toggle="Search For User" 
-  							data-ng-click="searchUser()" 
-  							class="fa fa-circle-o-notch fa-spin"
-  							style="color:blue; cursor:pointer">
-  						</i>
-  						<i data-ng-show="found" 
-  							data-ng-click="searchUser()" 
-  							class="fa fa-circle-o-notch fa-spin"
-  							style="color:green">
-  						</i>
-  						<i data-ng-show="Notfound" 
-  							data-ng-click="searchUser()" 
-  							class="fa fa-circle-o-notch" 
-  							style="color:red; cursor:pointer">
-  						</i>
-  						<i data-ng-show="!searched" 
-  							data-ng-click="searchUser()" 
-  							class="fa fa-search-plus"
-  							style="cursor:pointer">
-  						</i>
-  					</span>
+	
+		  		<div class="input-group" style="padding-bottom:10px">
+	 					
+	 					<input type="text" 
+	 						class="form-control" 
+	 						data-ng-model="shareUser"
+	 						data-ng-change="findUsers()" 
+	 						placeholder="User's ID" 
+	 						aria-describedby="basic-addon2">
+	 					
+	 					<span class="input-group-addon" id="basic-addon2">
+	 						<i data-ng-show="!searched" 
+	 							data-ng-click="shareFile()"
+	 							data-uib-tooltip="Share" 
+	 							class="fa fa-share-alt"
+	 							style="cursor:pointer; color:green">
+	 						</i>
+	 					</span>
 				</div> 
 			
-			<div data-ng-repeat="value in users">
-  				<button type="button" data-ng-click="setUser(value.user)" class="btn btn-secondary">{{value.user}}</button>
-			</div>
-			
-		  	<div class="modal-footer">
-				
-				<button type="submit" class="btn btn-primary" data-ng-click="shareFile()">Share</button>
-		    	<button class="btn btn-danger" data-dismiss="modal">Close</button>
-		    	
-		  	</div>
- 			
- 		</div>
+				<div data-ng-repeat="value in users">
+	  				<button type="button" data-ng-click="setUser(value.user)" 
+	  						data-uib-tooltip="Click To Share With {{value.user}}" 
+	  						class="btn btn-secondary">
+	  					<span class="glyphicon glyphicon-user ng-scope" style="padding-right:10px">
+	  					</span>
+	  					{{value.user}}
+	  				</button>
+				</div>
+		</div>
  	</div>
 </div>

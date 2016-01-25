@@ -11,8 +11,10 @@ app.directive('sharemodal', ['homeFactory', '$timeout', '$rootScope', function (
 	    	
 	        scope.$watch(attrs.visible, function(value){
 	          
-	        	if(value == true)       		
+	        	if(value == true){      		
 	        		$(element).modal('show');
+	        		scope.users = [];
+	        	}
 	        	else
 	        		$(element).modal('hide');
 	        });
@@ -53,6 +55,7 @@ app.directive('sharemodal', ['homeFactory', '$timeout', '$rootScope', function (
 		    	scope.shareUser = undefined;
 		    	scope.userKey = undefined;
 		    	scope.result = undefined;
+		    	scope.users = [];
 	        };
 	        
 	        scope.setUser = function(user){
