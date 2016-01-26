@@ -1,0 +1,65 @@
+<div class="modal fade">
+ 	<div class="modal-dialog">
+ 		<div class="modal-content">
+ 			
+ 			<div class="modal-header">
+ 				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+ 				<h3 class="modal-title" style="text-align:center">
+ 					<span class="glyphicon glyphicon-comment" style="padding-right:10px"></span>Send Message
+ 				</h3>
+ 			</div>
+ 			
+ 			<div class="modal-body">
+ 							
+				<div data-ng-if="result.success===true" class="alert alert-success alert-dismissible" role="alert" style="text-align:center">
+		  			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+		  				<span aria-hidden="true">&times;</span>
+		  			</button>
+		  			<strong>{{result.message}}</strong>
+				</div>
+				
+				<div data-ng-if="result.success===false" class="alert alert-danger alert-dismissible" role="alert" style="text-align:center">
+		  			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+		  				<span aria-hidden="true">&times;</span>
+		  			</button>
+		  			<strong>{{result.message}}</strong>
+				</div>
+			
+				<div class="form-group">
+					<label>Recipient</label>
+					<input type="text" 
+						class="form-control"
+						data-ng-disabled="!textSearchBoxEnabled" 
+						data-ng-model="messageUser"
+						data-ng-change="findUsers();isEnabled()" 
+						placeholder="User's ID" 
+						aria-describedby="basic-addon2">
+				</div>
+			
+				<div>
+					<div data-ng-repeat="value in users">
+		  				<button type="button" 
+		  						data-ng-click="setUser(value.user)" 
+		  						data-uib-tooltip="Click To Share With {{value.user}}" 
+		  						class="btn btn-secondary">
+		  					<span class="glyphicon glyphicon-user ng-scope" style="padding-right:10px"></span>
+		  					{{value.user}}
+		  				</button>
+					</div>
+				</div>
+				
+				
+				<label for="comment">Message</label>
+      			<textarea class="form-control" rows="5" data-ng-model="message" data-ng-change="isEnabled()"></textarea>
+				
+			</div>
+			<div class="modal-footer">
+				<button type="button" 
+					data-ng-click="sendMessage" 
+					data-ng-class="enabled ? 'btn btn-success' : 'btn btn-secondary'" 
+					data-ng-disabled="!enabled">Send
+				</button>
+			</div>
+		</div>
+ 	</div>
+</div>

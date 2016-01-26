@@ -135,7 +135,7 @@ public class UserAccessController {
 	         		return payload;
 				}
 				
-				JsonArray jsonArray = userService.findUsersLike(searchUserId);
+				JsonArray jsonArray = userService.findUsersLike(searchUserId, 5);
 				
 				payload.add("message", new JsonPrimitive("Successful Search Results"));
 	         	payload.add("success", new JsonPrimitive(true));

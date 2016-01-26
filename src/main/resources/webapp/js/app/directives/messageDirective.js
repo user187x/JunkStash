@@ -1,4 +1,4 @@
-app.directive('sharemodal', ['homeFactory', '$timeout', '$rootScope', function (homeFactory, $timeout, $rootScope) {
+app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', function (homeFactory, $timeout, $rootScope) {
 	
 	return {
 	    
@@ -6,18 +6,31 @@ app.directive('sharemodal', ['homeFactory', '$timeout', '$rootScope', function (
 	    transclude: true,
 	    replace:true,
 	    scope:true,
-	    templateUrl: '/js/app/views/share.html',	   
+	    templateUrl: '/js/app/views/message.html',	   
 	    link: function postLink(scope, element, attrs) {
+	    	
+	    	scope.enabled = false;
+	    	scope.textSearchBoxEnabled = true;
 	    	
 	        scope.$watch(attrs.visible, function(value){
 	          
-	        	if(value == true){      		
+	        	if(value == true){    		
 	        		
 	        		$(element).modal('show');
+	        		
+	        		scope.messageUser = scope.messageRecipient;
+	        		
+	        		if(scope.messageRecipient && scope.messageRecipient!==undefined && scope.messageRecipient!=='')
+	        			scope.textSearchBoxEnabled = false;
+	        		else
+	        			scope.textSearchBoxEnabled = true;
+	        			
+	        	}
+	        	else{
+	        		
+	        		$(element).modal('hide');
 	        		clearForm();
 	        	}
-	        	else
-	        		$(element).modal('hide');
 	        });
 	
 	        $(element).on('shown.bs.modal', function(){
@@ -53,27 +66,37 @@ app.directive('sharemodal', ['homeFactory', '$timeout', '$rootScope', function (
 	        
 	        var clearForm = function(){
 	        	
-		    	scope.shareUser = undefined;
+		    	scope.messageUser = undefined;
 		    	scope.result = undefined;
 		    	scope.users = [];
+		    	scope.textSearchBoxEnabled = true;
+		    	scope.message = undefined;
 	        };
 	        
 	        scope.setUser = function(user){
 	        	
-	        	scope.shareUser = user;
-	        	scope.shareFile();
+	        	scope.messageUser = user;
+	        	scope.users = [];
+	        }
+	        
+	        scope.isEnabled = function(){
+	        	
+	        	var messageCheck = scope.message!==undefined && scope.message!=='' && scope.message;
+	        	var userCheck = scope.messageUser!==undefined && scope.messageUser!=='' && scope.messageUser;
+	        	
+	        	scope.enabled = messageCheck && userCheck;
 	        }
 	        
 	    	scope.findUsers = function() { 		
 	    		
-	    		if(scope.shareUser===undefined || scope.shareUser===''){
+	    		if(scope.messageUser===undefined || scope.messageUser===''){
 	    			scope.users = [];
 	    			return;
 	    		}
 	    		
 	    		scope.users = [];
 	    		
-	    		homeFactory.findUsers(scope.userKey, scope.shareUser).success(function (data) {
+	    		homeFactory.findUsers(scope.userKey, scope.messageUser).success(function (data) {
 	    			
 	    		    angular.forEach(data.payload, function(value, key) {
 	    		        
@@ -85,11 +108,11 @@ app.directive('sharemodal', ['homeFactory', '$timeout', '$rootScope', function (
 	    		});
 	    	};
 	        
-	        scope.shareFile = function(){
+	        scope.sendMessage = function(){
 	        	
 	        	var payload = {
-	        		user : scope.shareUser,
-        			fileId : scope.selectedFile
+	        		user : scope.messageUser,
+	        		message : scope.message
 	        	};
 	        	
 	        	homeFactory.shareFile(payload, scope.userKey).success(function (data) {

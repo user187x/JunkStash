@@ -2,6 +2,7 @@
 
 	<loginmodal visible="showLoginModal"></loginmodal>
 	<sharemodal visible="showShareModal"></sharemodal>
+	<messagemodal visible="showMessageModal"></messagemodal>
 	
 	<div class="jumbotron">
 		
@@ -15,9 +16,20 @@
 	      				data-placement="left" 
 	      				data-trigger="hover">JunkStash</a>
 		    	</div>
+		    	
 		    	<ul class="nav navbar-nav navbar-right">
+		    		<li>
+		      			<a data-ng-show="user" data-ng-click="showAlert()" data-uib-tooltip="Show Alerts" style="cursor:pointer">
+		      				<span class="glyphicon glyphicon-exclamation-sign"></span>
+		      			</a>
+	      			</li>
+	      			<li>
+		      			<a data-ng-show="user" data-ng-click="toggleMessageModal()" data-uib-tooltip="Message User" style="cursor:pointer">
+		      				<span class="glyphicon glyphicon-comment"></span>
+		      			</a>
+	      			</li>
 		      		<li>
-		      			<a data-ng-show="!user" data-ng-click="toggleLoginModal()">
+		      			<a data-ng-show="!user" data-ng-click="toggleLoginModal()" style="cursor:pointer">
 		      				<span class="glyphicon glyphicon-log-in">
 		      				</span> Login
 		      			</a>
@@ -26,7 +38,7 @@
 				        <a class="dropdown-toggle" data-toggle="dropdown">
 				        <span data-ng-if="admin" 
 				        	class="glyphicon glyphicon-user"
-				        	title="Admin User" 
+				        	data-uib-tooltip="Admin User" 
 				        	style="padding-right:10px; 
 				        	color:green">
 				        </span>
@@ -207,20 +219,26 @@
 					<td>{{user.added}}</td>
 					<td>{{user.space}}</td>
 					<td style="text-align:right">
+						<span class="glyphicon glyphicon-comment"
+							data-ng-click="toggleMessageModal(user.user)" 
+							data-uib-tooltip="Message User"
+							style="cursor: pointer; padding-right:10px;"">
+						</span>
 						<i data-ng-click="approveUser(user.user)" 
 							class="fa fa-thumbs-o-up"
 							data-uib-tooltip="Approve User"
-							style="cursor: pointer; padding-right:10px;"></i>
-						
+							style="cursor: pointer; padding-right:10px;">
+						</i>
 						<i data-ng-click="revokeUser(user.user)" 
 							class="fa fa-thumbs-o-down"
 							data-uib-tooltip="Revoke User"
-							style="cursor: pointer; padding-right:10px;"></i>
-							
+							style="cursor: pointer; padding-right:10px;">
+						</i>
 						<i data-ng-click="removeUser(user.user)" 
 							class="fa fa-trash-o" 
 							data-uib-tooltip="Delete User"
-							style="cursor: pointer; padding-right:10px;"></i>
+							style="cursor: pointer; padding-right:10px;">
+						</i>
 					</td>
 				</tr>
 			</tbody>

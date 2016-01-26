@@ -111,12 +111,12 @@ public class UserService {
 			return null;
 	}
 	
-	public JsonArray findUsersLike(String user){
+	public JsonArray findUsersLike(String user, int maxReturn){
 		
 		Document match = new Document();
 		match.append("user",  Pattern.compile(user));
 		
-		MongoCursor<Document> cursor = databaseService.getUserCollection().find(match).iterator();
+		MongoCursor<Document> cursor = databaseService.getUserCollection().find(match).limit(maxReturn).iterator();
 		
 		JsonArray jsonArray = new JsonArray();
 		

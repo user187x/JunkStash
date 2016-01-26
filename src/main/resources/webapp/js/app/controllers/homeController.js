@@ -12,9 +12,6 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
 	$scope.result = undefined;
 	$scope.uploadFile = undefined;
 	$scope.loading = false;
-	
-    $scope.showLoginModal = false;
-    $scope.showShareModal = false;
     
     $scope.user = undefined;
     $scope.userKey = undefined;
@@ -25,6 +22,10 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
     $scope.maxSpaceNormalized = undefined;
     $scope.maxSpace = undefined;
     $scope.percentUsed = undefined;
+    
+    $scope.showLoginModal = false;
+    $scope.showShareModal = false;
+    $scope.showMessageModal = false;
     $scope.spinLogo = false;
     
     $scope.toggleSpin = function(){
@@ -37,6 +38,12 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
         $scope.showLoginModal = !$scope.showLoginModal;
     };
 	
+    $scope.toggleMessageModal = function(messageRecipient){
+    	
+    	$scope.messageRecipient = messageRecipient;
+        $scope.showMessageModal = !$scope.showMessageModal;
+    };
+    
     $scope.toggleShareModal = function(file){
     	
     	$scope.selectedFile = file.id;
