@@ -6,6 +6,11 @@
  				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
  				<h3 class="modal-title" style="text-align:center">
  					<span class="glyphicon glyphicon-comment" style="padding-right:10px"></span>Send Message
+ 					<br/>
+ 					<span><small data-ng-if="connected">Conntected</small></span>
+ 					<span><small data-ng-if="!connected">Disconnected</small></span>
+ 					<br/>
+ 					<span><small>Message Token : {{serverMessage}}</small></span>
  				</h3>
  			</div>
  			
@@ -55,7 +60,7 @@
 			</div>
 			<div class="modal-footer">
 				<button type="button" 
-					data-ng-click="sendMessage" 
+					data-ng-click="sendMessage(message)" 
 					data-ng-class="enabled ? 'btn btn-success' : 'btn btn-secondary'" 
 					data-ng-disabled="!enabled">Send
 				</button>

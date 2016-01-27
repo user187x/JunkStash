@@ -1,4 +1,5 @@
-app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', function (homeFactory, $timeout, $rootScope) {
+app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websocket', 
+       function (homeFactory, $timeout, $rootScope, $websocket) {
 	
 	return {
 	    
@@ -11,10 +12,26 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', function
 	    	
 	    	scope.enabled = false;
 	    	scope.textSearchBoxEnabled = true;
+	    	scope.connected = false;
+	    	scope.serverMessage = undefined;
+	    	
+	    	scope.webSocket = $websocket.$new({url: 'ws://localhost:8888/chat'});
+
+	        scope.webSocket.$on('$open', function () {
+	        	scope.connected = true;	        	
+	        })
+	        .$on('$close', function () {
+	        	scope.connected = false;
+	        })
+	        .$on('broadcast', function (data) {
+	        	scope.serverMessage = data;
+	        });
 	    	
 	        scope.$watch(attrs.visible, function(value){
 	          
-	        	if(value == true){    		
+	        	if(value == true){ 
+	        		
+	        		scope.visible = true;
 	        		
 	        		$(element).modal('show');
 	        		
@@ -24,12 +41,19 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', function
 	        			scope.textSearchBoxEnabled = false;
 	        		else
 	        			scope.textSearchBoxEnabled = true;
-	        			
+	    	        
+	    	        if(scope.connected===false)
+	    	        	scope.webSocket.$open();
 	        	}
 	        	else{
 	        		
+	        		scope.visible = false;
+	        		
 	        		$(element).modal('hide');
 	        		clearForm();
+	        		
+	        		if(scope.connected)
+	        			scope.webSocket.$close();
 	        	}
 	        });
 	
@@ -108,19 +132,22 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', function
 	    		});
 	    	};
 	        
-	        scope.sendMessage = function(){
+	        scope.sendMessage = function(message){
+	        	
+	        	scope.message = message;
+	        	
+	        	if(!scope.message || scope.message==='' || scope.message===undefined)
+	        		return;
 	        	
 	        	var payload = {
-	        		user : scope.messageUser,
-	        		message : scope.message
+	        		message : scope.message,
+	        		user : scope.userKey,
+	        		recipient : scope.messageUser
 	        	};
 	        	
-	        	homeFactory.shareFile(payload, scope.userKey).success(function (data) {
-	    			
-	    			scope.result = data;
-	    			
-	    			autoCloseModal(data.success);
-	        	});
+	        	if(scope.connected){
+	        		scope.webSocket.$emit('message', payload);
+	        	}
 	        };
 	    }
 	};

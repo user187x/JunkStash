@@ -1,4 +1,4 @@
-app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScope' ,
+app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScope',
       function($scope, homeFactory, $timeout, $rootScope) {
 	
 	$scope.files = [];
@@ -27,6 +27,7 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
     $scope.showShareModal = false;
     $scope.showMessageModal = false;
     $scope.spinLogo = false;
+
     
     $scope.toggleSpin = function(){
     	
