@@ -30,7 +30,6 @@ public class WebAppConfig {
 		
 		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(WebAppConfig.class);	
 		ctx.registerShutdownHook();
-		ctx.close();
 		
 		initializeControllers();
 	}

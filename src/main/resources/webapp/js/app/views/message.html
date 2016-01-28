@@ -7,10 +7,16 @@
  				<h3 class="modal-title" style="text-align:center">
  					<span class="glyphicon glyphicon-comment" style="padding-right:10px"></span>Send Message
  					<br/>
- 					<span><small data-ng-if="connected">Conntected</small></span>
- 					<span><small data-ng-if="!connected">Disconnected</small></span>
- 					<br/>
- 					<span><small>Message Token : {{serverMessage}}</small></span>
+ 					<span data-ng-show="connected">
+ 						<small>
+ 							Connected
+ 						</small>
+ 					</span>
+ 					<span data-ng-show="!connected">
+ 						<small>
+ 							Disconnected
+ 						</small>
+ 					</span>
  				</h3>
  			</div>
  			
@@ -62,7 +68,7 @@
 				<button type="button" 
 					data-ng-click="sendMessage(message)" 
 					data-ng-class="enabled ? 'btn btn-success' : 'btn btn-secondary'" 
-					data-ng-disabled="!enabled">Send
+					data-ng-disabled="!enabled && !connected">Send
 				</button>
 			</div>
 		</div>

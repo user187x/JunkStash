@@ -9,6 +9,10 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.stereotype.Component;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -17,17 +21,24 @@ import com.junkStash.util.UserUtils;
 
 
 @WebSocket
-public class MessageSocketHandler {
+@Component
+public class MessageSocketHandler implements ApplicationContextAware {
 	
     private static Map<Session, UserMessage> userSessionMap = new HashMap<>();
+    private static UserService userServcie;
     
     public MessageSocketHandler() {
 		System.out.println("Junkstash Websockets Initialized...");
 	}
     
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		userServcie = applicationContext.getBean(UserService.class);
+	}
+    
     @OnWebSocketConnect
     public void onConnect(Session session) throws Exception {
-        
+    	
     	String messengerKey = UserUtils.createSecureIdentifier();
         broadcastMessage(session, messengerKey);
         userSessionMap.put(session, new UserMessage(messengerKey));
@@ -127,4 +138,5 @@ public class MessageSocketHandler {
 			this.user = user;
 		}
     }
+
 }

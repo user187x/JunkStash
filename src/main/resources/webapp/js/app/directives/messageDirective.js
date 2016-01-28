@@ -108,7 +108,7 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 	        	var messageCheck = scope.message!==undefined && scope.message!=='' && scope.message;
 	        	var userCheck = scope.messageUser!==undefined && scope.messageUser!=='' && scope.messageUser;
 	        	
-	        	scope.enabled = messageCheck && userCheck;
+	        	scope.enabled = messageCheck && userCheck && scope.connected;
 	        }
 	        
 	    	scope.findUsers = function() { 		
@@ -136,7 +136,7 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 	        	
 	        	scope.message = message;
 	        	
-	        	if(!scope.message || scope.message==='' || scope.message===undefined)
+	        	if(!scope.message || scope.message==='' || scope.message===undefined || scope.connected===false)
 	        		return;
 	        	
 	        	var payload = {
@@ -147,6 +147,7 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 	        	
 	        	if(scope.connected){
 	        		scope.webSocket.$emit('message', payload);
+	        		scope.message = undefined;
 	        	}
 	        };
 	    }
