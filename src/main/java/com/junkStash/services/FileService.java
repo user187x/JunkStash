@@ -1,12 +1,9 @@
 package com.junkStash.services;
 
-import java.io.InputStream;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Date;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -37,11 +34,7 @@ public class FileService {
 	@Autowired
 	private UserService userService;
 	
-	private static String cachedIndex;
-	
-	public FileService(){
-		cacheResource();
-	}
+	public FileService(){}
 		
 	public MongoDatabase getMongoDatabase(){
 		return databaseService.getMongoDatabase();
@@ -451,27 +444,5 @@ public class FileService {
 		
 		else
 			return null;
-	}
-	
-	public static void cacheResource(){
-		
-		InputStream inputStream = FileService.class.getResourceAsStream("/index.html");
-		
-		StringWriter writer = new StringWriter();
-		
-		try{
-			IOUtils.copy(inputStream, writer);
-			cachedIndex = writer.toString();
-		}
-		catch(Exception e){
-			System.out.println("Failure Caching Resource File : index.html");
-			System.exit(1);
-		}
-		
-		System.out.println("Resource Cached : "+cachedIndex.getBytes().length+" Bytes");
-	}
-	
-	public String getIndex(){
-		return cachedIndex;
 	}
 }

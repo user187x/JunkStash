@@ -15,7 +15,7 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 	    	scope.connected = false;
 	    	scope.serverMessage = undefined;
 	    	
-	    	scope.webSocket = $websocket.$new({url: 'ws://localhost:8888/chat'});
+	    	scope.webSocket = $websocket.$new({url: 'ws://localhost:4567/chat'});
 
 	        scope.webSocket.$on('$open', function () {
 	        	scope.connected = true;	        	

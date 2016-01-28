@@ -115,7 +115,7 @@ public class MessageSocketHandler {
 			return messageKey;
 		}
 
-		public void setMessageToken(String messageKey) {
+		public void setMessageKey(String messageKey) {
 			this.messageKey = messageKey;
 		}
 
