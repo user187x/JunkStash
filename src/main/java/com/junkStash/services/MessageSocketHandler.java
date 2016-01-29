@@ -17,14 +17,17 @@ import org.springframework.stereotype.Component;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
-import com.junkStash.util.UserUtils;
 
 
 @WebSocket
 @Component
 public class MessageSocketHandler implements ApplicationContextAware {
 	
-    private static Map<Session, UserMessage> userSessionMap = new HashMap<>();
+	public static final String HOST = "localhost";
+	public static final String PATH = "/chat";
+	public static final int PORT = 4567;
+	
+    private static Map<Session, String> userSessionMap = new HashMap<>();
     private static UserService userServcie;
     
     public MessageSocketHandler() {
@@ -39,9 +42,11 @@ public class MessageSocketHandler implements ApplicationContextAware {
     @OnWebSocketConnect
     public void onConnect(Session session) throws Exception {
     	
-    	String messengerKey = UserUtils.createSecureIdentifier();
-        broadcastMessage(session, messengerKey);
-        userSessionMap.put(session, new UserMessage(messengerKey));
+    	String userKey = session.getUpgradeRequest().getHeader("Sec-WebSocket-Protocol");
+    	String userId = userServcie.getUserId(userKey);
+    	
+        broadcastMessage(session, userId);
+        userSessionMap.put(session, userId);
         
         System.out.println("JunkStash Websocket Connection Created ");
     }
@@ -49,8 +54,8 @@ public class MessageSocketHandler implements ApplicationContextAware {
     @OnWebSocketClose
     public void onClose(Session session, int statusCode, String reason) {
         
-    	String messengerKey = userSessionMap.get(session).getMessageKey();
-        userSessionMap.remove(messengerKey);
+    	String userId = userSessionMap.get(session);
+        userSessionMap.remove(userId);
         
         System.out.println("JunkStash Websocket Closed");
     }
@@ -58,7 +63,7 @@ public class MessageSocketHandler implements ApplicationContextAware {
     @OnWebSocketMessage
     public void onMessage(Session session, String payload) {
         
-    	String messengerKey = userSessionMap.get(session).getMessageKey();
+    	String userId = userSessionMap.get(session);
     	
     	JsonParser jsonParser = new JsonParser();
     	String userKey = null;
@@ -89,9 +94,9 @@ public class MessageSocketHandler implements ApplicationContextAware {
     		message = null;
     	}
     	
-        System.out.println("JunkStash Websocket Recieved Message : "+message+" From User "+userKey+" To User : "+recipient);
+        System.out.println("JunkStash Websocket Recieved Message : "+message+" From User "+userId+" To User : "+recipient);
         
-        broadcastMessage(session, messengerKey);
+        broadcastMessage(session, userId);
     }
     
     //Sends Client Back MessageKey from the Server
@@ -111,32 +116,4 @@ public class MessageSocketHandler implements ApplicationContextAware {
 			System.out.println("Failure Broadcast Messsage : "+e.getMessage());
 		}
     }
-    
-    private class UserMessage
-    {
-    	public String messageKey;
-    	public String user;
-    	
-    	public UserMessage(String messageKey){
-    		this.messageKey = messageKey;
-    		this.user = null;
-    	}
-
-		public String getMessageKey() {
-			return messageKey;
-		}
-
-		public void setMessageKey(String messageKey) {
-			this.messageKey = messageKey;
-		}
-
-		public String getUser() {
-			return user;
-		}
-
-		public void setUser(String user) {
-			this.user = user;
-		}
-    }
-
 }

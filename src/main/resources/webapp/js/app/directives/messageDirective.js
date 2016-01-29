@@ -15,20 +15,23 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 	    	scope.connected = false;
 	    	scope.serverMessage = undefined;
 	    	
-	    	scope.webSocket = $websocket.$new({url: 'ws://localhost:4567/chat'});
-
-	        scope.webSocket.$on('$open', function () {
-	        	scope.connected = true;	        	
-	        })
-	        .$on('$close', function () {
-	        	scope.connected = false;
-	        })
-	        .$on('broadcast', function (data) {
-	        	scope.serverMessage = data;
-	        });
-	    	
 	        scope.$watch(attrs.visible, function(value){
 	          
+		    	if(scope.userKey!==undefined){
+		    		
+		    		scope.webSocket = $websocket.$new({url: 'ws://localhost:4567/chat', protocols: [scope.userKey]});
+
+			        scope.webSocket.$on('$open', function () {
+			        	scope.connected = true;	        	
+			        })
+			        .$on('$close', function () {
+			        	scope.connected = false;
+			        })
+			        .$on('broadcast', function (data) {
+			        	scope.serverMessage = data;
+			        });
+		    	}
+	        	
 	        	if(value == true){ 
 	        		
 	        		scope.visible = true;

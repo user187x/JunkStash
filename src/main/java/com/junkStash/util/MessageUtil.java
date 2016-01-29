@@ -18,15 +18,18 @@ public class MessageUtil {
 		SecretKey secretKey = keyGenerator.generateKey();
 		cipher = Cipher.getInstance("AES");
 
-		String plainText = "AES Symmetric Encryption Decryption";
+		String plainText = "Blah Blah Blah Blah Blah";
+		String encryptedText;
+		String decryptedText;
 		
-		System.out.println("Plain: " + plainText);
+		System.out.println("Plain : " + plainText);
 
-		String encryptedText = encrypt(plainText, secretKey);
-		System.out.println("Encryption: " + encryptedText);
+		encryptedText = encrypt(plainText, secretKey);
+		System.out.println("Encryption : " + encryptedText);
 
-		String decryptedText = decrypt(encryptedText, secretKey);
-		System.out.println("Decryption: " + decryptedText);
+		decryptedText = decrypt(encryptedText, secretKey);
+		System.out.println("Decryption : " + decryptedText);
+		
 	}
 
 	public static String encrypt(String plainText, SecretKey secretKey) throws Exception {
