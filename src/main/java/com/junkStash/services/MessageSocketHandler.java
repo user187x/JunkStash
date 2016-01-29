@@ -17,21 +17,18 @@ import org.springframework.stereotype.Component;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+import com.junkStash.util.PropertyUtil;
 
 
 @WebSocket
 @Component
 public class MessageSocketHandler implements ApplicationContextAware {
 	
-	public static final String HOST = "localhost";
-	public static final String PATH = "/chat";
-	public static final int PORT = 4567;
-	
     private static Map<Session, String> userSessionMap = new HashMap<>();
     private static UserService userServcie;
     
     public MessageSocketHandler() {
-		System.out.println("Junkstash Websockets Initialized...");
+		System.out.println("Junkstash Websockets Initialized URL @ "+PropertyUtil.getWebSocketUrl());
 	}
     
 	@Override

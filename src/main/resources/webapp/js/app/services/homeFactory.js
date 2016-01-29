@@ -63,7 +63,12 @@ app.factory('homeFactory', ['$http', function($http) {
     	return $http.post('/register', payload);
     };
     
+    var getSocketInfo = function (userKey) {
+    	return $http.get('/socket/'+userKey);
+    };
+    
     return {
+    	
     	login : login,
     	logout : logout,
     	register : register,
@@ -77,6 +82,7 @@ app.factory('homeFactory', ['$http', function($http) {
     	userExists : userExists,
     	searchUser : searchUser,
     	findUsers : findUsers,
+    	getSocketInfo : getSocketInfo,
     	getTotalDiskSpace : getTotalDiskSpace
     };
     

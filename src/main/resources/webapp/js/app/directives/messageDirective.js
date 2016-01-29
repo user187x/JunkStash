@@ -1,5 +1,4 @@
-app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websocket', 
-       function (homeFactory, $timeout, $rootScope, $websocket) {
+app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websocket', function (homeFactory, $timeout, $rootScope, $websocket) {
 	
 	return {
 	    
@@ -14,12 +13,16 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 	    	scope.textSearchBoxEnabled = true;
 	    	scope.connected = false;
 	    	scope.serverMessage = undefined;
+	    	scope.url = undefined;
 	    	
 	        scope.$watch(attrs.visible, function(value){
 	          
 		    	if(scope.userKey!==undefined){
 		    		
-		    		scope.webSocket = $websocket.$new({url: 'ws://localhost:4567/chat', protocols: [scope.userKey]});
+		    		if(scope.url===undefined)
+		    			getSocketInfo();
+		    		
+		    		scope.webSocket = $websocket.$new({url: scope.url, protocols: [scope.userKey]});
 
 			        scope.webSocket.$on('$open', function () {
 			        	scope.connected = true;	        	
@@ -90,6 +93,15 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 	        		scope.result = undefined;
 	            }, 2000);
 	        };
+	        
+	        var getSocketInfo = function(){
+	        	
+	        	homeFactory.getSocketInfo(scope.userKey).success(function (data) {
+	    			
+    				scope.url = data;
+    				
+	        	});	
+	        }
 	        
 	        var clearForm = function(){
 	        	

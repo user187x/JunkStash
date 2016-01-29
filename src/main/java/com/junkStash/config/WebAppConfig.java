@@ -1,6 +1,5 @@
 package com.junkStash.config;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 
@@ -9,23 +8,23 @@ import com.junkStash.controllers.IndexController;
 import com.junkStash.controllers.UserAccessController;
 import com.junkStash.services.MessageSocketHandler;
 import com.junkStash.util.CacheUtil;
+import com.junkStash.util.PropertyUtil;
 
 import spark.Spark;
 
 @ComponentScan({"com.junkStash"})
 public class WebAppConfig {
-
-	private WebAppConfig(){}
 	
-	public WebAppConfig(String port) {
+	public WebAppConfig(){}
+	
+	public static void intialized(){
 		
-		if(StringUtils.isNotEmpty(port) && StringUtils.isNumeric(port))
-			Spark.port(Integer.parseInt(port));
+		Spark.port(PropertyUtil.getPort());
 		
 		CacheUtil.cacheResource();
 		
-		Spark.staticFileLocation("/webapp");
-		Spark.webSocket("/chat", MessageSocketHandler.class);
+		Spark.staticFileLocation(PropertyUtil.getPublicDirectory());
+		Spark.webSocket(PropertyUtil.getSocketPath(), MessageSocketHandler.class);
 		Spark.init();
 		
 		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(WebAppConfig.class);	
@@ -34,7 +33,7 @@ public class WebAppConfig {
 		initializeControllers();
 	}
 	
-	private void initializeControllers() {
+	private static void initializeControllers() {
 		
 		new IndexController();
 		new UserAccessController();

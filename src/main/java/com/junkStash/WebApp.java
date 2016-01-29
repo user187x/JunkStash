@@ -1,8 +1,7 @@
 package com.junkStash;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.junkStash.config.WebAppConfig;
+import com.junkStash.util.PropertyUtil;
 
 
 public class WebApp {
@@ -11,9 +10,9 @@ public class WebApp {
 		
 		System.out.println("Starting JunkStash.... ");
 		
-		if(args.length==0)
-			new WebAppConfig(StringUtils.EMPTY);
-		else
-			new WebAppConfig(args[0]);
+		if(args.length!=0)
+			PropertyUtil.setPort(args[0]);
+		
+		WebAppConfig.intialized();
     }   
 }
