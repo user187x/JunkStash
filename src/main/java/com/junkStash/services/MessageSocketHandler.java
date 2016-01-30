@@ -5,6 +5,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
@@ -44,6 +45,14 @@ public class MessageSocketHandler implements ApplicationContextAware {
     	String userKey = uri.getQuery().split("=")[1];
     	
     	String userId = userServcie.getUserId(userKey);
+    	
+    	if(StringUtils.isEmpty(userId)){
+    		
+    		System.out.println("This User ID Is Not Known : Rejecting Connection");
+    		session.close();
+    		
+    		return;
+    	}
     	
         broadcastMessage(session, userId);
         userSessionMap.put(session, userId);
@@ -92,7 +101,7 @@ public class MessageSocketHandler implements ApplicationContextAware {
     		message = null;
     	}
     	
-        System.out.println("JunkStash Websocket Recieved Message >> FROM : "+userId+" TO : "+recipient+" :: "+message);
+        System.out.println("JunkStash Websocket Recieved Message [FROM : "+userId+" TO : "+recipient+" :: "+message+"]");
         
         broadcastMessage(session, userId);
     }

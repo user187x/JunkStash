@@ -36,10 +36,8 @@ public class IndexController {
 				
 			@Override
 			public Object handle(Request request, Response response) throws Exception {					
-				
 				return CacheUtil.getIndex();
 			}
-			
 		});
 		
 		Spark.get("/socket/:userKey", new Route() {
@@ -50,14 +48,11 @@ public class IndexController {
 				String userKey = request.params(":userKey");
 				String userId = userService.getUserId(userKey);
 				
-				if(StringUtils.isEmpty(userId)|| !userService.userExists(userId)){
-					
-					return StatusCode.POLICY_VIOLATION;
-				}
+				if(StringUtils.isEmpty(userId)|| !userService.userExists(userId))
+					return StatusCode.BAD_PAYLOAD;
 				
 				return PropertyUtil.getWebSocketUrl();
 			}
-			
 		});
 	}
 }

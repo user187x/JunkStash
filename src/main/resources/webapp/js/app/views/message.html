@@ -65,8 +65,9 @@
 				
 			</div>
 			<div class="modal-footer">
-				<button type="button" 
-					data-ng-click="sendMessage(message)" 
+				<button type="button"
+					class="btn" 
+					data-ng-click="sendMessage(message)"
 					data-ng-class="enabled ? 'btn btn-success' : 'btn btn-secondary'" 
 					data-ng-disabled="!enabled && !connected">Send
 				</button>
