@@ -1,6 +1,7 @@
 package com.junkStash.services;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,7 +40,9 @@ public class MessageSocketHandler implements ApplicationContextAware {
     @OnWebSocketConnect
     public void onConnect(Session session) throws Exception {
     	
-    	String userKey = session.getUpgradeRequest().getHeader("Sec-WebSocket-Protocol");
+    	URI uri = session.getUpgradeRequest().getRequestURI();
+    	String userKey = uri.getQuery().split("=")[1];
+    	
     	String userId = userServcie.getUserId(userKey);
     	
         broadcastMessage(session, userId);
@@ -63,7 +66,6 @@ public class MessageSocketHandler implements ApplicationContextAware {
     	String userId = userSessionMap.get(session);
     	
     	JsonParser jsonParser = new JsonParser();
-    	String userKey = null;
     	String recipient = null;
 		String message = null;
     	
@@ -71,7 +73,6 @@ public class MessageSocketHandler implements ApplicationContextAware {
     		
     		JsonObject json = jsonParser.parse(payload).getAsJsonObject();
     		JsonObject data = json.get("data").getAsJsonObject();
-    		userKey = data.get("user").getAsString();
     	}
     	catch(Exception e){
     		
@@ -91,7 +92,7 @@ public class MessageSocketHandler implements ApplicationContextAware {
     		message = null;
     	}
     	
-        System.out.println("JunkStash Websocket Recieved Message : "+message+" From User "+userId+" To User : "+recipient);
+        System.out.println("JunkStash Websocket Recieved Message >> FROM : "+userId+" TO : "+recipient+" :: "+message);
         
         broadcastMessage(session, userId);
     }

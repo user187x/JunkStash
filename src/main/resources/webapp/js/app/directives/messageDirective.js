@@ -22,7 +22,7 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 		    		if(scope.url===undefined)
 		    			getSocketInfo();
 		    		
-		    		scope.webSocket = $websocket.$new({url: scope.url, protocols: [scope.userKey]});
+		    		scope.webSocket = $websocket.$new({url: scope.url+"?userKey="+scope.userKey});
 
 			        scope.webSocket.$on('$open', function () {
 			        	scope.connected = true;	        	
