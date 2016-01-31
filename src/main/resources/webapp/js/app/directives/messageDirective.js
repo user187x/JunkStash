@@ -12,32 +12,55 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 	    	scope.enabled = false;
 	    	scope.textSearchBoxEnabled = true;
 	    	scope.connected = false;
-	    	scope.serverMessage = undefined;
-	    	scope.url = undefined;
+	    	scope.serverMessage = undefined;	    	
+	    	
+	    	$rootScope.$on('user-login', function (event, args) {
+	    		
+	    		scope.userKey = args.userKey;
+	    		
+	    		homeFactory.getSocketInfo(scope.userKey).success(function (data) {
+	    			
+	    			scope.url = data;
+	    			
+		    		if(scope.userKey!==undefined && data!==undefined){
+			    		
+			    		scope.wsUrl = scope.url+"?userKey="+scope.userKey;
+			    		
+			    		scope.webSocket = $websocket.$new({url: scope.wsUrl});
+
+				        scope.webSocket.$on('$open', function () {
+				        	
+				        	scope.connected = true;	   
+				        	console.log("Client Socket Connected ");
+				        	
+				        })
+				        .$on('$close', function () {
+				        	
+				        	scope.connected = false;
+				        	console.log("Client Socket Closed");
+				        })
+				        .$on('broadcast', function (data) {
+				        	
+				        	scope.serverMessage = data;
+				        	
+				        	console.log("<<<Broadcast>>> : "+JSON.stringify(data));
+				        })
+				        .$on('message', function (message) {
+				        	scope.serverMessage = message;
+				        	
+				        	console.log("Message Recieved :"+JSON.stringify(message));
+				        });
+			    	}
+	    		});
+	    	});
+	    	
+	    	$rootScope.$on('user-logout', function (event, args) {
+	    		scope.webSocket.$close();
+	    	});
 	    	
 	        scope.$watch(attrs.visible, function(value){
-	          
-		    	if(scope.userKey!==undefined){
-		    		
-		    		if(scope.url===undefined)
-		    			getSocketInfo();
-		    		
-		    		scope.webSocket = $websocket.$new({url: scope.url+"?userKey="+scope.userKey});
-
-			        scope.webSocket.$on('$open', function () {
-			        	scope.connected = true;	        	
-			        })
-			        .$on('$close', function () {
-			        	scope.connected = false;
-			        })
-			        .$on('broadcast', function (data) {
-			        	scope.serverMessage = data;
-			        });
-		    	}
 	        	
 	        	if(value == true){ 
-	        		
-	        		scope.visible = true;
 	        		
 	        		$(element).modal('show');
 	        		
@@ -47,19 +70,11 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 	        			scope.textSearchBoxEnabled = false;
 	        		else
 	        			scope.textSearchBoxEnabled = true;
-	    	        
-	    	        if(scope.connected===false)
-	    	        	scope.webSocket.$open();
 	        	}
 	        	else{
 	        		
-	        		scope.visible = false;
-	        		
 	        		$(element).modal('hide');
 	        		clearForm();
-	        		
-	        		if(scope.connected)
-	        			scope.webSocket.$close();
 	        	}
 	        });
 	
@@ -87,21 +102,23 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 	            }, 800);
 	        };
 	        
+	        var nameExists = function(name){
+	        	
+	        	if(scope.users===undefined)
+	        		return false;
+	        	
+	        	if(name in scope.users)
+	        		return true;
+	        	else
+	        		return false;
+	        };
+	        
 	        var autoCloseAlert = function(){
 	            
 	        	$timeout(function(){
 	        		scope.result = undefined;
 	            }, 2000);
 	        };
-	        
-	        var getSocketInfo = function(){
-	        	
-	        	homeFactory.getSocketInfo(scope.userKey).success(function (data) {
-	    			
-    				scope.url = data;
-    				
-	        	});	
-	        }
 	        
 	        var clearForm = function(){
 	        	
@@ -116,15 +133,16 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 	        	
 	        	scope.messageUser = user;
 	        	scope.users = [];
-	        }
+	        };
 	        
 	        scope.isEnabled = function(){
 	        	
 	        	var messageCheck = scope.message!==undefined && scope.message!=='' && scope.message;
 	        	var userCheck = scope.messageUser!==undefined && scope.messageUser!=='' && scope.messageUser;
+	        	var inputNameValid = nameExists(scope.messageUser);
 	        	
-	        	scope.enabled = messageCheck && userCheck && scope.connected;
-	        }
+	        	scope.enabled = messageCheck && userCheck && scope.connected && inputNameValid;
+	        };
 	        
 	    	scope.findUsers = function() { 		
 	    		
@@ -156,7 +174,6 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 	        	
 	        	var payload = {
 	        		message : scope.message,
-	        		user : scope.userKey,
 	        		recipient : scope.messageUser
 	        	};
 	        	

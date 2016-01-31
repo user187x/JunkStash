@@ -23,3 +23,9 @@ body {
     cursor: inherit;
     display: block;
 } 
+
+nav ul.recipients{height:150px}
+nav ul.recipients{overflow:auto; overflow-y:auto;}
+
+nav ul.users{height:100px}
+nav ul.users{overflow:auto; overflow-y:auto;}

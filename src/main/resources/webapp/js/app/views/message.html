@@ -13,9 +13,7 @@
  						</small>
  					</span>
  					<span data-ng-show="!connected">
- 						<small>
- 							Disconnected
- 						</small>
+ 							<i class="fa fa-refresh fa-spin"></i>
  					</span>
  				</h3>
  			</div>
@@ -36,34 +34,72 @@
 		  			<strong>{{result.message}}</strong>
 				</div>
 			
-				<div class="form-group">
-					<label>Recipient</label>
-					<input type="text" 
-						class="form-control"
-						data-ng-disabled="!textSearchBoxEnabled" 
-						data-ng-model="messageUser"
-						data-ng-change="findUsers();isEnabled()" 
-						placeholder="User's ID" 
-						aria-describedby="basic-addon2">
+				<div style="width: 100%; overflow: hidden;">
+				    <div style="width: 70%; float: left; padding-right:10px"> 
+				    	<div class="form-group">
+				    	<label><span class="glyphicon glyphicon-user ng-scope" style="padding-right:10px"></span>Recipient</label>
+						<input type="text" 
+							class="form-control"
+							data-ng-disabled="!textSearchBoxEnabled" 
+							data-ng-model="messageUser"
+							data-ng-change="findUsers();isEnabled()" 
+							placeholder="To" 
+							aria-describedby="basic-addon2">
+						</div>
+						
+<!-- 						 <div>						
+							<nav>
+								<ul class="list-group users">
+								  	<li class="list-group-item"
+								  		style="cursor:pointer" 
+								  		data-ng-repeat="value in users" 
+								  		data-ng-click="setUser(value.user)">
+								  			<span class="glyphicon glyphicon-user ng-scope" style="padding-right:10px"></span>
+			  								{{value.user}}
+								  	</li>
+								</ul>
+							</nav>
+						</div> -->
+						
+						<div>
+							<label for="comment"><span class="glyphicon glyphicon-comment" style="padding-right:10px"></span>Message</label>
+			      			<textarea class="form-control" 
+			      				rows="5" 
+			      				style="max-width: 100%; min-width: 100%"
+			      				data-ng-model="message" 
+			      				data-ng-change="isEnabled()">
+			      			</textarea>
+						</div>
+						
+				    </div>
+				   
+				    <div style="width:30%; float:right"> 
+				    	<label style="padding-left:5px">Online</label>
+				    	<nav data-ng-if="users.length">
+							<ul class="list-group recipients">
+							  	<li class="list-group-item"
+							  		style="cursor:pointer" 
+							  		data-ng-repeat="value in users" 
+							  		data-ng-click="setUser(value.user)">
+							  			<i class="fa fa-circle" style="color:green; padding-right:10px;"></i>
+							  			{{value.user}}
+							  	</li>
+							</ul>
+						</nav>
+						<nav data-ng-if="!users.length">
+							<ul class="list-group recipients">
+							  	<li class="list-group-item disabled"
+							  			style="text-align:center" 
+							  			data-uib-tooltip="No One To Chat With">
+							  		<i class="fa fa-frown-o" style="color:red"></i>
+							  	</li>
+							</ul>
+						</nav>
+				    </div>
 				</div>
-			
-				<div>
-					<div data-ng-repeat="value in users">
-		  				<button type="button" 
-		  						data-ng-click="setUser(value.user)" 
-		  						data-uib-tooltip="Click To Share With {{value.user}}" 
-		  						class="btn btn-secondary">
-		  					<span class="glyphicon glyphicon-user ng-scope" style="padding-right:10px"></span>
-		  					{{value.user}}
-		  				</button>
-					</div>
-				</div>
-				
-				
-				<label for="comment">Message</label>
-      			<textarea class="form-control" rows="5" data-ng-model="message" data-ng-change="isEnabled()"></textarea>
-				
+
 			</div>
+			
 			<div class="modal-footer">
 				<button type="button"
 					class="btn" 
