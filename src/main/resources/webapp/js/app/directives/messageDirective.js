@@ -12,7 +12,7 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 	    	scope.enabled = false;
 	    	scope.textSearchBoxEnabled = true;
 	    	scope.connected = false;
-	    	scope.serverMessage = undefined;	    	
+	    	scope.serverMessage = undefined;
 	    	
 	    	$rootScope.$on('user-login', function (event, args) {
 	    		
@@ -25,14 +25,12 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 		    		if(scope.userKey!==undefined && data!==undefined){
 			    		
 			    		scope.wsUrl = scope.url+"?userKey="+scope.userKey;
-			    		
 			    		scope.webSocket = $websocket.$new({url: scope.wsUrl});
 
 				        scope.webSocket.$on('$open', function () {
 				        	
 				        	scope.connected = true;	   
 				        	console.log("Client Socket Connected ");
-				        	
 				        })
 				        .$on('$close', function () {
 				        	
@@ -41,14 +39,17 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 				        })
 				        .$on('broadcast', function (data) {
 				        	
-				        	scope.serverMessage = data;
-				        	
+				        	//Update active user list
 				        	console.log("<<<Broadcast>>> : "+JSON.stringify(data));
+				        	
+				        	scope.$apply();
 				        })
 				        .$on('message', function (message) {
-				        	scope.serverMessage = message;
 				        	
-				        	console.log("Message Recieved :"+JSON.stringify(message));
+				        	scope.serverMessage = message.sender+" : "+message.message;
+				        	console.log('Client Recieved Message :'+message.message);
+				        	
+				        	scope.$apply();
 				        });
 			    	}
 	    		});
