@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
@@ -37,6 +38,7 @@ public class MessageSocketHandler implements ApplicationContextAware {
     private static final String MESSAGE = "message";
     private static final String BROADCAST = "broadcast";
     private static final String STATUS = "status";
+    private static final String USERS = "users";
     private static enum Status {ONLINE, OFFLINE};
     
     public MessageSocketHandler() {
@@ -58,7 +60,8 @@ public class MessageSocketHandler implements ApplicationContextAware {
     	if(StringUtils.isNotEmpty(userId)){
     		
     		userSessionMap.put(userId, session);
-            broadcastMessage(session, Status.ONLINE);
+            broadcastMessage();
+            
             System.out.println("Websocket Connection Established [USER : ("+userId+") CONNECTED]");
     	}
     	else{
@@ -72,9 +75,9 @@ public class MessageSocketHandler implements ApplicationContextAware {
     public void onClose(Session session, int statusCode, String reason) {
         
     	String userId = userSessionMap.inverse().get(session);
-        
     	userSessionMap.remove(userId);
-        broadcastMessage(session, Status.OFFLINE);
+    	
+        broadcastMessage();
         
         System.out.println("Websocket Connection Terminated [USER : ("+userId+") DISCONNECTED]");
     }
@@ -143,33 +146,31 @@ public class MessageSocketHandler implements ApplicationContextAware {
     }
     
     //Notify other users are available/unavailable for chat
-    public static void broadcastMessage(Session session, Status status) {
+    public static void broadcastMessage() {
     	
-    	String sender = userSessionMap.inverse().get(session);
+    	JsonArray users = new JsonArray();
     	
     	JsonObject data = new JsonObject();
-    	data.add(STATUS, new JsonPrimitive(status.name()));
-    	data.add(SENDER, new JsonPrimitive(sender));
+    	data.add(USERS, users);
     	
-    	JsonObject json = new JsonObject();
-    	json.add(EVENT, new JsonPrimitive(BROADCAST));
-    	json.add(DATA, data);
+    	JsonObject payload = new JsonObject();
+    	payload.add(EVENT, new JsonPrimitive(BROADCAST));
+    	payload.add(DATA, data);
     	
-    	for(Session ses : userSessionMap.inverse().keySet()){
+    	for(String user : userSessionMap.keySet())
+	    	users.add(new JsonPrimitive(user));
     	
-	    	try {
-	    		
-	    		if(ses.isOpen()){
-	    			ses.getRemote().sendString(json.toString());
-	    			
-	    			System.out.println("Websocket Recieved Message [USER : ("+sender+") >>BROADCAST<< STATUS :: ("+status.name()+")]");
-	    		}
-	    		else
-	    			userSessionMap.inverse().remove(ses);
-			} 
-	    	catch (IOException e) {
-				System.out.println("Failure Broadcast Messsage : "+e.getMessage());
-			}
+    	for(Session session : userSessionMap.inverse().keySet()){
+    		
+    		if(session.isOpen()){
+    			try{
+    				
+    				session.getRemote().sendString(payload.toString());
+    			}
+    			catch(Exception e){}
+    		}
     	}
+    	
+    	System.out.println("Websocket Broadcast : "+payload.toString());
     }
 }

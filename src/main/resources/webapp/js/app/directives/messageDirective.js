@@ -13,6 +13,7 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 	    	scope.textSearchBoxEnabled = true;
 	    	scope.connected = false;
 	    	scope.serverMessage = undefined;
+	    	scope.onlineUsers = [];
 	    	
 	    	$rootScope.$on('user-login', function (event, args) {
 	    		
@@ -41,6 +42,7 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 				        	
 				        	//Update active user list
 				        	console.log("<<<Broadcast>>> : "+JSON.stringify(data));
+				        	scope.onlineUsers = data.users
 				        	
 				        	scope.$apply();
 				        })
@@ -56,6 +58,7 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 	    	});
 	    	
 	    	$rootScope.$on('user-logout', function (event, args) {
+	    		
 	    		scope.webSocket.$close();
 	    	});
 	    	
@@ -82,6 +85,7 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 	        $(element).on('shown.bs.modal', function(){
 	        	
 	        	scope.$apply(function(){
+	        		
 	        		scope.$parent[attrs.visible] = true;
 		        });
 	        });
@@ -89,6 +93,7 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 	        $(element).on('hidden.bs.modal', function(){
 	        	
 	        	scope.$apply(function(){
+	        		
 	        		scope.$parent[attrs.visible] = false;
 		        });
 	        });
@@ -117,8 +122,10 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 	        var autoCloseAlert = function(){
 	            
 	        	$timeout(function(){
+	        		
 	        		scope.result = undefined;
-	            }, 2000);
+	            
+	        	}, 2000);
 	        };
 	        
 	        var clearForm = function(){
@@ -148,6 +155,7 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 	    	scope.findUsers = function() { 		
 	    		
 	    		if(scope.messageUser===undefined || scope.messageUser===''){
+	    			
 	    			scope.users = [];
 	    			return;
 	    		}
@@ -165,7 +173,7 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 	    		    });
 	    		});
 	    	};
-	        
+	    	
 	        scope.sendMessage = function(message){
 	        	
 	        	scope.message = message;
@@ -179,6 +187,7 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 	        	};
 	        	
 	        	if(scope.connected){
+	        		
 	        		scope.webSocket.$emit('message', payload);
 	        		scope.message = undefined;
 	        	}

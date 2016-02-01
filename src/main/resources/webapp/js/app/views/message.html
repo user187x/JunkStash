@@ -47,7 +47,7 @@
 							aria-describedby="basic-addon2">
 						</div>
 						
-<!-- 						 <div>						
+ 						 <div>						
 							<nav>
 								<ul class="list-group users">
 								  	<li class="list-group-item"
@@ -59,8 +59,8 @@
 								  	</li>
 								</ul>
 							</nav>
-						</div> -->
-						
+						</div>
+					
 						<div style="padding-bottom:20px">
 							<label for="comment"><span class="glyphicon glyphicon-comment" style="padding-right:10px"></span>Message</label>
 			      			<input type="text" 
@@ -83,24 +83,25 @@
 				    </div>
 				   
 				    <div style="width:30%; float:right"> 
+				    	
 				    	<label style="padding-left:5px">Online</label>
-				    	<nav data-ng-if="users.length">
+				    	<nav data-ng-if="onlineUsers.length">
 							<ul class="list-group recipients">
 							  	<li class="list-group-item"
 							  		style="cursor:pointer" 
-							  		data-ng-repeat="value in users" 
-							  		data-ng-click="setUser(value.user)">
-							  			<i class="fa fa-circle" style="color:green; padding-right:10px;"></i>
-							  			{{value.user}}
+							  		data-ng-repeat="user in onlineUsers" 
+							  		data-ng-click="setUser(user)">
+							  			<i class="fa fa-circle" style="color:green; padding-right:10px;"></i>{{user}}
 							  	</li>
 							</ul>
 						</nav>
-						<nav data-ng-if="!users.length">
+						
+						<nav data-ng-if="!onlineUsers.length">
 							<ul class="list-group recipients">
 							  	<li class="list-group-item disabled"
-							  			style="text-align:center" 
-							  			data-uib-tooltip="No One To Chat With">
-							  		<i class="fa fa-frown-o" style="color:red"></i>
+						  			style="text-align:center" 
+						  			data-uib-tooltip="No One To Chat With">
+					  					<i class="fa fa-frown-o" style="color:red"></i>
 							  	</li>
 							</ul>
 						</nav>
