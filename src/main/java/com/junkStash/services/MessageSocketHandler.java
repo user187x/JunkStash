@@ -60,7 +60,7 @@ public class MessageSocketHandler implements ApplicationContextAware {
     	if(StringUtils.isNotEmpty(userId)){
     		
     		userSessionMap.put(userId, session);
-            broadcastMessage();
+    		 broadcastMessage();
             
             System.out.println("Websocket Connection Established [USER : ("+userId+") CONNECTED]");
     	}
@@ -156,6 +156,9 @@ public class MessageSocketHandler implements ApplicationContextAware {
     	JsonObject payload = new JsonObject();
     	payload.add(EVENT, new JsonPrimitive(BROADCAST));
     	payload.add(DATA, data);
+    	
+    	if(userSessionMap.isEmpty())
+    		return;
     	
     	for(String user : userSessionMap.keySet())
 	    	users.add(new JsonPrimitive(user));

@@ -15,6 +15,14 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 	    	scope.serverMessage = undefined;
 	    	scope.onlineUsers = [];
 	    	
+	    	var removeMySelf = function(userArray){
+	    		
+	    		for (var i=userArray.length-1; i>=0; i--) {
+	    		    if (userArray[i] === scope.user)
+	    		    	userArray.splice(i, 1);
+	    		}
+	    	};
+	    	
 	    	$rootScope.$on('user-login', function (event, args) {
 	    		
 	    		scope.userKey = args.userKey;
@@ -42,7 +50,9 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 				        	
 				        	//Update active user list
 				        	console.log("<<<Broadcast>>> : "+JSON.stringify(data));
-				        	scope.onlineUsers = data.users
+				        	scope.onlineUsers = data.users;
+				        	
+				        	removeMySelf(scope.onlineUsers);
 				        	
 				        	scope.$apply();
 				        })
@@ -50,6 +60,8 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 				        	
 				        	scope.serverMessage = message.sender+" : "+message.message;
 				        	console.log('Client Recieved Message :'+message.message);
+				        	
+				        	appendToMessage(scope.serverMessage);
 				        	
 				        	scope.$apply();
 				        });
@@ -97,6 +109,18 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 	        		scope.$parent[attrs.visible] = false;
 		        });
 	        });
+	        
+	        var appendFromMessage = function(incomingMessage) {
+	            
+	        	var msgArea = angular.element(document.querySelector('#messageArea'));
+	        	msgArea.append('<li class="list-group-item list-group-item-info">'+incomingMessage+'</li>');     
+	        };
+	        
+	        var appendToMessage = function(incomingMessage) {
+	            
+	        	var msgArea = angular.element(document.querySelector('#messageArea'));
+	        	msgArea.append('<li class="list-group-item">'+incomingMessage+'</li>');     
+	        };
 	        
 	        var autoCloseModal = function(success){
 	            
@@ -187,6 +211,8 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 	        	};
 	        	
 	        	if(scope.connected){
+	        		
+	        		appendFromMessage(scope.user+' : '+scope.message)
 	        		
 	        		scope.webSocket.$emit('message', payload);
 	        		scope.message = undefined;
