@@ -5,16 +5,7 @@
  			<div class="modal-header">
  				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
  				<h3 class="modal-title" style="text-align:center">
- 					<span class="glyphicon glyphicon-comment" style="padding-right:10px"></span>Send Message
- 					<br/>
- 					<span data-ng-show="connected">
- 						<small>
- 							Connected
- 						</small>
- 					</span>
- 					<span data-ng-show="!connected">
- 							<i class="fa fa-refresh fa-spin"></i>
- 					</span>
+ 					<span class="glyphicon glyphicon-comment" style="padding-right:10px"></span>Instant Message
  				</h3>
  			</div>
  			
@@ -35,86 +26,62 @@
 				</div>
 			
 				<div style="width: 100%; overflow: hidden;">
+				    
 				    <div style="width: 70%; float: left; padding-right:10px"> 
-				    	<div class="form-group">
-				    	<label><span class="glyphicon glyphicon-user ng-scope" style="padding-right:10px"></span>Recipient</label>
-						<input type="text" 
-							class="form-control"
-							data-ng-disabled="!textSearchBoxEnabled" 
-							data-ng-model="messageUser"
-							data-ng-change="findUsers();isEnabled()" 
-							placeholder="To" 
-							aria-describedby="basic-addon2">
-						</div>
+				    	
+						<div class="recipients" id="messageArea"></div>
 						
-<!--  						 <div>						
-							<nav>
-								<ul class="list-group users">
-								  	<li class="list-group-item"
-								  		style="cursor:pointer" 
-								  		data-ng-repeat="value in users" 
-								  		data-ng-click="setUser(value.user)">
-								  			<span class="glyphicon glyphicon-user ng-scope" style="padding-right:10px"></span>
-			  								{{value.user}}
-								  	</li>
-								</ul>
-							</nav>
-						</div> -->
-					
-						<div style="padding-bottom:20px">
-							<label for="comment"><span class="glyphicon glyphicon-comment" style="padding-right:10px"></span>Message</label>
-			      			<input type="text" 
+						<div class="form-group" style="padding-top:10px">
+							
+							<div class="input-group">
+							  <input type="text" 
 								class="form-control"
+								data-ng-disabled="!textSearchBoxEnabled" 
 								data-ng-model="message"
 								data-ng-change="isEnabled()" 
 								placeholder="Message" 
 								aria-describedby="basic-addon2">
-						</div>
-						
-						<div>
-							<nav>
-							<ul class="list-group recipients" id="messageArea"></ul>
-			      			</nav>
-						</div>
-						
-				    </div>
+								
+							  <span class="input-group-addon" id="basic-addon2"
+							 	style="cursor:pointer"
+								data-ng-click="sendMessage(message)">Send
+							  </span>
+							</div>
+							
+					    </div>
 				   
-				    <div style="width:30%; float:right"> 
-				    	
-				    	<label style="padding-left:5px">Online</label>
+				   </div>
+				   
+				    <div data-ng-if="onlineUsers.length" style="width:30%; float:right"> 
 				    	<nav data-ng-if="onlineUsers.length">
 							<ul class="list-group recipients">
-							  	<li class="list-group-item"
+							  	<li data-ng-class="{'list-group-item active' : user===selected, 'list-group-item' : user!==selected}"
 							  		style="cursor:pointer" 
 							  		data-ng-repeat="user in onlineUsers" 
-							  		data-ng-click="setUser(user)">
+							  		data-ng-click="setUser(user); isEnabled()">
 							  			<i class="fa fa-circle" style="color:green; padding-right:10px;"></i>{{user}}
 							  	</li>
 							</ul>
-						</nav>
-						
-						<nav data-ng-if="!onlineUsers.length">
+						</nav>	
+				    </div>
+				    
+				    <div data-ng-if="!onlineUsers.length" style="width:30%; float:right"> 
+				    	<nav data-ng-if="onlineUsers.length">
 							<ul class="list-group recipients">
-							  	<li class="list-group-item disabled"
-						  			style="text-align:center" 
-						  			data-uib-tooltip="No One To Chat With">
-					  					<i class="fa fa-frown-o" style="color:red"></i>
+							  	<li class="list-group-item disabled" style="height:100%">Yo!
 							  	</li>
 							</ul>
-						</nav>
+						</nav>	
 				    </div>
-				</div>
 
-			</div>
+				</div>
 			
-			<div class="modal-footer">
-				<button type="button"
-					class="btn" 
-					data-ng-click="sendMessage(message)"
-					data-ng-class="enabled ? 'btn btn-success' : 'btn btn-secondary'" 
-					data-ng-disabled="!enabled && !connected">Send
-				</button>
-			</div>
+			<div class="modal-footer" style="text-align:center">
+				<span data-ng-show="connected">
+					<small><i class="fa fa-spinner fa-pulse" style="color:gray"></i>&nbsp;Connected</small>
+				</span>
+				<span data-ng-show="!connected"><i class="fa fa-refresh fa-spin"></i>&nbsp;Disconnected</span>
+			</div>		
 		</div>
  	</div>
 </div>

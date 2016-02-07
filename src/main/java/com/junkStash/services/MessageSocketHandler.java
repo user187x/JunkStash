@@ -37,9 +37,7 @@ public class MessageSocketHandler implements ApplicationContextAware {
     private static final String SENDER = "sender";
     private static final String MESSAGE = "message";
     private static final String BROADCAST = "broadcast";
-    private static final String STATUS = "status";
     private static final String USERS = "users";
-    private static enum Status {ONLINE, OFFLINE};
     
     public MessageSocketHandler() {
 		System.out.println("Websockets Initialized URL @ "+PropertyUtil.getWebSocketUrl());

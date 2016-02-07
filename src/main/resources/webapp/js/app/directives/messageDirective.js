@@ -14,6 +14,7 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 	    	scope.connected = false;
 	    	scope.serverMessage = undefined;
 	    	scope.onlineUsers = [];
+	    	scope.selected = undefined;
 	    	
 	    	var removeMySelf = function(userArray){
 	    		
@@ -61,7 +62,7 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 				        	scope.serverMessage = message.sender+" : "+message.message;
 				        	console.log('Client Recieved Message :'+message.message);
 				        	
-				        	appendToMessage(scope.serverMessage);
+				        	appendToMessage(message.sender, message.message);
 				        	
 				        	scope.$apply();
 				        });
@@ -110,16 +111,34 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 		        });
 	        });
 	        
-	        var appendFromMessage = function(incomingMessage) {
+	        var appendFromMessage = function(user, incomingMessage) {
 	            
 	        	var msgArea = angular.element(document.querySelector('#messageArea'));
-	        	msgArea.append('<li class="list-group-item list-group-item-info">'+incomingMessage+'</li>');     
+
+	        	msgArea.append(
+	        		'<div class="alert alert-info alert-dismissible" role="alert">'
+	        		+'<button type="button" class="close" data-dismiss="alert" aria-label="Close">'
+	        		+'<span aria-hidden="true">&times;</span>'
+	        		+'</button><strong>'+user+'</strong>&nbsp;'+incomingMessage+'</div>'
+	        		+'<div><small>'+new Date()+'</small></div>'
+	        	);
 	        };
 	        
-	        var appendToMessage = function(incomingMessage) {
+	        var appendToMessage = function(user, incomingMessage) {
 	            
 	        	var msgArea = angular.element(document.querySelector('#messageArea'));
-	        	msgArea.append('<li class="list-group-item">'+incomingMessage+'</li>');     
+	        	var alertType = 'success';
+	        	
+	        	if(user==='Server')
+	        		alertType = 'danger';
+	        	
+	        	msgArea.append(
+	        		'<div class="alert alert-'+alertType+' alert-dismissible" role="alert">'
+	        		+'<button type="button" class="close" data-dismiss="alert" aria-label="Close">'
+	        		+'<span aria-hidden="true">&times;</span>'
+	        		+'</button><strong>'+user+'</strong>&nbsp;'+incomingMessage+'</div>'
+	        		+'<div><small>'+new Date()+'</small></div>'
+	        	);
 	        };
 	        
 	        var autoCloseModal = function(success){
@@ -163,6 +182,7 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 	        
 	        scope.setUser = function(user){
 	        	
+	        	scope.selected = user;
 	        	scope.messageUser = user;
 	        	scope.users = [];
 	        };
@@ -172,8 +192,9 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 	        	var messageCheck = scope.message!==undefined && scope.message!=='' && scope.message;
 	        	var userCheck = scope.messageUser!==undefined && scope.messageUser!=='' && scope.messageUser;
 	        	var inputNameValid = nameExists(scope.messageUser);
+	        	var selectedCheck = scope.selected!==undefined && scope.selected!=='' && scope.selected;
 	        	
-	        	scope.enabled = messageCheck && userCheck && scope.connected && inputNameValid;
+	        	scope.enabled = messageCheck && userCheck && scope.connected && inputNameValid && selectedCheck;
 	        };
 	        
 	    	scope.findUsers = function() { 		
@@ -205,6 +226,9 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 	        	if(!scope.message || scope.message==='' || scope.message===undefined || scope.connected===false)
 	        		return;
 	        	
+	        	if(!scope.selected || scope.selected==='' || scope.selected===undefined)
+	        		return;
+	        	
 	        	var payload = {
 	        		message : scope.message,
 	        		recipient : scope.messageUser
@@ -212,7 +236,7 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 	        	
 	        	if(scope.connected){
 	        		
-	        		appendFromMessage(scope.user+' : '+scope.message)
+	        		appendFromMessage(scope.user, scope.message)
 	        		
 	        		scope.webSocket.$emit('message', payload);
 	        		scope.message = undefined;
