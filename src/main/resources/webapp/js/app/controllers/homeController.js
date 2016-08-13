@@ -34,6 +34,11 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
         $scope.spinLogo = !$scope.spinLogo;
     };
     
+    $scope.refreshFiles = function(){
+    	
+		$scope.listAllFiles();
+    };
+    
     $scope.toggleLoginModal = function(){
     	
         $scope.showLoginModal = !$scope.showLoginModal;

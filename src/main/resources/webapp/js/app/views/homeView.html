@@ -114,7 +114,14 @@
 		</div>
 		
 		<div data-ng-show="admin" class="row">
-		  <div class="col-sm-2"><i class="fa fa-floppy-o" style="padding-right:10px; padding-bottom:10px"></i>Files ({{files.length}})</div>
+		  <div class="col-sm-2">
+		    <i class="fa fa-refresh"
+		    	data-uib-tooltip="Refresh File List"  
+		    	style="padding-right:10px; padding-bottom:10px; cursor:pointer" 
+		    	data-ng-click="refreshFiles()">
+		    </i>
+		  	<i class="fa fa-floppy-o" style="padding-right:10px; padding-bottom:10px"></i>Files ({{files.length}})
+		  </div>
 		  <div class="col-sm-10"></div>
 		</div>
 		
