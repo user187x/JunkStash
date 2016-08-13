@@ -3,6 +3,8 @@ package com.junkStash.services;
 import java.util.ArrayList;
 import java.util.Date;
 
+import javax.print.attribute.standard.NumberOfInterveningJobs;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
@@ -136,6 +138,22 @@ public class FileService {
 			return false;
 	}
 	
+	public boolean incrementDownloadCount(String fileId){
+		
+		Document query = new Document();
+		query.append("_id", new ObjectId(fileId));
+		
+		Document update = new Document();
+		update.append("$inc", new Document("downloadCount", 1));
+		
+		UpdateResult results = databaseService.getFileCollection().updateOne(query, update);
+		
+		if(results.getModifiedCount()>0)
+			return true;
+		else
+			return false;
+	}
+	
 	public JsonObject getFile(String fileId, Document shareInfo){
 		
 		Document match = new Document();
@@ -151,6 +169,7 @@ public class FileService {
 		String name = result.getString("filename");
 		String time = result.getDate("uploadDate").toString();
 		String owner = result.getString("owner");
+		long downloadCount = result.getLong("downloadCount");
 		long size = result.getLong("length");
 		
 		JsonObject json = new JsonObject();
@@ -172,6 +191,8 @@ public class FileService {
 		
 		if(StringUtils.isNotEmpty(owner))
 			json.add("owner", new JsonPrimitive(owner));
+		
+		json.add("downloadCount", new JsonPrimitive(downloadCount));
 		
 		JsonObject shareDetails = new JsonObject();
 		
@@ -215,6 +236,7 @@ public class FileService {
 			String name = result.getString("filename");
 			String time = result.getDate("uploadDate").toString();
 			String owner = result.getString("owner");
+			long downloadCount = result.getLong("downloadCount");
 			long size = result.getLong("length");
 			
 			JsonObject json = new JsonObject();
@@ -236,6 +258,8 @@ public class FileService {
 			
 			if(StringUtils.isNotEmpty(owner))
 				json.add("owner", new JsonPrimitive(owner));
+			
+			json.add("downloadCount", new JsonPrimitive(downloadCount));
 			
 			JsonObject shareInfo = new JsonObject();
 			shareInfo.add("shared", new JsonPrimitive(false));
@@ -391,6 +415,22 @@ public class FileService {
 		
 		Document update = new Document();
 		update.append("$set", new Document("owner", userId));
+		
+		UpdateResult results = databaseService.getFileCollection().updateOne(query, update);
+		
+		if(results.getModifiedCount()>0)
+			return true;
+		else
+			return false;
+	}
+	
+	public boolean initFileCounter(String fileId){
+		
+		Document query = new Document();
+		query.append("_id", new ObjectId(fileId));
+		
+		Document update = new Document();
+		update.append("$set", new Document("downloadCount", new Long(0)));
 		
 		UpdateResult results = databaseService.getFileCollection().updateOne(query, update);
 		

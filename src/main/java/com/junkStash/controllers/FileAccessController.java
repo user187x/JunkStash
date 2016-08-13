@@ -103,15 +103,18 @@ public class FileAccessController {
 				}
 		     });
 			 
-		 Spark.get("/download/:userKey/:fileId", new Route() {
+		 Spark.get("/download/:userKey/:fileId/:fileName", new Route() {
 			
 			@Override
 			public Object handle(Request request, Response response) throws Exception {
 				
+				String fileId = request.params(":fileId");
 	         	String userKey = request.params(":userKey");
-	         	String fileId = request.params(":fileId");
+	         	String fileName = request.params(":fileName");
 				
-				if(fileId == null || fileId.isEmpty() || userKey == null || userKey.isEmpty()){
+				if(fileId == null || fileId.isEmpty() 
+					|| userKey == null || userKey.isEmpty()
+					|| fileName == null || fileName.isEmpty()){
 					
 					JsonObject payload = new JsonObject();
 					payload.add("message", new JsonPrimitive("Request Was Empty"));
@@ -131,17 +134,22 @@ public class FileAccessController {
 	         		return payload;
 				}
 				
-				String fileName = fileService.getFileName(fileId);
-				
 				System.out.println("Request To Download File : "+fileName);
-
+				
 				ObjectId objectId = new ObjectId(fileId);
 				fileService.getGridFSBucket().downloadToStream(objectId, response.raw().getOutputStream());
 	         	
 				String mimeType = fileService.getFile(fileId, null).get("type").getAsString();
+				String[] mimeTypeParts = mimeType.split("/");
+				String fileExtension = mimeTypeParts[1];
 
+				response.header("Content-Type", "application/"+fileExtension);
+				response.header("Content-Transfer-Encoding", "binary");
 				response.header("Content-Disposition", "attachment; filename=" + fileName);
+				response.type("application/force-download");
 				response.type(mimeType);
+				
+				fileService.incrementDownloadCount(fileId);
 				
 	         	return response.raw();
 			}
@@ -347,6 +355,7 @@ public class FileAccessController {
 		            
 		            fileService.setFileType(fileId.toString(), fileType);
 		            fileService.setFileOwner(fileId.toString(), userId);
+		            fileService.initFileCounter(fileId.toString());
 	     		}
 	     		
 	     		catch(Exception e){

@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class PropertyUtil {
 
-	public static String DEFAULT_SOCKET_HOST = "localhost";
+	public static String DEFAULT_SOCKET_HOST = "junkstash.com";
 	public static String DEFAULT_SOCKET_PATH = "/chat";
 	public static int DEFAULT_APP_PORT = 8080;
 	public static String DEFAULT_PUBLIC_DIR = "/webapp";
@@ -44,6 +44,6 @@ public class PropertyUtil {
 	}
 	
 	public static String getWebSocketUrl(){
-		return "ws://"+PropertyUtil.getSocketHost()+":"+PropertyUtil.getPort()+PropertyUtil.getSocketPath();
+		return "ws://"+PropertyUtil.getSocketHost()+PropertyUtil.getSocketPath();
 	}
 }

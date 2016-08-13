@@ -147,11 +147,14 @@
 					<td data-ng-if="admin">{{file.owner}}</td>
 					
 					<td style="text-align:right">
-						<a href="/download/{{userKey}}/{{file.id}}" download="file.name">
-							<i class="fa fa-arrow-circle-down"
-								data-uib-tooltip="Download File"  
-								style="cursor:pointer; padding-right:10px;">
-							</i>
+						<a  data-ng-href="/download/{{userKey}}/{{file.id}}/{{file.name}}" 
+							target="_self"
+							download={{file.name}}
+							style="cursor:pointer; text-decoration:none">
+								<i class="fa fa-arrow-circle-down"
+									data-uib-tooltip="Download File {{file.name}}"  
+									style="padding-right:10px">
+								</i>
 						</a>
 						<i class="fa fa-share-alt" 
 							data-ng-click="toggleShareModal(file)"
