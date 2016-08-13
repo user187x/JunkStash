@@ -1,15 +1,17 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.junkStash</groupId>
 	<artifactId>junkStash</artifactId>
-	<version>1.0</version>
+	<version>1.0.0</version>
 
 	<properties>
 		<jdk.version>1.8</jdk.version>
 		<spark.version>2.5</spark.version>
-		<spring.version>4.2.0.RELEASE</spring.version>
+		<spring.version>4.3.2.RELEASE</spring.version>
 		<commons.beanutils.version>1.9.2</commons.beanutils.version>
 	</properties>
 
@@ -40,14 +42,14 @@
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-mongodb</artifactId>
-			<version>1.6.2.RELEASE</version>
+			<version>1.9.2.RELEASE</version>
 		</dependency>
 
 		<!-- Mongo Driver -->
 		<dependency>
 			<groupId>org.mongodb</groupId>
 			<artifactId>mongo-java-driver</artifactId>
-			<version>3.2.0</version>
+			<version>3.3.0</version>
 		</dependency>
 
 		<!-- Populate bean from request -->
