@@ -26,6 +26,7 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
     $scope.showLoginModal = false;
     $scope.showShareModal = false;
     $scope.showMessageModal = false;
+    $scope.showMailModal = false
     $scope.spinLogo = false;
 
     
@@ -44,6 +45,12 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
         $scope.showLoginModal = !$scope.showLoginModal;
     };
 	
+    $scope.toggleMailModal = function(mailRecipient){
+    	
+    	 $scope.showMailModal = !$scope.showMailModal;
+    	 $scope.mailRecipient = mailRecipient;
+    };
+    
     $scope.toggleMessageModal = function(messageRecipient){
     	
     	$scope.messageRecipient = messageRecipient;

@@ -17,10 +17,12 @@ public class DatabaseConfig {
 
 	public static final Date systemStart = new Date();
 	
+	public static final String DATABASE = "junkstash";
+	
 	public static final String GRID_FS = "fileStore";	
 	public static final String USER_COLLECTION = "users";
+	public static final String MAIL_COLLECTION = "mail";
 	public static final String FILE_COLLECTION = "fileStore.files";
-	public static final String DATABASE = "junkstash";
 	
 	private static MongoClient mongoClient;
     
@@ -45,7 +47,7 @@ public class DatabaseConfig {
      
      public GridFSBucket getGridFSBucket(){
  		return GridFSBuckets.create(getMongoDatabase(), DatabaseConfig.GRID_FS);
- 	}
+ 	 }
      
      public MongoClient getMongoClient(){
     	 return mongoClient;
@@ -53,6 +55,10 @@ public class DatabaseConfig {
      
      public MongoCollection<Document> getUserCollection(){
     	 return getMongoDatabase().getCollection(USER_COLLECTION);
+     }
+     
+     public MongoCollection<Document> getMailCollection(){
+    	 return getMongoDatabase().getCollection(MAIL_COLLECTION);
      }
      
      public MongoCollection<Document> getFileCollection(){

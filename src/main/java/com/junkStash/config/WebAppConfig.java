@@ -6,6 +6,7 @@ import org.springframework.context.annotation.ComponentScan;
 import com.junkStash.controllers.FileAccessController;
 import com.junkStash.controllers.IndexController;
 import com.junkStash.controllers.UserAccessController;
+import com.junkStash.services.MailService;
 import com.junkStash.services.MessageSocketHandler;
 import com.junkStash.util.CacheUtil;
 import com.junkStash.util.PropertyUtil;
@@ -27,6 +28,7 @@ public class WebAppConfig {
 		Spark.webSocket(PropertyUtil.getSocketPath(), MessageSocketHandler.class);
 		Spark.init();
 		
+		@SuppressWarnings("resource")
 		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(WebAppConfig.class);	
 		ctx.registerShutdownHook();
 		
@@ -38,5 +40,6 @@ public class WebAppConfig {
 		new IndexController();
 		new UserAccessController();
 		new FileAccessController();
+		new MailService();
     }
 }

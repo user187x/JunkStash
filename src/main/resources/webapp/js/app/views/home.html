@@ -3,6 +3,7 @@
 	<loginmodal visible="showLoginModal"></loginmodal>
 	<sharemodal visible="showShareModal"></sharemodal>
 	<messagemodal visible="showMessageModal"></messagemodal>
+	<mailmodal visible="showMailModal"></mailmodal>
 	
 	<div class="jumbotron">
 		
@@ -229,8 +230,8 @@
 					<td>{{user.added}}</td>
 					<td>{{user.space}}</td>
 					<td style="text-align:right">
-						<span class="glyphicon glyphicon-comment"
-							data-ng-click="toggleMessageModal(user.user)" 
+						<span class="glyphicon glyphicon-envelope"
+							data-ng-click="toggleMailModal(user.user)" 
 							data-uib-tooltip="Message User"
 							style="cursor: pointer; padding-right:10px;"">
 						</span>

@@ -46,6 +46,10 @@ app.factory('homeFactory', ['$http', function($http) {
     var getTotalDiskSpace = function (userKey) {
     	return $http.get('/getTotalDiskSpace/'+userKey);
     };
+    
+    var sendMail = function (userKey, payload) {
+    	return $http.post('/sendMail/'+userKey, payload);
+    };
 
     var login = function(payload){
     	return $http.post('/login', payload);
@@ -81,6 +85,7 @@ app.factory('homeFactory', ['$http', function($http) {
     	getUsers : getUsers,
     	userExists : userExists,
     	searchUser : searchUser,
+    	sendMail : sendMail,
     	findUsers : findUsers,
     	getSocketInfo : getSocketInfo,
     	getTotalDiskSpace : getTotalDiskSpace
