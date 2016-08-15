@@ -165,6 +165,26 @@ public class MessageSocketHandler implements ApplicationContextAware {
     			
     			toUserSession.getRemote().sendString(payload.toString());
     			
+    			//Notify Administrators As Well
+    	    	for(String userSession : userSessionMap.keySet()){
+    	    		
+    	    		boolean isAdmin = userServcie.isUserAdmin(userSession);
+    	    		
+    	    		if(isAdmin==false)
+    	    			continue;
+    	    		
+    	    		Session session = userSessionMap.get(userSession);
+    	    		
+    	    		if(session.isOpen()){
+    	    			try{
+    	    				
+    	    				session.getRemote().sendString(payload.toString());
+    	    			}
+    	    			catch(Exception e){}
+    	    		}
+    	    	}
+    			
+    			
     			System.out.println("Notifying User For File Update ("+user+")");
     		}
     		else

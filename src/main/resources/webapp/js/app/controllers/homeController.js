@@ -76,8 +76,6 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
 				$scope.result = data;
 				$scope.loading = false;
 				$scope.uploadFile = undefined;
-				
-				$scope.refresh();
 			})
 			.error(function (data) {
 			
@@ -135,7 +133,7 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
 		
 		homeFactory.approve(data, $scope.userKey).success(function (data) {
 			$scope.result = data;
-			$scope.refresh();
+			$scope.listAllUsers();
 		});
 	};
 	
@@ -174,13 +172,13 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
 			
 			$rootScope.$broadcast('user-logout', function (event, args) {});
 			
-			$scope.refresh();
+			$scope.updatePage();
 			autoCloseAlert();
 			
 		});
 	};
 	
-	$scope.refresh = function(){
+	$scope.updatePage = function(){
 		
 		if($scope.userKey===undefined)
 			return;
@@ -204,7 +202,6 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
 		
 		homeFactory.removeFile(data, $scope.userKey).success(function (data) {
 			$scope.result = data;
-			$scope.refresh();
 		});
 	};
 		
@@ -212,7 +209,7 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
 		
 		homeFactory.removeUser(data, $scope.userKey).success(function (data) {
 			$scope.result = data;
-			$scope.refresh();
+			$scope.listAllUsers();
 		});
 	};
 	
@@ -220,7 +217,7 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
 		
 		homeFactory.approveUser(data, $scope.userKey).success(function (data) {
 			$scope.result = data;
-			$scope.refresh();
+			$scope.listAllUsers();
 		});
 	};
 	
@@ -230,7 +227,7 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
 		$scope.userKey = args.userKey;
 		$scope.admin = args.admin;
 		
-		$scope.refresh();
+		$scope.updatePage();
 	});
 	
 	$rootScope.$on('user-notification', function (event, args) {
@@ -243,6 +240,7 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
 	$rootScope.$on('file-update', function (event, args) {
 		
 		$scope.refreshFiles();
+		$scope.getTotalDiskSpace();
 	});
 	
 	var autoCloseAlert = function(){
