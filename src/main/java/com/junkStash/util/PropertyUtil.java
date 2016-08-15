@@ -8,6 +8,13 @@ public class PropertyUtil {
 	public static String DEFAULT_SOCKET_PATH = "/chat";
 	public static int DEFAULT_APP_PORT = 8080;
 	public static String DEFAULT_PUBLIC_DIR = "/webapp";
+	private static boolean testMode = false;
+	
+	public static void setTestMode(){
+		testMode = true;
+		
+		System.out.println("Websockets Set To TestMode : Using localhost On Port "+getPort());
+	}
 	
 	public static String getSocketHost() {
 		return DEFAULT_SOCKET_HOST;
@@ -44,6 +51,10 @@ public class PropertyUtil {
 	}
 	
 	public static String getWebSocketUrl(){
-		return "ws://"+PropertyUtil.getSocketHost()+PropertyUtil.getSocketPath();
+		
+		if(testMode)
+			return "ws://localhost:"+PropertyUtil.getPort()+PropertyUtil.getSocketPath();
+		else
+			return "ws://"+PropertyUtil.getSocketHost()+PropertyUtil.getSocketPath();
 	}
 }

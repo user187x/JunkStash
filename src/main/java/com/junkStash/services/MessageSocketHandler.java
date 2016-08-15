@@ -22,7 +22,6 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.junkStash.util.PropertyUtil;
 
-
 @WebSocket
 @Component
 public class MessageSocketHandler implements ApplicationContextAware {
@@ -30,6 +29,7 @@ public class MessageSocketHandler implements ApplicationContextAware {
     private static BiMap<String, Session> userSessionMap = HashBiMap.create();
     
     private static UserService userServcie;
+    private static MailService mailService;
     
     private static final String EVENT = "event";
     private static final String DATA = "data";
@@ -38,6 +38,9 @@ public class MessageSocketHandler implements ApplicationContextAware {
     private static final String MESSAGE = "message";
     private static final String BROADCAST = "broadcast";
     private static final String USERS = "users";
+    private static final String NOTIFICATION = "notification";
+    private static final String TYPE = "type";
+    private static final String COUNT = "count";
     
     public MessageSocketHandler() {
 		System.out.println("Websockets Initialized URL @ "+PropertyUtil.getWebSocketUrl());
@@ -46,6 +49,7 @@ public class MessageSocketHandler implements ApplicationContextAware {
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		userServcie = applicationContext.getBean(UserService.class);
+		mailService = applicationContext.getBean(MailService.class);
 	}
     
     @OnWebSocketConnect
@@ -58,8 +62,10 @@ public class MessageSocketHandler implements ApplicationContextAware {
     	if(StringUtils.isNotEmpty(userId)){
     		
     		userSessionMap.put(userId, session);
-    		 broadcastMessage();
+    		broadcastMessage();
             
+    		checkAndAlertUser(userId);
+    		
             System.out.println("Websocket Connection Established [USER : ("+userId+") CONNECTED]");
     	}
     	else{
@@ -140,6 +146,39 @@ public class MessageSocketHandler implements ApplicationContextAware {
 		} 
     	catch (IOException e) {
 			System.out.println("Failure Sending Messsage : "+e.getMessage());
+		}
+    }
+    
+    public static void checkAndAlertUser(String user){
+    	
+    	if(!mailService.hasUnAcknowledgedMail(user) || !userSessionMap.containsKey(user))
+    		return;
+    	
+    	Session toUserSession = userSessionMap.get(user);
+    	
+    	try {
+    		if(toUserSession.isOpen()){
+    			
+    			JsonArray mail = mailService.getUnreadMail(user);
+    			
+    			JsonObject data = new JsonObject();
+    			data.add(TYPE, new JsonPrimitive("Mail Messages"));
+    			data.add(COUNT, new JsonPrimitive(mail.size()));
+    			
+    	    	JsonObject payload = new JsonObject();
+    	    	payload.add(EVENT, new JsonPrimitive(NOTIFICATION));
+    	    	payload.add(DATA, data);
+    			
+    			toUserSession.getRemote().sendString(payload.toString());
+    			
+    			System.out.println("Notifying User ("+user+")");
+    		}
+    		else
+    			userSessionMap.remove(toUserSession);
+		} 
+    	catch (IOException e) {
+			
+    		System.out.println("Failure Sending User Alert : "+e.getMessage());
 		}
     }
     

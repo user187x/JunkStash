@@ -29,6 +29,9 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
     $scope.showMailModal = false
     $scope.spinLogo = false;
 
+    $scope.notification = false;
+    $scope.notificationType = undefined;
+	$scope.notificationCount = undefined;
     
     $scope.toggleSpin = function(){
     	
@@ -228,6 +231,13 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
 		$scope.admin = args.admin;
 		
 		$scope.refresh();
+	});
+	
+	$rootScope.$on('user-notification', function (event, args) {
+		
+		$scope.notification = true;
+		$scope.notificationType = args.type;
+		$scope.notificationCount = args.count;
 	});
 	
 	var autoCloseAlert = function(){
