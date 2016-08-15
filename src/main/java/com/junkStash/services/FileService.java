@@ -287,16 +287,21 @@ public class FileService {
 		if(user.get("shared")==null)
 			return;
 		
-		ArrayList<Document> sharedFiles = (ArrayList<Document>) user.get("shared");
+		boolean shareRemoved = false;
 		
+		ArrayList<Document> sharedFiles = (ArrayList<Document>) user.get("shared");
 		for(Document share : sharedFiles){
 			
 			String fileId = share.getString("_id");
 			
 			if(!exists(fileId)){
 				removeShared(userId, fileId);
+				shareRemoved = true;
 			}
 		}
+		
+		if(shareRemoved)
+			MessageSocketHandler.fileUpdate(userId);
 	}
 	
 	public JsonArray addSharedFiles(String userId, JsonArray files){

@@ -41,6 +41,7 @@ public class MessageSocketHandler implements ApplicationContextAware {
     private static final String NOTIFICATION = "notification";
     private static final String TYPE = "type";
     private static final String COUNT = "count";
+    private static final String FILE_UPDATE = "fileUpdate";
     
     public MessageSocketHandler() {
 		System.out.println("Websockets Initialized URL @ "+PropertyUtil.getWebSocketUrl());
@@ -64,7 +65,7 @@ public class MessageSocketHandler implements ApplicationContextAware {
     		userSessionMap.put(userId, session);
     		broadcastMessage();
             
-    		checkAndAlertUser(userId);
+    		checkMailAndNotify(userId);
     		
             System.out.println("Websocket Connection Established [USER : ("+userId+") CONNECTED]");
     	}
@@ -149,7 +150,33 @@ public class MessageSocketHandler implements ApplicationContextAware {
 		}
     }
     
-    public static void checkAndAlertUser(String user){
+    public static void fileUpdate(String user){
+    	
+       	if(!userSessionMap.containsKey(user))
+    		return;
+    	
+    	Session toUserSession = userSessionMap.get(user);
+    	
+    	try {
+    		if(toUserSession.isOpen()){
+    			
+    	    	JsonObject payload = new JsonObject();
+    	    	payload.add(EVENT, new JsonPrimitive(FILE_UPDATE));
+    			
+    			toUserSession.getRemote().sendString(payload.toString());
+    			
+    			System.out.println("Notifying User For File Update ("+user+")");
+    		}
+    		else
+    			userSessionMap.remove(toUserSession);
+		} 
+    	catch (IOException e) {
+			
+    		System.out.println("Failure Sending User File Update : "+e.getMessage());
+		}
+    }
+    
+    public static void checkMailAndNotify(String user){
     	
     	if(!mailService.hasUnAcknowledgedMail(user) || !userSessionMap.containsKey(user))
     		return;
@@ -171,14 +198,14 @@ public class MessageSocketHandler implements ApplicationContextAware {
     			
     			toUserSession.getRemote().sendString(payload.toString());
     			
-    			System.out.println("Notifying User ("+user+")");
+    			System.out.println("Notifying Mail Alert To User ("+user+")");
     		}
     		else
     			userSessionMap.remove(toUserSession);
 		} 
     	catch (IOException e) {
 			
-    		System.out.println("Failure Sending User Alert : "+e.getMessage());
+    		System.out.println("Failure Sending User Mail Alert : "+e.getMessage());
 		}
     }
     

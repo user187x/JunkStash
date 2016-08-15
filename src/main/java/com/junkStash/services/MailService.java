@@ -35,7 +35,7 @@ public class MailService {
 		
 		databaseService.getMailCollection().insertOne(document);
 		
-		MessageSocketHandler.checkAndAlertUser(recipient);
+		MessageSocketHandler.checkMailAndNotify(recipient);
 		
 		return true;
 	}

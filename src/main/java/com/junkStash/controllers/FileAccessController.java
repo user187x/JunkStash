@@ -17,6 +17,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.junkStash.services.FileService;
+import com.junkStash.services.MessageSocketHandler;
 import com.junkStash.services.UserService;
 
 import spark.Request;
@@ -213,6 +214,8 @@ public class FileAccessController {
 			         		
 			         		payload.add("message", new JsonPrimitive("Successfully Shared File : "+fileId));
 				         	payload.add("success", new JsonPrimitive(true));
+				         	
+				         	MessageSocketHandler.fileUpdate(userId);
 			         		
 			         		return payload;
 			         	}
@@ -249,7 +252,7 @@ public class FileAccessController {
 	     			
 	     			payload.add("message", new JsonPrimitive("Failure Remove File : Unable to find owner"));
 		         	payload.add("success", new JsonPrimitive(false));
-	         		
+		         	
 	         		return payload;
 	     		}
 	     		
@@ -283,6 +286,8 @@ public class FileAccessController {
 	         		payload.add("message", new JsonPrimitive("Entry Successfully Removed"));
 		         	payload.add("success", new JsonPrimitive(true));
 	         		
+		         	MessageSocketHandler.fileUpdate(userId);
+		         	
 	         		return payload;
 	         	}
 	         	else{
@@ -370,6 +375,8 @@ public class FileAccessController {
 	     		
 	     		payload.add("message", new JsonPrimitive("Successfully Uploaded File"));
 	         	payload.add("success", new JsonPrimitive(true));
+	         	
+	         	MessageSocketHandler.fileUpdate(userId);
 	         	
 	         	return payload;
 	     	} 	

@@ -240,6 +240,11 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
 		$scope.notificationCount = args.count;
 	});
 	
+	$rootScope.$on('file-update', function (event, args) {
+		
+		$scope.refreshFiles();
+	});
+	
 	var autoCloseAlert = function(){
         
     	$timeout(function(){

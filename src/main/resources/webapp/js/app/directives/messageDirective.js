@@ -57,6 +57,16 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 				        	
 				        	scope.$apply();
 				        })
+			        	.$on('fileUpdate', function (data) {
+				        	
+				        	//Update active user list
+				        	console.log("Client Recieved Notification : "+JSON.stringify(data));
+				        	
+				        	//Angular Broadcast
+				        	$rootScope.$broadcast('file-update');
+				        	
+				        	scope.$apply();
+				        })
 				        .$on('notification', function (data) {
 				        	
 				        	//Update active user list
