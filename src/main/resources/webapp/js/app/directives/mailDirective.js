@@ -9,7 +9,7 @@ app.directive('mailmodal', ['homeFactory', '$timeout', '$rootScope', function (h
 	    templateUrl: '/js/app/views/mail.html',	   
 	    link: function postLink(scope, element, attrs) {
 	    	
-	    	user = scope.mailRecipient;
+	    	scope.user = scope.mailRecipient;
 	    	scope.message = undefined;
 	    	
 	        scope.$watch(attrs.visible, function(value){

@@ -67,6 +67,10 @@ app.factory('homeFactory', ['$http', function($http) {
     	return $http.post('/register', payload);
     };
     
+    var getNotifications = function (userKey) {
+    	return $http.get('/getNotifications/'+userKey);
+    };
+    
     var getSocketInfo = function (userKey) {
     	return $http.get('/socket/'+userKey);
     };
@@ -88,6 +92,7 @@ app.factory('homeFactory', ['$http', function($http) {
     	sendMail : sendMail,
     	findUsers : findUsers,
     	getSocketInfo : getSocketInfo,
+    	getNotifications : getNotifications,
     	getTotalDiskSpace : getTotalDiskSpace
     };
     

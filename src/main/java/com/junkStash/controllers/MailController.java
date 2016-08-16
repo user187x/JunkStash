@@ -36,7 +36,7 @@ public class MailController {
 	
 	private void setUpRoutes(){
 	
-		Spark.get("/getMail/:userKey", new Route() {
+		Spark.get("/getNotifications/:userKey", new Route() {
 		
 			@Override
 	        public Object handle(Request request, Response response) {

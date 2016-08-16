@@ -26,7 +26,8 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
     $scope.showLoginModal = false;
     $scope.showShareModal = false;
     $scope.showMessageModal = false;
-    $scope.showMailModal = false
+    $scope.showMailModal = false;
+    $scope.showNotificationModal = false;
     $scope.spinLogo = false;
 
     $scope.notification = false;
@@ -43,6 +44,12 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
 		$scope.listAllFiles();
     };
     
+    $scope.toggleNotificationModal = function(user){
+    	
+    	$scope.userKey = user;
+    	$scope.showNotificationModal = !$scope.showNotificationModal;
+    };
+    
     $scope.toggleLoginModal = function(){
     	
         $scope.showLoginModal = !$scope.showLoginModal;
@@ -50,8 +57,8 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
 	
     $scope.toggleMailModal = function(mailRecipient){
     	
-    	 $scope.showMailModal = !$scope.showMailModal;
-    	 $scope.mailRecipient = mailRecipient;
+    	$scope.mailRecipient = mailRecipient;
+    	$scope.showMailModal = !$scope.showMailModal;
     };
     
     $scope.toggleMessageModal = function(messageRecipient){

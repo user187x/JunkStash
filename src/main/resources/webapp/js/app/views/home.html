@@ -4,6 +4,7 @@
 	<sharemodal visible="showShareModal"></sharemodal>
 	<messagemodal visible="showMessageModal"></messagemodal>
 	<mailmodal visible="showMailModal"></mailmodal>
+	<notificationModal visible="showNotificationModal"></notificationModal>
 	
 	<div class="jumbotron">
 		
@@ -24,6 +25,7 @@
 		      				<span data-ng-if="!notification" class="glyphicon glyphicon-exclamation-sign"></span>
 		      				<span data-ng-if="notification"
 		      					data-uib-tooltip="{{notificationCount}} New {{notificationType}}" 
+		      					data-ng-click="toggleNotificationModal(userKey)"
 		      					class="glyphicon glyphicon-exclamation-sign" 
 		      					style="color:yellow; cursor:pointer">
 		      				</span>
