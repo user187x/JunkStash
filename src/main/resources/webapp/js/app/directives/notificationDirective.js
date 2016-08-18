@@ -32,11 +32,6 @@ app.directive('notificationmodal', ['homeFactory', '$timeout', '$rootScope', fun
 	    	    				from : value.from
 	    					});
 	    			    });
-	    				
-	    				console.log(JSON.stringify(data.payload));
-	    				
-	    				console.log(JSON.stringify(scope.notifications[0].message));
-	    				
 	    			});
 	        	}
 	        	else{
