@@ -3,12 +3,17 @@ package com.junkStash.services;
 import java.util.ArrayList;
 import java.util.Date;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
 import com.junkStash.config.DatabaseConfig;
 import com.mongodb.client.MongoCursor;
 
@@ -79,8 +84,28 @@ public class MailService {
 		if(cursor==null || cursor.hasNext()==false)
 			return mail;
 		
-		while(cursor.hasNext())
-			mail.add(cursor.next().toJson());
+		while(cursor.hasNext()){
+				
+			Document result = cursor.next();
+			
+			String messsage = result.getString("message");
+			String from = result.getString("from");
+			String timeStamp = result.getDate("timeStamp").toString();
+			
+			JsonObject json = new JsonObject();
+			
+			if(StringUtils.isNotEmpty(messsage))
+				json.add("message", new JsonPrimitive(messsage));
+			
+			if(StringUtils.isNotEmpty(timeStamp))
+				json.add("timeStamp", new JsonPrimitive(timeStamp));
+			
+			if(StringUtils.isNotEmpty(from))
+				json.add("from", new JsonPrimitive(from));
+			
+			
+			mail.add(json);
+		}
 		
 		return mail;
 	}

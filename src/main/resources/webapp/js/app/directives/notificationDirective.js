@@ -10,16 +10,33 @@ app.directive('notificationmodal', ['homeFactory', '$timeout', '$rootScope', fun
 	    link: function postLink(scope, element, attrs) {
 	    	
 	    	scope.user = scope.userKey;
-	    	scope.notifications = undefined;
+	    	scope.notifications = [];
 	    	
 	        scope.$watch(attrs.visible, function(value){
 	        	
 	        	if(value == true){ 
 	        		$(element).modal('show');
 	        		
+	        		scope.notifications = [];
+	        		
 	    			homeFactory.getNotifications(scope.userKey).success(function (data) {
 	    				
-	    				scope.notifications = data;
+	    				scope.notifications = [];
+	    				
+	    			    angular.forEach(data.payload, function(value, key) {
+	    			        
+	    			    	scope.notifications.push({ 
+	    	    				
+	    			    		message : value.message,
+	    	    				timeStamp : value.timeStamp,
+	    	    				from : value.from
+	    					});
+	    			    });
+	    				
+	    				console.log(JSON.stringify(data.payload));
+	    				
+	    				console.log(JSON.stringify(scope.notifications[0].message));
+	    				
 	    			});
 	        	}
 	        	else{
@@ -27,15 +44,13 @@ app.directive('notificationmodal', ['homeFactory', '$timeout', '$rootScope', fun
 	        	}
 	        });
 	
-	        $(element).on('shown.bs.modal', function(){  	
-	        	
+	        $(element).on('shown.bs.modal', function(){  		
 	        	scope.$apply(function(){
 	        		scope.$parent[attrs.visible] = true;
 		        });
 	        });
 	
 	        $(element).on('hidden.bs.modal', function(){
-	        	
 	        	scope.$apply(function(){
 	        		scope.$parent[attrs.visible] = false;
 		        });

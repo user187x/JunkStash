@@ -12,7 +12,24 @@
  			<div class="modal-body">
  										
 				<div class="recipients" id="messageArea">
-					{{notifications}}
+				
+					<table data-ng-show="userKey" class="table table-striped table-hover" style="border: 2px solid #ccc">
+				    	<thead>
+					        <tr>
+					        	<th>From</th>
+					        	<th>Date</th>
+					        	<th>Message</th>
+					        </tr>
+				    	</thead>
+				    	<tbody>
+							<tr data-ng-repeat="notification in notifications">
+								<td>{{notification.from}}</td>
+								<td>{{notification.timeStamp}}</td>
+								<td>{{notification.message}}</td>
+							</tr>
+						</tbody>
+					</table>
+				
 				</div>
 				
 			</div>

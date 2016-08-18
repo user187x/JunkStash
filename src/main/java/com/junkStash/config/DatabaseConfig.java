@@ -36,6 +36,7 @@ public class DatabaseConfig {
 			System.exit(1);
 		}
 		else{
+			
 			System.out.println("Database Service Initialized...");
 			System.out.println("JunkStash Started "+systemStart);
 		}

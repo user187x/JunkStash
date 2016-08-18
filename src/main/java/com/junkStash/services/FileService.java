@@ -289,6 +289,7 @@ public class FileService {
 		
 		boolean shareRemoved = false;
 		
+		@SuppressWarnings("unchecked")
 		ArrayList<Document> sharedFiles = (ArrayList<Document>) user.get("shared");
 		for(Document share : sharedFiles){
 			
