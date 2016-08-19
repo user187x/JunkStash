@@ -22,7 +22,9 @@
 					        </tr>
 				    	</thead>
 				    	<tbody>
-							<tr data-ng-repeat="notification in notifications">
+							<tr data-ng-repeat="notification in notifications"
+								data-ng-class="{info: notification.id === selectedId}" 
+								data-ng-click="setSelected(notification.id)">
 								<td>{{notification.from}}</td>
 								<td>{{notification.timeStamp}}</td>
 								<td>{{notification.message}}</td>
@@ -34,8 +36,14 @@
 				
 			</div>
 			
-			<div class="modal-footer"></div>
-					
+			<div class="modal-footer">
+				<button type="submit"
+						class="btn btn-primary" 
+						data-ng-click="markAcknowledged()">
+						<span class="glyphicon glyphicon-eye-open" style="padding-right:10px"></span>Seen
+				</button>
+			</div>
+
 		</div>
  	</div>
 </div>

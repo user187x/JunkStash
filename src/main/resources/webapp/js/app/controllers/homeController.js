@@ -239,9 +239,14 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
 	
 	$rootScope.$on('user-notification', function (event, args) {
 		
-		$scope.notification = true;
 		$scope.notificationType = args.type;
 		$scope.notificationCount = args.count;
+		
+		if(args.count>0)
+			$scope.notification = true;
+		else
+			$scope.notification = false;
+		
 	});
 	
 	$rootScope.$on('file-update', function (event, args) {

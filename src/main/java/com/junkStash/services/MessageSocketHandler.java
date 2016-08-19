@@ -198,7 +198,7 @@ public class MessageSocketHandler implements ApplicationContextAware {
     
     public static void checkMailAndNotify(String user){
     	
-    	if(!mailService.hasUnAcknowledgedMail(user) || !userSessionMap.containsKey(user))
+    	if(!userSessionMap.containsKey(user))
     		return;
     	
     	Session toUserSession = userSessionMap.get(user);
@@ -206,19 +206,22 @@ public class MessageSocketHandler implements ApplicationContextAware {
     	try {
     		if(toUserSession.isOpen()){
     			
-    			JsonArray mail = mailService.getUnreadMail(user);
-    			
     			JsonObject data = new JsonObject();
     			data.add(TYPE, new JsonPrimitive("Mail Messages"));
-    			data.add(COUNT, new JsonPrimitive(mail.size()));
+    			
+    			if(!mailService.hasUnAcknowledgedMail(user))
+        			data.add(COUNT, new JsonPrimitive(0));
+    			else
+    				data.add(COUNT, new JsonPrimitive(mailService.getUnreadMail(user).size()));
     			
     	    	JsonObject payload = new JsonObject();
     	    	payload.add(EVENT, new JsonPrimitive(NOTIFICATION));
     	    	payload.add(DATA, data);
     			
     			toUserSession.getRemote().sendString(payload.toString());
+    			int count = payload.get("data").getAsJsonObject().get("count").getAsInt();
     			
-    			System.out.println("Notifying Mail Alert To User ("+user+")");
+    			System.out.println("Notifying Mail Alert To User ("+user+") of "+count+" Notifications");
     		}
     		else
     			userSessionMap.remove(toUserSession);

@@ -10,6 +10,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.junkStash.services.MailService;
+import com.junkStash.services.MessageSocketHandler;
 import com.junkStash.services.UserService;
 
 import spark.Request;
@@ -86,6 +87,37 @@ public class MailController {
 	    		payload.add("payload", new JsonPrimitive(unacknowledged));
 	    		
 	    		
+	    		
+	    		return payload;
+			}
+		
+		});
+		
+		Spark.get("/markAcknowledged/:userKey/:mailId", new Route() {
+			
+			@Override
+	        public Object handle(Request request, Response response) {
+				
+				JsonObject payload = new JsonObject();
+				
+				String userKey = request.params(":userKey");
+				String mailId = request.params(":mailId");
+				
+	    		String userId = userService.getUserId(userKey);
+	    		
+	    		if(StringUtils.isEmpty(userId) || StringUtils.isEmpty(mailId)){
+	    			
+	    			payload.add("message", new JsonPrimitive("Unable to find owner/mail"));
+		         	payload.add("success", new JsonPrimitive(false));
+	        		
+	        		return payload;
+	    		}
+	    		
+	    		boolean success = mailService.acknowledgeMail(mailId);
+	         	payload.add("success", new JsonPrimitive(success));
+	         	
+	         	if(success)
+	         		MessageSocketHandler.checkMailAndNotify(userId);
 	    		
 	    		return payload;
 			}

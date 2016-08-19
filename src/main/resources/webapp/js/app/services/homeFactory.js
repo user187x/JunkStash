@@ -43,6 +43,10 @@ app.factory('homeFactory', ['$http', function($http) {
     	return $http.get('/getUsers/'+userKey);
     };
     
+    var markAcknowledged = function(userKey, mailId){
+    	return $http.get('/markAcknowledged/'+userKey+'/'+mailId);
+    };
+    
     var getTotalDiskSpace = function (userKey) {
     	return $http.get('/getTotalDiskSpace/'+userKey);
     };
@@ -91,6 +95,7 @@ app.factory('homeFactory', ['$http', function($http) {
     	searchUser : searchUser,
     	sendMail : sendMail,
     	findUsers : findUsers,
+    	markAcknowledged : markAcknowledged,
     	getSocketInfo : getSocketInfo,
     	getNotifications : getNotifications,
     	getTotalDiskSpace : getTotalDiskSpace

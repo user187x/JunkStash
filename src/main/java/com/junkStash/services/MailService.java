@@ -88,11 +88,14 @@ public class MailService {
 				
 			Document result = cursor.next();
 			
+			String id = result.get("_id").toString();
 			String messsage = result.getString("message");
 			String from = result.getString("from");
 			String timeStamp = result.getDate("timeStamp").toString();
 			
 			JsonObject json = new JsonObject();
+			
+			json.add("id", new JsonPrimitive(id));
 			
 			if(StringUtils.isNotEmpty(messsage))
 				json.add("message", new JsonPrimitive(messsage));
@@ -110,7 +113,7 @@ public class MailService {
 		return mail;
 	}
 	
-	public void acknowledgeMail(String mailId){
+	public boolean acknowledgeMail(String mailId){
 		
 		Document match = new Document();
 		match.append("_id", new ObjectId(mailId));
@@ -118,7 +121,12 @@ public class MailService {
 		Document update = new Document();
 		update.append("$set", new Document("acknowledged", true));
 		
-		databaseService.getMailCollection().updateOne(match, update);
+		long modCount = databaseService.getMailCollection().updateOne(match, update).getModifiedCount();
+		
+		if(modCount==1)
+			return true;
+		else
+			return false;
 	}
 	
 	public boolean hasUnAcknowledgedMail(String userId){
