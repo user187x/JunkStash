@@ -7,7 +7,7 @@ import com.junkStash.controllers.FileAccessController;
 import com.junkStash.controllers.IndexController;
 import com.junkStash.controllers.UserAccessController;
 import com.junkStash.services.MailService;
-import com.junkStash.services.MessageSocketHandler;
+import com.junkStash.services.SocketService;
 import com.junkStash.util.CacheUtil;
 import com.junkStash.util.PropertyUtil;
 
@@ -25,7 +25,7 @@ public class WebAppConfig {
 		CacheUtil.cacheResource();
 		
 		Spark.staticFileLocation(PropertyUtil.getPublicDirectory());
-		Spark.webSocket(PropertyUtil.getSocketPath(), MessageSocketHandler.class);
+		Spark.webSocket(PropertyUtil.getSocketPath(), SocketService.class);
 		Spark.init();
 		
 		@SuppressWarnings("resource")

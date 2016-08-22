@@ -1,7 +1,5 @@
 package com.junkStash.controllers;
 
-import org.apache.commons.lang3.StringUtils;
-import org.eclipse.jetty.websocket.api.StatusCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Controller;
@@ -18,9 +16,6 @@ import spark.Spark;
 @Controller
 @Configurable
 public class IndexController {
-	
-	@Autowired
-	private UserService userService;
 	
 	public IndexController(){
 		setUpRoutes();
@@ -40,17 +35,10 @@ public class IndexController {
 			}
 		});
 		
-		Spark.get("/socket/:userKey", new Route() {
+		Spark.get("/socket", new Route() {
 			
 			@Override
-			public Object handle(Request request, Response response) throws Exception {					
-				
-				String userKey = request.params(":userKey");
-				String userId = userService.getUserId(userKey);
-				
-				if(StringUtils.isEmpty(userId)|| !userService.userExists(userId))
-					return StatusCode.BAD_PAYLOAD;
-				
+			public Object handle(Request request, Response response) throws Exception {	
 				return PropertyUtil.getWebSocketUrl();
 			}
 		});

@@ -1,4 +1,4 @@
-app.directive('loginmodal', ['homeFactory', '$timeout', '$rootScope', function (homeFactory, $timeout, $rootScope) {
+app.directive('loginmodal', ['homeFactory', 'socketService' , '$timeout', '$rootScope', function (homeFactory, socketService, $timeout, $rootScope) {
 	
 	return {
 	    
@@ -20,7 +20,8 @@ app.directive('loginmodal', ['homeFactory', '$timeout', '$rootScope', function (
 	    	scope.userExists = false;
 	    	
 	        scope.toggleRegister = function(){
-	            scope.registeringUser = !scope.registeringUser;
+	            
+	        	scope.registeringUser = !scope.registeringUser;
 	        };
 	    	
 	        scope.$watch(attrs.visible, function(value){
@@ -88,6 +89,8 @@ app.directive('loginmodal', ['homeFactory', '$timeout', '$rootScope', function (
 	        	if(success===false)
 	        		return;
 	        	
+	        	socketService.openSocketConnection(userKey, user);
+	        	
 	        	$rootScope.$broadcast('user-login', {
 	        		
 	        		user : scope.user,
@@ -135,7 +138,10 @@ app.directive('loginmodal', ['homeFactory', '$timeout', '$rootScope', function (
 	        };
 	        
 	    	$rootScope.$on('user-logout', function (event, args) {
+	    	
 	    		clearForm();
+	    		socketService.closeSocketConnection();
+	    		
 	    	});
 	    
 	        scope.register = function(){

@@ -10,7 +10,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.junkStash.services.MailService;
-import com.junkStash.services.MessageSocketHandler;
+import com.junkStash.services.SocketService;
 import com.junkStash.services.UserService;
 
 import spark.Request;
@@ -117,7 +117,7 @@ public class MailController {
 	         	payload.add("success", new JsonPrimitive(success));
 	         	
 	         	if(success)
-	         		MessageSocketHandler.checkMailAndNotify(userId);
+	         		SocketService.checkMailAndNotify(userId);
 	    		
 	    		return payload;
 			}

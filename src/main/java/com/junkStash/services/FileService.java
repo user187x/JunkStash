@@ -302,7 +302,7 @@ public class FileService {
 		}
 		
 		if(shareRemoved)
-			MessageSocketHandler.fileUpdate(userId);
+			SocketService.fileUpdate(userId);
 	}
 	
 	public JsonArray addSharedFiles(String userId, JsonArray files){

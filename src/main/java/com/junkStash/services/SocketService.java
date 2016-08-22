@@ -24,7 +24,7 @@ import com.junkStash.util.PropertyUtil;
 
 @WebSocket
 @Component
-public class MessageSocketHandler implements ApplicationContextAware {
+public class SocketService implements ApplicationContextAware {
 	
     private static BiMap<String, Session> userSessionMap = HashBiMap.create();
     
@@ -37,13 +37,14 @@ public class MessageSocketHandler implements ApplicationContextAware {
     private static final String SENDER = "sender";
     private static final String MESSAGE = "message";
     private static final String BROADCAST = "broadcast";
+    private static final String ONLINE_USERS = "onlineUsers";
     private static final String USERS = "users";
     private static final String NOTIFICATION = "notification";
     private static final String TYPE = "type";
     private static final String COUNT = "count";
     private static final String FILE_UPDATE = "fileUpdate";
     
-    public MessageSocketHandler() {
+    public SocketService() {
 		System.out.println("Websockets Initialized URL @ "+PropertyUtil.getWebSocketUrl());
 	}
     
@@ -63,8 +64,8 @@ public class MessageSocketHandler implements ApplicationContextAware {
     	if(StringUtils.isNotEmpty(userId)){
     		
     		userSessionMap.put(userId, session);
-    		broadcastMessage();
-            
+    		
+    		transmitAcitveUsers();
     		checkMailAndNotify(userId);
     		
             System.out.println("Websocket Connection Established [USER : ("+userId+") CONNECTED]");
@@ -82,7 +83,7 @@ public class MessageSocketHandler implements ApplicationContextAware {
     	String userId = userSessionMap.inverse().get(session);
     	userSessionMap.remove(userId);
     	
-        broadcastMessage();
+    	transmitAcitveUsers();
         
         System.out.println("Websocket Connection Terminated [USER : ("+userId+") DISCONNECTED]");
     }
@@ -148,6 +149,40 @@ public class MessageSocketHandler implements ApplicationContextAware {
     	catch (IOException e) {
 			System.out.println("Failure Sending Messsage : "+e.getMessage());
 		}
+    }
+    
+    private static void transmitAcitveUsers(){
+    	
+    	for(String userKey : userSessionMap.keySet()){
+	    	
+	    	JsonArray users = new JsonArray();
+	    	
+	    	JsonObject data = new JsonObject();
+	    	data.add(USERS, users);
+	    	
+	    	JsonObject payload = new JsonObject();
+	    	payload.add(EVENT, new JsonPrimitive(ONLINE_USERS));
+	    	payload.add(DATA, data);
+	    	payload.add(COUNT, new JsonPrimitive(users.size()));
+    		
+    		for(String key : userSessionMap.keySet()){
+    			
+    			if(key.equalsIgnoreCase(userKey))
+    				continue;
+
+    			users.add(key);
+    		}
+    		
+    		Session session = userSessionMap.get(userKey);
+    		
+    		if(session.isOpen()){
+    			try{
+    			
+    				session.getRemote().sendString(payload.toString());
+	    		}
+	    		catch(Exception e){}
+    		}
+    	}
     }
     
     public static void fileUpdate(String user){
@@ -235,6 +270,9 @@ public class MessageSocketHandler implements ApplicationContextAware {
     //Notify other users are available/unavailable for chat
     public static void broadcastMessage() {
     	
+    	if(userSessionMap.isEmpty())
+    		return;
+    	
     	JsonArray users = new JsonArray();
     	
     	JsonObject data = new JsonObject();
@@ -243,12 +281,11 @@ public class MessageSocketHandler implements ApplicationContextAware {
     	JsonObject payload = new JsonObject();
     	payload.add(EVENT, new JsonPrimitive(BROADCAST));
     	payload.add(DATA, data);
-    	
-    	if(userSessionMap.isEmpty())
-    		return;
+    	payload.add(COUNT, new JsonPrimitive(userSessionMap.keySet().size()));
     	
     	for(String user : userSessionMap.keySet())
 	    	users.add(new JsonPrimitive(user));
+    	
     	
     	for(Session session : userSessionMap.inverse().keySet()){
     		

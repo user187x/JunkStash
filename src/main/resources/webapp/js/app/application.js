@@ -14,4 +14,10 @@ app.config([ '$routeProvider', '$locationProvider' , function($routeProvider, $l
 	//Turns on Pretty URL HTML5 
 	$locationProvider.html5Mode(true).hashPrefix('!');
 	
-} ]);
+}]).
+run(['socketService', function(socketService) {
+	  
+	//Get Socket URL From Server
+	socketService.getSocketInfo();
+	
+}]);

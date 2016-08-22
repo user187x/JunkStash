@@ -40,7 +40,7 @@ public class MailService {
 		
 		databaseService.getMailCollection().insertOne(document);
 		
-		MessageSocketHandler.checkMailAndNotify(recipient);
+		SocketService.checkMailAndNotify(recipient);
 		
 		return true;
 	}

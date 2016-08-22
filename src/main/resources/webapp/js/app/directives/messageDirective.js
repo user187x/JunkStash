@@ -1,4 +1,4 @@
-app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websocket', function (homeFactory, $timeout, $rootScope, $websocket) {
+app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', 'socketService', function (homeFactory, $timeout, $rootScope, socketService) {
 	
 	return {
 	    
@@ -9,12 +9,13 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 	    templateUrl: '/js/app/views/message.html',	   
 	    link: function postLink(scope, element, attrs) {
 	    	
+	    	scope.service = socketService;
 	    	scope.enabled = false;
 	    	scope.textSearchBoxEnabled = true;
-	    	scope.connected = false;
 	    	scope.serverMessage = undefined;
 	    	scope.onlineUsers = [];
 	    	scope.selected = undefined;
+	    	scope.connected = false;
 	    	
 	    	var removeMySelf = function(userArray){
 	    		
@@ -22,81 +23,13 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 	    		    if (userArray[i] === scope.user)
 	    		    	userArray.splice(i, 1);
 	    		}
-	    	};
+	    	}
 	    	
-	    	$rootScope.$on('user-login', function (event, args) {
+	    	//Watch Connection Change In Service
+	    	scope.$watch('service.isConnected()', function(value) {
 	    		
-	    		scope.userKey = args.userKey;
-	    		
-	    		homeFactory.getSocketInfo(scope.userKey).success(function (data) {
-	    			
-	    			scope.url = data;
-	    			
-		    		if(scope.userKey!==undefined && data!==undefined){
-			    		
-			    		scope.wsUrl = scope.url+"?userKey="+scope.userKey;
-			    		scope.webSocket = $websocket.$new({url: scope.wsUrl});
-
-				        scope.webSocket.$on('$open', function () {
-				        	
-				        	scope.connected = true;	   
-				        	console.log("Client Socket Connected ");
-				        })
-				        .$on('$close', function () {
-				        	
-				        	scope.connected = false;
-				        	console.log("Client Socket Closed");
-				        })
-				        .$on('broadcast', function (data) {
-				        	
-				        	//Update active user list
-				        	console.log("<<<Broadcast>>> : "+JSON.stringify(data));
-				        	scope.onlineUsers = data.users;
-				        	
-				        	removeMySelf(scope.onlineUsers);
-				        	
-				        	scope.$apply();
-				        })
-			        	.$on('fileUpdate', function (data) {
-				        	
-				        	//Update active user list
-				        	console.log("Client Recieved Notification : "+JSON.stringify(data));
-				        	
-				        	//Angular Broadcast
-				        	$rootScope.$broadcast('file-update');
-				        	
-				        	scope.$apply();
-				        })
-				        .$on('notification', function (data) {
-				        	
-				        	//Update active user list
-				        	console.log("Client Recieved Notification : "+JSON.stringify(data));
-				        	
-				        	//Angular Broadcast
-				        	$rootScope.$broadcast('user-notification', {
-				        		
-				        		type : data.type,
-				        		count : data.count
-				        	});
-				        	
-				        	scope.$apply();
-				        })
-				        .$on('message', function (message) {
-				        	
-				        	scope.serverMessage = message.sender+" : "+message.message;
-				        	console.log('Client Recieved Message :'+message.message);
-				        	
-				        	appendToMessage(message.sender, message.message);
-				        	
-				        	scope.$apply();
-				        });
-			    	}
-	    		});
-	    	});
-	    	
-	    	$rootScope.$on('user-logout', function (event, args) {
-	    		
-	    		scope.webSocket.$close();
+    		    scope.connected = value;
+    		    console.log('Socket Service Connection : '+value);
 	    	});
 	    	
 	        scope.$watch(attrs.visible, function(value){
@@ -243,6 +176,18 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 	    		});
 	    	};
 	    	
+	    	$rootScope.$on('message', function (event, args) {
+		    	
+	    		appendToMessage(args.sender, args.message);
+	        	scope.$apply();
+	    	});
+	    	
+	    	$rootScope.$on('online-users', function (event, args) {
+		    	
+	    		scope.onlineUsers = args.onlineUsers;
+	        	scope.$apply();
+	    	});
+	    	
 	        scope.sendMessage = function(message){
 	        	
 	        	scope.message = message;
@@ -254,6 +199,7 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 	        		return;
 	        	
 	        	var payload = {
+	        		
 	        		message : scope.message,
 	        		recipient : scope.messageUser
 	        	};
@@ -261,8 +207,7 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', '$websoc
 	        	if(scope.connected){
 	        		
 	        		appendFromMessage(scope.user, scope.message)
-	        		
-	        		scope.webSocket.$emit('message', payload);
+	        		scope.service.sendMessage(payload);
 	        		scope.message = undefined;
 	        	}
 	        };

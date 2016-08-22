@@ -75,10 +75,6 @@ app.factory('homeFactory', ['$http', function($http) {
     	return $http.get('/getNotifications/'+userKey);
     };
     
-    var getSocketInfo = function (userKey) {
-    	return $http.get('/socket/'+userKey);
-    };
-    
     return {
     	
     	login : login,
@@ -96,7 +92,6 @@ app.factory('homeFactory', ['$http', function($http) {
     	sendMail : sendMail,
     	findUsers : findUsers,
     	markAcknowledged : markAcknowledged,
-    	getSocketInfo : getSocketInfo,
     	getNotifications : getNotifications,
     	getTotalDiskSpace : getTotalDiskSpace
     };

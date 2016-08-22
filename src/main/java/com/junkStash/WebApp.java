@@ -13,7 +13,9 @@ public class WebApp {
 		if(args.length!=0)
 			PropertyUtil.setPort(args[0]);
 		
-		PropertyUtil.setTestMode();
+		String testMode = System.getProperty("testMode");
+		if(Boolean.parseBoolean(testMode))
+			PropertyUtil.setTestMode();
 		
 		WebAppConfig.intialized();
     }   
