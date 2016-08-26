@@ -1,3 +1,26 @@
+.pulsing {
+  
+  animation: pulse 600ms ease infinite alternate;
+  cursor:pointer;
+}
+
+.pulsing-exclimation {
+	
+  animation: pulse 600ms ease infinite alternate;
+  cursor:pointer;
+  color: yellow;
+}
+
+@keyframes pulse {
+  0% {
+    transform: none;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0.3;
+  }
+}
+
 body {
     
     background-image: url("/images/static.gif");
