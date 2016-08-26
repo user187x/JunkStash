@@ -4,11 +4,19 @@
   cursor:pointer;
 }
 
-.pulsing-exclimation {
+.pulsing-notification {
 	
   animation: pulse 600ms ease infinite alternate;
   cursor:pointer;
   color: yellow;
+}
+
+.pulsing-comment {
+	
+  animation: pulse 600ms ease infinite alternate;
+  cursor:pointer;
+  color: #0080ff;
+  
 }
 
 @keyframes pulse {

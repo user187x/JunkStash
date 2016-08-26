@@ -144,6 +144,11 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', 'socketS
 	        	scope.users = [];
 	        };
 	        
+	        scope.seenMessage = function(){
+	        	
+	        	$rootScope.$broadcast('seen-message');
+	        };
+	        
 	        scope.isEnabled = function(){
 	        	
 	        	var messageCheck = scope.message!==undefined && scope.message!=='' && scope.message;

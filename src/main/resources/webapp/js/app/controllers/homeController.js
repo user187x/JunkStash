@@ -23,21 +23,17 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
     $scope.maxSpace = undefined;
     $scope.percentUsed = undefined;
     
+    $scope.message = false;
+    
     $scope.showLoginModal = false;
     $scope.showShareModal = false;
     $scope.showMessageModal = false;
     $scope.showMailModal = false;
     $scope.showNotificationModal = false;
-    $scope.spinLogo = false;
 
     $scope.notification = false;
     $scope.notificationType = undefined;
 	$scope.notificationCount = undefined;
-    
-    $scope.toggleSpin = function(){
-    	
-        $scope.spinLogo = !$scope.spinLogo;
-    };
     
     $scope.refreshFiles = function(){
     	
@@ -247,6 +243,16 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
 		else
 			$scope.notification = false;
 		
+	});
+	
+	$rootScope.$on('message', function (event, args) {
+		
+		$scope.message = true;
+	});
+	
+	$rootScope.$on('seen-message', function (event, args) {
+		
+		$scope.message = false;
 	});
 	
 	$rootScope.$on('file-update', function (event, args) {

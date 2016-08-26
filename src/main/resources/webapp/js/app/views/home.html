@@ -24,15 +24,18 @@
 		    		<li>
 		      			<a data-ng-show="user" data-ng-click="showAlert()">
 		      				<span
-		      					data-ng-class="!notification ? 'glyphicon glyphicon-exclamation-sign' : 'glyphicon glyphicon-exclamation-sign pulsing-exclimation'"
+		      					data-ng-class="!notification ? 'glyphicon glyphicon-exclamation-sign' : 'glyphicon glyphicon-exclamation-sign pulsing-notification'"
 		      					data-uib-tooltip="{{notificationCount}} New {{notificationType}}" 
 		      					data-ng-click="toggleNotificationModal(userKey)">
 		      				</span>
 		      			</a>
 	      			</li>
 	      			<li>
-		      			<a data-ng-show="user" data-ng-click="toggleMessageModal()" data-uib-tooltip="Message User" style="cursor:pointer">
-		      				<span class="glyphicon glyphicon-comment"></span>
+		      			<a data-ng-show="user" data-ng-click="toggleMessageModal()">
+		      				<span 
+		      					data-ng-class="!message ? 'glyphicon glyphicon-comment' : 'glyphicon glyphicon-comment pulsing-comment'"
+		      					data-uib-tooltip="View & Send Messages">
+		      				</span>
 		      			</a>
 	      			</li>
 		      		<li>
@@ -83,8 +86,7 @@
 		<div data-ng-show="!userKey" style="background-color:DarkGray !important" class="jumbotron">
 			<div class="text-center" data-ng-show="!userKey">
 				<img 
-					data-ng-click="toggleSpin()" 
-					data-ng-class="spinLogo ? 'fa-spin' : ''" 
+					class="hvr-wobble-vertical" 
 					style="opacity: 0.4" 
 					data-uib-tooltip="JunkStash"
 					src="/images/JunkStash.png"/>
