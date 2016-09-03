@@ -1,5 +1,5 @@
-app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScope',
-      function($scope, homeFactory, $timeout, $rootScope) {
+app.controller('homeController', ['$scope', 'homeFactory', '$timeout', '$rootScope', '$cookieStore', 'socketService',
+      function($scope, homeFactory, $timeout, $rootScope, $cookieStore, socketService) {
 	
 	$scope.files = [];
 	$scope.users = [];
@@ -34,7 +34,7 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
     $scope.notification = false;
     $scope.notificationType = undefined;
 	$scope.notificationCount = undefined;
-    
+	
     $scope.refreshFiles = function(){
     	
 		$scope.listAllFiles();
@@ -176,6 +176,11 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
 			
 			$rootScope.$broadcast('user-logout', function (event, args) {});
 			
+			// Remove User Info Cookies
+			$cookieStore.remove('userKey');
+			$cookieStore.remove('user');
+			$cookieStore.remove('admin');
+			
 			$scope.updatePage();
 			autoCloseAlert();
 			
@@ -232,6 +237,11 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
 		$scope.userKey = args.userKey;
 		$scope.admin = args.admin;
 		
+		// Put User Info cookie
+		$cookieStore.put('userKey', args.userKey);
+		$cookieStore.put('user', args.user);
+		$cookieStore.put('admin', args.admin);
+		
 		$scope.updatePage();
 	});
 	
@@ -266,8 +276,28 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
 	var autoCloseAlert = function(){
         
     	$timeout(function(){
+    		
     		$scope.result = undefined;
+    	
     	}, 1000);
     };
+    
+	// Get cookie
+	if($cookieStore.get('userKey') !== undefined){
+		
+		$scope.userKey = $cookieStore.get('userKey');
+		$scope.user = $cookieStore.get('user');
+		$scope.admin = $cookieStore.get('admin');
+		
+		console.log("Using Previous User Session : "+$scope.user);
+		
+		$scope.listAllFiles();
+		$scope.getTotalDiskSpace();
+		
+		if($scope.admin)
+			$scope.listAllUsers();
+		
+		socketService.openSocketConnection($scope.userKey);
+	}
 	
 }]);

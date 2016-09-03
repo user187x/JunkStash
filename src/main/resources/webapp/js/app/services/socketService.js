@@ -5,6 +5,15 @@ app.service('socketService', ['$websocket', '$http', '$rootScope', function($web
     var socketUrl = undefined;
     var connected = false;
 	  
+	$rootScope.$on('user-logout', function (event, args) {
+    	
+		if(socketConnection !== undefined){
+			
+			socketConnection.$close();
+	    	connected = false;
+		}
+	});
+    
     this.getSocketInfo = function(){
     	
     	$http.get('/socket').success(function(data) {
@@ -19,8 +28,11 @@ app.service('socketService', ['$websocket', '$http', '$rootScope', function($web
     
     this.closeSocketConnection = function () {
     	
-    	socketConnection.$close();
-    	connected = false;
+    	if(socketConnection !== undefined){
+    	
+	    	socketConnection.$close();
+	    	connected = false;
+    	}
     }
     
     this.sendMessage = function(payload){

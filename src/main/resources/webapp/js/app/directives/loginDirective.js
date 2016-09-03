@@ -89,7 +89,7 @@ app.directive('loginmodal', ['homeFactory', 'socketService' , '$timeout', '$root
 	        	if(success===false)
 	        		return;
 	        	
-	        	socketService.openSocketConnection(userKey, user);
+	        	socketService.openSocketConnection(userKey);
 	        	
 	        	$rootScope.$broadcast('user-login', {
 	        		
