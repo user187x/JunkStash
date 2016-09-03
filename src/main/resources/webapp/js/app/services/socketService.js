@@ -28,6 +28,17 @@ app.service('socketService', ['$websocket', '$http', '$rootScope', function($web
     	socketConnection.$emit('message', payload);
     }
     
+    this.userTyping = function(userTyping, userToNotify){
+    	
+    	var payload = {
+			
+    		userTyping : userTyping,
+			userToNotify : userToNotify
+    	};
+    	
+    	socketConnection.$emit('typing', payload);
+    }
+    
     this.openSocketConnection = function (userKey) {
     	
 		socketConnection = $websocket.$new({url: socketUrl+"?userKey="+userKey});
@@ -71,6 +82,16 @@ app.service('socketService', ['$websocket', '$http', '$rootScope', function($web
         	
         	$rootScope.$broadcast('user-update');
         	
+        }).$on('user-typing', function (data) {
+        	
+        	//Notification Alert
+        	console.log("Clients Recipient Is Typing : "+JSON.stringify(data));
+        	
+        	$rootScope.$broadcast('peer-typing', {
+        		
+        		user : data.user,
+        	});
+
         }).$on('notification', function (data) {
         	
         	//Notification Alert

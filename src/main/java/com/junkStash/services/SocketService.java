@@ -31,6 +31,13 @@ public class SocketService implements ApplicationContextAware {
     private static UserService userServcie;
     private static MailService mailService;
     
+    private enum SocketEvent {
+    	
+    	MESSAGE,
+    	TYPING,
+    	BROADCAST;
+    }
+    
     private static final String EVENT = "event";
     private static final String DATA = "data";
     private static final String RECIPIENT = "recipient";
@@ -39,17 +46,20 @@ public class SocketService implements ApplicationContextAware {
     private static final String BROADCAST = "broadcast";
     private static final String ONLINE_USERS = "onlineUsers";
     private static final String USERS = "users";
+    private static final String USER = "user";
     private static final String NOTIFICATION = "notification";
     private static final String TYPE = "type";
     private static final String COUNT = "count";
     private static final String FILE_UPDATE = "fileUpdate";
     
     public SocketService() {
-		System.out.println("Websockets Initialized URL @ "+PropertyUtil.getWebSocketUrl());
+		
+    	System.out.println("Websockets Initialized URL @ "+PropertyUtil.getWebSocketUrl());
 	}
     
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		
 		userServcie = applicationContext.getBean(UserService.class);
 		mailService = applicationContext.getBean(MailService.class);
 	}
@@ -88,63 +98,93 @@ public class SocketService implements ApplicationContextAware {
         System.out.println("Websocket Connection Terminated [USER : ("+userId+") DISCONNECTED]");
     }
 
+    private void routeEvent(SocketEvent event, String user, JsonObject payload){
+    	
+    	switch (event){
+    		
+    	 case MESSAGE : privateMessage(user, payload);
+    	 	break;
+    	 case TYPING : notifyUserIsTyping(user, payload.get("userToNotify").getAsString());
+    	 	break;
+    	 default : broadcastMessage(payload);
+    	 	break;
+    	 	
+    	}
+    }
+     
     @OnWebSocketMessage
     public void onMessage(Session userSession, String payload) {
         
-    	String fromUserId = userSessionMap.inverse().get(userSession);
+    	String user = userSessionMap.inverse().get(userSession);
     	
-    	JsonParser jsonParser = new JsonParser();
-    	
-    	try{
-			
-    		JsonObject json = jsonParser.parse(payload).getAsJsonObject();
-			JsonObject data = json.get(DATA).getAsJsonObject();
-			String message = data.get(MESSAGE).getAsString();
-			String toUser = data.get(RECIPIENT).getAsString();
-			
-        	data = new JsonObject();
-        	data.add(MESSAGE,new JsonPrimitive(message));
-        	data.add(SENDER, new JsonPrimitive(fromUserId));
-			
-			JsonObject conversation = new JsonObject();
-	        conversation.add(EVENT, new JsonPrimitive(MESSAGE));
-	        conversation.add(DATA, data);
-	        
-	        System.out.println("Websocket Recieved Message [FROM : ("+fromUserId+") TO : ("+toUser+") MESSAGE : ("+message+")]");
-	        
-	        if(!userSessionMap.containsKey(toUser)){
-	        	System.out.println("User "+toUser+" Not Online");
-	        	return;
-	        }
-	        
-	        privateMessage(toUser, conversation.toString());
-    	}
-    	catch(Exception e){
-    		
-        	JsonObject data = new JsonObject();
-        	data.add(MESSAGE, new JsonPrimitive("Unble To Send Message"));
-        	data.add(SENDER, new JsonPrimitive("Server"));
-    		
-			JsonObject conversation = new JsonObject();
-	        conversation.add(EVENT, new JsonPrimitive(MESSAGE));
-	        conversation.add(DATA, data);
-    		
-    		privateMessage(fromUserId, conversation.toString());
-    	}
+		JsonObject json = new JsonParser().parse(payload).getAsJsonObject();
+		JsonObject data = json.get(DATA).getAsJsonObject();
+		
+		SocketEvent socketEvent = SocketEvent.valueOf(json.get(EVENT).getAsString().toUpperCase());
+		
+		routeEvent(socketEvent, user, data);
     }
     
-    public static void privateMessage(String recipient, String message){
+    public static void privateMessage(String user, JsonObject payload){
     	
-    	Session toUserSession = userSessionMap.get(recipient);
+		String message = payload.get(MESSAGE).getAsString();
+		String toUser = payload.get(RECIPIENT).getAsString();
+		
+		JsonObject data = new JsonObject();
+    	data.add(MESSAGE,new JsonPrimitive(message));
+    	data.add(SENDER, new JsonPrimitive(user));
+		
+		JsonObject conversation = new JsonObject();
+        conversation.add(EVENT, new JsonPrimitive(MESSAGE));
+        conversation.add(DATA, data);
+        
+        System.out.println("Websocket Recieved Message [FROM : ("+user+") TO : ("+toUser+") MESSAGE : ("+message+")]");
+        
+        if(!userSessionMap.containsKey(toUser)){
+        	System.out.println("User "+toUser+" Not Online");
+        	return;
+        }
+    	
+    	Session toUserSession = userSessionMap.get(toUser);
     	
     	try {
     		if(toUserSession.isOpen()){
-    			toUserSession.getRemote().sendString(message);
+    			toUserSession.getRemote().sendString(conversation.toString());
     			
-    			System.out.println("Websocket Recieved Message [TO : ("+recipient+") MESSAGE : ("+message+")]");
+    			System.out.println("Websocket Recieved Message [TO : ("+user+") MESSAGE : ("+message+")]");
     		}
     		else
     			userSessionMap.remove(toUserSession);
+		} 
+    	catch (IOException e) {
+			System.out.println("Failure Sending Messsage : "+e.getMessage());
+		}
+    }
+    
+    public static void notifyUserIsTyping (String userTyping, String userToNotify){
+    	
+    	if(!userSessionMap.containsKey(userToNotify))
+    		return;
+    	
+    	Session session = userSessionMap.get(userToNotify);
+    	
+    	JsonObject data = new JsonObject();
+    	data.add(USER, new JsonPrimitive(userTyping));
+    	
+    	JsonObject response = new JsonObject();
+    	response.add(EVENT, new JsonPrimitive("user-typing"));
+    	response.add(DATA, data);
+    	
+    	try {
+    		
+    		if(session.isOpen()){
+    			
+    			System.out.println("User : "+userTyping+" Is Typing To : "+userToNotify);
+    			
+    			session.getRemote().sendString(response.toString());
+    		}
+    		else
+    			userSessionMap.remove(userToNotify);
 		} 
     	catch (IOException e) {
 			System.out.println("Failure Sending Messsage : "+e.getMessage());
@@ -268,30 +308,19 @@ public class SocketService implements ApplicationContextAware {
     }
     
     //Notify other users are available/unavailable for chat
-    public static void broadcastMessage() {
+    public static void broadcastMessage(JsonObject data) {
     	
     	if(userSessionMap.isEmpty())
     		return;
     	
-    	JsonArray users = new JsonArray();
-    	
-    	JsonObject data = new JsonObject();
-    	data.add(USERS, users);
-    	
     	JsonObject payload = new JsonObject();
     	payload.add(EVENT, new JsonPrimitive(BROADCAST));
     	payload.add(DATA, data);
-    	payload.add(COUNT, new JsonPrimitive(userSessionMap.keySet().size()));
-    	
-    	for(String user : userSessionMap.keySet())
-	    	users.add(new JsonPrimitive(user));
-    	
     	
     	for(Session session : userSessionMap.inverse().keySet()){
     		
     		if(session.isOpen()){
     			try{
-    				
     				session.getRemote().sendString(payload.toString());
     			}
     			catch(Exception e){}

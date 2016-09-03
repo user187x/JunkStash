@@ -17,13 +17,12 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', 'socketS
 	    	scope.selected = undefined;
 	    	scope.connected = false;
 	    	
-	    	var removeMySelf = function(userArray){
-	    		
-	    		for (var i=userArray.length-1; i>=0; i--) {
-	    		    if (userArray[i] === scope.user)
-	    		    	userArray.splice(i, 1);
-	    		}
-	    	}
+	    	scope.userTyping = undefined;
+	    	scope.inputChanged = false;
+	    	scope.userTyping = false;
+	    	scope.peerTyping = undefined;
+	    	scope.inputChangedPromise = undefined;
+	    	scope.typingTimer = undefined;
 	    	
 	    	//Watch Connection Change In Service
 	    	scope.$watch('service.isConnected()', function(value) {
@@ -104,8 +103,10 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', 'socketS
 	        		return;
 	        	
 	        	$timeout(function(){
+	        		
 	        		$(element).modal('hide');
-	            }, 800);
+	            
+	        	}, 800);
 	        };
 	        
 	        var nameExists = function(name){
@@ -144,11 +145,6 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', 'socketS
 	        	scope.users = [];
 	        };
 	        
-	        scope.seenMessage = function(){
-	        	
-	        	$rootScope.$broadcast('seen-message');
-	        };
-	        
 	        scope.isEnabled = function(){
 	        	
 	        	var messageCheck = scope.message!==undefined && scope.message!=='' && scope.message;
@@ -179,13 +175,51 @@ app.directive('messagemodal', ['homeFactory', '$timeout', '$rootScope', 'socketS
 	    				});
 	    		    });
 	    		});
-	    	};
+	    	}
+	        
+	        scope.seenMessage = function(){
+	        	
+	        	$rootScope.$broadcast('seen-message');
+	        };
 	    	
 	    	$rootScope.$on('message', function (event, args) {
 		    	
 	    		appendToMessage(args.sender, args.message);
 	        	scope.$apply();
 	    	});
+	    	
+	    	// Listen When Recipient Typing 	
+	    	$rootScope.$on('peer-typing', function (event, args) {
+		    	
+	    		scope.userTyping = true;
+	    		scope.peerTyping = args.user;
+	    		scope.$apply();
+	    		
+	    		scope.startNotify(args.user);	        	
+	    	});
+	    	
+	   	  	scope.startNotify = function(peer) {
+	    	  
+	   		   if(scope.typingTimer !== undefined)
+	   			   $timeout.cancel(scope.typingTimer);
+	   		   
+	   		   scope.typingTimer = $timeout(function () {
+	    	      
+	   			  scope.userTyping = false;
+	    		  scope.peerTyping = undefined;
+	    	    
+	   		   }, 1000);
+	   		   
+	   	  	};
+	    	
+	    	// Emit when User is typing
+	        scope.inputChanged = function(){
+	            
+	        	if(scope.inputChangedPromise)
+	                $timeout.cancel(scope.inputChangedPromise);
+	            
+	        	scope.inputChangedPromise = $timeout(scope.service.userTyping(scope.userKey, scope.selected), 1000);
+	        }
 	    	
 	    	$rootScope.$on('online-users', function (event, args) {
 		    	

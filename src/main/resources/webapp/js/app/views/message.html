@@ -36,10 +36,10 @@
 							<div class="input-group">
 							  <input type="text" 
 								class="form-control"
-								data-ng-disabled="!textSearchBoxEnabled" 
-								data-ng-model="message"
+								data-ng-disabled="!textSearchBoxEnabled"
 								data-ng-click="seenMessage()"
-								data-ng-change="isEnabled()"
+								data-ng-change="isEnabled(); inputChanged()"
+								data-ng-model="message"
 								placeholder="Message" 
 								aria-describedby="basic-addon2">
 								
@@ -79,7 +79,10 @@
 			
 				<div class="modal-footer" style="text-align:center">
 					<span data-ng-show="connected">
-						<small><i class="fa fa-circle" style="color:green"></i>&nbsp;Connected</small>
+						<small>
+							<i class="fa fa-circle" style="color:green"></i>&nbsp;Connected
+							<p data-ng-if="userTyping">{{peerTyping}} Is Typing...</p>
+						</small>
 					</span>
 					<span data-ng-show="!connected"><i class="fa fa-circle" style="color:red"></i>&nbsp;Disconnected</span>
 				</div>
