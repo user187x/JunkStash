@@ -106,6 +106,36 @@ public class UserAccessController {
 			}
 	     });
 		 
+		 Spark.get("/isUserApproved/:userId", new Route() {
+			 
+			@Override
+			public Object handle(Request request, Response response) throws Exception {
+				
+				JsonObject payload = new JsonObject();
+				
+				System.out.println("User Request at Path : ("+request.pathInfo()+") "+new Date());
+				
+				String userId = request.params(":userId");
+				
+				if(userId == null || userId.isEmpty()){
+					
+					payload.add("message", new JsonPrimitive("Request Was Empty"));
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
+				}
+				
+				String user = userService.getUserId(userId);
+				boolean useHasAccesses = userService.isUserApproved(user);
+				
+				payload.add("message", new JsonPrimitive("User Has File Access Permissionsl : "+user));
+	         	payload.add("success", new JsonPrimitive(true));
+	         	payload.add("payload", new JsonPrimitive(useHasAccesses));
+	         	
+	         	return payload;
+			}
+	     });
+		 
 		 Spark.get("/findUsers/:userKey/:searchUser", new Route() {
 			 
 			@Override

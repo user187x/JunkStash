@@ -11,6 +11,10 @@ app.factory('homeFactory', ['$http', function($http) {
 	    });
     };
     
+    var userHasAccess = function (userKey) {
+    	return $http.get('/isUserApproved/'+userKey);
+    };
+    
     var shareFile = function (payload, userKey) {
     	return $http.post('/shareFile/'+userKey, payload);
     };
@@ -91,6 +95,7 @@ app.factory('homeFactory', ['$http', function($http) {
     	searchUser : searchUser,
     	sendMail : sendMail,
     	findUsers : findUsers,
+    	userHasAccess : userHasAccess,
     	markAcknowledged : markAcknowledged,
     	getNotifications : getNotifications,
     	getTotalDiskSpace : getTotalDiskSpace

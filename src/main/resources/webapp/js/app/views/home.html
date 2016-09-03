@@ -93,7 +93,15 @@
 			</div>
 		</div>
 		
-		<div data-ng-show="userKey" class="input-group" style="padding-bottom: 20px">	
+		<div data-ng-show="userKey" style="text-align:center">
+			<div data-ng-show="!hasAccess">
+			<p><i class="fa fa-spinner fa-pulse fa-fw"></i>
+				&nbsp; Awaiting Administrative Approval For File Access
+			</p>
+			</div>
+		</div>
+		
+		<div data-ng-show="hasAccess" class="input-group" style="padding-bottom: 20px">	
 			<input 
 				type="text" 
 				class="form-control" 
@@ -105,13 +113,13 @@
 			</span>
 		</div>
 		
-		 <div data-ng-show="userKey" class="row">
+		 <div data-ng-show="hasAccess" class="row">
 		  <div class="col-sm-2"><i class="fa fa-database" style="padding-right:10px"></i>Used {{totalSpaceNormalized}}</div>
 		  <div class="col-sm-8"></div>
 		  <div class="col-sm-2" style="text-align:right">Total {{maxSpaceNormalized}}</div>
 		</div>
 		
-		 <div data-ng-show="userKey" class="progress">
+		 <div data-ng-show="hasAccess" class="progress">
   			<div 	data-ng-class="{'progress-bar progress-bar-striped active progress-bar-danger' : percentUsed>90, 'progress-bar progress-bar-striped active' : percentUsed<90, 'progress-bar progress-bar-striped active progress-bar-warning' : percentUsed>60 && percentUsed<90}" 
 					role="progressbar"
 					aria-valuenow="0" 
@@ -134,7 +142,7 @@
 		  <div class="col-sm-10"></div>
 		</div>
 		
-		<table data-ng-show="userKey" class="table table-striped table-hover" style="border: 2px solid #ccc">
+		<table data-ng-show="hasAccess" class="table table-striped table-hover" style="border: 2px solid #ccc">
 	    	<thead>
 		        <tr>
 		        	<th></th>
@@ -187,7 +195,7 @@
 			</tbody>
 		</table>
 				
-		<div data-ng-show="userKey" style="margin-bottom:20px; text-align:center;">
+		<div data-ng-show="hasAccess" style="margin-bottom:20px; text-align:center;">
 			<div data-ng-show="!loading">
    				<span class="btn btn-default btn-file">
     				Browse <input type="file" data-file-model="uploadFile">

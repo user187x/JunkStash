@@ -16,6 +16,7 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout', '$rootSco
     $scope.user = undefined;
     $scope.userKey = undefined;
     $scope.selectedFile = undefined;
+    $scope.hasAccess = false;
     
     $scope.totalSpace = undefined;
     $scope.totalSpaceNormalized = undefined;
@@ -67,6 +68,14 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout', '$rootSco
     	
     	$scope.selectedFile = file.id;
         $scope.showShareModal = !$scope.showShareModal;
+    };
+    
+    $scope.userHasAccess = function(user){
+    	
+		homeFactory.userHasAccess(user).success(function (data) {
+			
+			$scope.hasAccess = data.payload;
+		});
     };
     
 	$scope.upload = function(data) { 		
@@ -173,6 +182,7 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout', '$rootSco
 			$scope.files = undefined;
 			$scope.admin = undefined;
 			$scope.selectedFile = undefined;
+			$scope.hasAccess = false;
 			
 			$rootScope.$broadcast('user-logout', function (event, args) {});
 			
@@ -242,6 +252,8 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout', '$rootSco
 		$cookieStore.put('user', args.user);
 		$cookieStore.put('admin', args.admin);
 		
+		$scope.userHasAccess($scope.userKey);
+		
 		$scope.updatePage();
 	});
 	
@@ -282,7 +294,7 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout', '$rootSco
     	}, 1000);
     };
     
-	// Get cookie
+	// Get cookies
 	if($cookieStore.get('userKey') !== undefined){
 		
 		$scope.userKey = $cookieStore.get('userKey');
@@ -290,6 +302,8 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout', '$rootSco
 		$scope.admin = $cookieStore.get('admin');
 		
 		console.log("Using Previous User Session : "+$scope.user);
+		
+		$scope.userHasAccess($scope.userKey);
 		
 		$scope.listAllFiles();
 		$scope.getTotalDiskSpace();
