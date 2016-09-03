@@ -90,9 +90,9 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
 	
 	$scope.listAllFiles = function(data) { 		
 		
-		$scope.files = [];
-		
 		homeFactory.getFiles($scope.userKey).success(function (data) {
+			
+			$scope.files = [];
 			
 		    angular.forEach(data.payload, function(value, key) {
 		        
@@ -115,9 +115,9 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
 	
 	$scope.listAllUsers = function(data) { 		
 		
-		$scope.users = [];
-		
 		homeFactory.getUsers($scope.userKey).success(function (data) {
+			
+			$scope.users = [];
 			
 		    angular.forEach(data.payload, function(value, key) {
 		        
@@ -159,6 +159,7 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
 			return;
 		
 		var payload = {
+			
 			user : $scope.user,
 			userKey : $scope.userKey
 		}
@@ -211,6 +212,7 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout','$rootScop
 	$scope.removeUser = function(data){
 		
 		homeFactory.removeUser(data, $scope.userKey).success(function (data) {
+			
 			$scope.result = data;
 			$scope.listAllUsers();
 		});

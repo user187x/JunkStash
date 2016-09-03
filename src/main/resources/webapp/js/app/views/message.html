@@ -81,7 +81,8 @@
 					<span data-ng-show="connected">
 						<small>
 							<i class="fa fa-circle" style="color:green"></i>&nbsp;Connected
-							<p data-ng-if="userTyping">{{peerTyping}} Is Typing...</p>
+							<br>
+							<i data-ng-if="userTyping">{{peerTyping}} Is Typing...</i>
 						</small>
 					</span>
 					<span data-ng-show="!connected"><i class="fa fa-circle" style="color:red"></i>&nbsp;Disconnected</span>
