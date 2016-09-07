@@ -11,7 +11,7 @@ app.factory('homeFactory', ['$http', function($http) {
 	    });
     };
     
-    var userHasAccess = function (userKey) {
+    var getUserAccess = function (userKey) {
     	return $http.get('/isUserApproved/'+userKey);
     };
     
@@ -25,6 +25,10 @@ app.factory('homeFactory', ['$http', function($http) {
     
     var removeUser = function (payload, userKey) {
     	return $http.post('/removeUser/'+userKey, payload);
+    };
+    
+    var denyUser = function (payload, userKey) {
+    	return $http.post('/denyUser/'+userKey, payload);
     };
     
     var getFiles = function (userKey) {
@@ -89,13 +93,14 @@ app.factory('homeFactory', ['$http', function($http) {
     	shareFile : shareFile,
     	removeUser : removeUser,
     	approveUser : approveUser,
+    	denyUser : denyUser,
     	getFiles : getFiles,
     	getUsers : getUsers,
     	userExists : userExists,
     	searchUser : searchUser,
     	sendMail : sendMail,
     	findUsers : findUsers,
-    	userHasAccess : userHasAccess,
+    	getUserAccess : getUserAccess,
     	markAcknowledged : markAcknowledged,
     	getNotifications : getNotifications,
     	getTotalDiskSpace : getTotalDiskSpace

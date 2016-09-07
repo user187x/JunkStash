@@ -4,8 +4,9 @@ http://www.junkstash.com/
 * Java 8
 * Spark Framework 2.5
 * Spring 4.3.2
-* Mongo 3.0.0
+* Mongo 3x
 * Angular 1.5.8
+* Hover.css 2
 * Font Awesome 4.6.3
 * Bootstrap 3.3.7
 * UI-Bootstrap 2.1.2

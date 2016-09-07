@@ -115,6 +115,16 @@ app.service('socketService', ['$websocket', '$http', '$rootScope', function($web
         		count : data.count
         	});
 
+        }).$on('accessUpdate', function (data) {
+        	
+        	//Notification Alert
+        	console.log("Access Update Received : "+JSON.stringify(data));
+        	
+        	$rootScope.$broadcast('access-update', {
+        		
+        		hasAccess : data.access
+        	});
+
         }).$on('message', function (message) {
         	
         	//Message Received

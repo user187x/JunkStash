@@ -81,6 +81,7 @@ app.directive('loginmodal', ['homeFactory', 'socketService' , '$timeout', '$root
 	        	$timeout(function(){
 	        		
 	        		scope.result = undefined;
+	        		
 	            }, 2000);
 	        };
 	        

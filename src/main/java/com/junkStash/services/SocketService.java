@@ -35,13 +35,32 @@ public class SocketService implements ApplicationContextAware {
     	
     	MESSAGE,
     	TYPING,
+    	ACCESS,
     	BROADCAST;
+    }
+    
+    public enum StatusType {
+        
+    	APPROVED("Approved"),
+        PENDING("Pending"),
+    	DENIED("Denied");
+
+        private String status;
+
+        StatusType(String status) {
+            this.status = status;
+        }
+
+        public String getStatus() {
+            return status;
+        }
     }
     
     private static final String EVENT = "event";
     private static final String DATA = "data";
     private static final String RECIPIENT = "recipient";
     private static final String SENDER = "sender";
+    private static final String ACCESS = "access";
     private static final String MESSAGE = "message";
     private static final String BROADCAST = "broadcast";
     private static final String ONLINE_USERS = "onlineUsers";
@@ -51,6 +70,7 @@ public class SocketService implements ApplicationContextAware {
     private static final String TYPE = "type";
     private static final String COUNT = "count";
     private static final String FILE_UPDATE = "fileUpdate";
+    private static final String ACCESS_UPDATE = "accessUpdate";
     
     public SocketService() {
 		
@@ -108,7 +128,6 @@ public class SocketService implements ApplicationContextAware {
     	 	break;
     	 default : broadcastMessage(payload);
     	 	break;
-    	 	
     	}
     }
      
@@ -188,6 +207,40 @@ public class SocketService implements ApplicationContextAware {
 		} 
     	catch (IOException e) {
 			System.out.println("Failure Sending Messsage : "+e.getMessage());
+		}
+    }
+    
+    public static void notifyAccessUpdate(String user, StatusType status){
+    	
+    	if(!userSessionMap.containsKey(user))
+    		return;
+    	
+    	Session session = userSessionMap.get(user);
+    	
+    	JsonObject data = new JsonObject();
+    	
+    	if(status == StatusType.APPROVED)
+    		data.add(ACCESS, new JsonPrimitive(true));
+    	else
+    		data.add(ACCESS, new JsonPrimitive(false));
+    	
+    	JsonObject response = new JsonObject();
+    	response.add(EVENT, new JsonPrimitive(ACCESS_UPDATE));
+    	response.add(DATA, data);
+    	
+    	try {
+    		
+    		if(session.isOpen()){
+    			
+    			System.out.println("User Access Updated "+status.getStatus());
+    			session.getRemote().sendString(response.toString());
+    		}
+    		else
+    			userSessionMap.remove(user);
+		} 
+    	catch (IOException e) {
+    		
+			System.out.println("Failure Notifying User Of Access Update : "+e.getMessage());
 		}
     }
     

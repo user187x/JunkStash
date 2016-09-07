@@ -272,6 +272,66 @@ public class UserAccessController {
 	          }
 	     });
 		 
+		 Spark.post("/denyUser/:userKey", new Route() {
+		     	
+	     	 @Override
+	         public Object handle(Request request, Response response) {
+	             
+	     		JsonObject payload = new JsonObject();
+	     		
+	     		String userKey = request.params(":userKey");
+	     		String userId = userService.getUserId(userKey);
+	     		
+	     		if(StringUtils.isEmpty(userId)){
+	     			
+	     			payload.add("message", new JsonPrimitive("Failure Denying User"));
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
+	     		}
+	     		
+	         	String userToApprove = request.body();
+	         	
+	         	if(userToApprove.isEmpty()){
+		         	
+	         		payload.add("message", new JsonPrimitive("Request Was Empty"));
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
+	         	}
+	         	
+	         	System.out.println("Server Attempting Approve : "+userToApprove);
+	         	
+	         	
+	         	boolean isAdmin = userService.isUserAdmin(userId);
+	         	
+	         	if(isAdmin==false){
+	         		
+	         		payload.add("message", new JsonPrimitive("Only Admins Can Take Action"));
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
+	         	}
+	         	
+	         	boolean userApproved = userService.denyUser(userToApprove);
+	         	
+	         	if(userApproved){
+	         		
+	         		payload.add("message", new JsonPrimitive("User Has Been Denied"));
+		         	payload.add("success", new JsonPrimitive(true));
+	         		
+	         		return payload;
+	         	}
+	         	else{
+		         	
+	         		payload.add("message", new JsonPrimitive("Failure Denying User"));
+		         	payload.add("success", new JsonPrimitive(false));
+	         		
+	         		return payload;
+	         	}
+	          }
+	     });
+		 
 		 Spark.post("/login", new Route() {
 		     
 	     	 @Override

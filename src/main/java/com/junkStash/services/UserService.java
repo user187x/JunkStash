@@ -15,6 +15,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.junkStash.config.DatabaseConfig;
+import com.junkStash.services.SocketService.StatusType;
 import com.junkStash.util.UserUtils;
 import com.mongodb.Block;
 import com.mongodb.client.FindIterable;
@@ -32,6 +33,8 @@ public class UserService {
 	
 	public static final int MAX_ATTEMPTS = 10;
 	public static final int DAY_LIMIT = 1;
+	
+	public enum Status {APPROVED, PENDING, DENIED};
 	
 	public boolean userExists(String user){
 		
@@ -417,11 +420,28 @@ public class UserService {
 		match.append("user", user);
 		
 		Document update = new Document();
-		update.append("$set", new Document("status", "Approved"));
+		update.append("$set", new Document("status", StatusType.APPROVED.getStatus()));
 		
 		databaseService.getUserCollection().updateOne(match, update);
 		
+		SocketService.notifyAccessUpdate(user, StatusType.APPROVED);
+		
 		return isUserApproved(user);
+	}
+	
+	public boolean denyUser(String user){
+		
+		Document match = new Document();
+		match.append("user", user);
+		
+		Document update = new Document();
+		update.append("$set", new Document("status", StatusType.DENIED.getStatus()));
+		
+		databaseService.getUserCollection().updateOne(match, update);
+		
+		SocketService.notifyAccessUpdate(user, StatusType.DENIED);
+		
+		return isUserDenied(user);
 	}
 	
 	public boolean isUserApproved(String user){
@@ -436,7 +456,28 @@ public class UserService {
 			Document document = results.iterator().next();
 			String status = document.getString("status");
 			
-			if(status == null || status.isEmpty() || !status.equalsIgnoreCase("Approved"))
+			if(status == null || status.isEmpty() || !status.equalsIgnoreCase(StatusType.APPROVED.getStatus()))
+				return false;
+			else
+				return true;
+		}
+		else
+			return false;
+	}
+	
+	public boolean isUserDenied(String user){
+		
+		Document query = new Document();
+		query.append("user", user);
+		
+		FindIterable<Document> results = databaseService.getUserCollection().find(query);
+		
+		if(results.iterator().hasNext()){
+			
+			Document document = results.iterator().next();
+			String status = document.getString("status");
+			
+			if(status == null || status.isEmpty() || !status.equalsIgnoreCase(StatusType.DENIED.getStatus()))
 				return false;
 			else
 				return true;

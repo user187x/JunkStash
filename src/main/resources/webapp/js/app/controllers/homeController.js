@@ -70,9 +70,9 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout', '$rootSco
         $scope.showShareModal = !$scope.showShareModal;
     };
     
-    $scope.userHasAccess = function(user){
+    var getAccess = function(user){
     	
-		homeFactory.userHasAccess(user).success(function (data) {
+		homeFactory.getUserAccess(user).success(function (data) {
 			
 			$scope.hasAccess = data.payload;
 		});
@@ -227,7 +227,6 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout', '$rootSco
 	$scope.removeUser = function(data){
 		
 		homeFactory.removeUser(data, $scope.userKey).success(function (data) {
-			
 			$scope.result = data;
 			$scope.listAllUsers();
 		});
@@ -236,6 +235,14 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout', '$rootSco
 	$scope.approveUser = function(data){
 		
 		homeFactory.approveUser(data, $scope.userKey).success(function (data) {
+			$scope.result = data;
+			$scope.listAllUsers();
+		});
+	};
+	
+	$scope.denyUser = function(data){
+		
+		homeFactory.denyUser(data, $scope.userKey).success(function (data) {
 			$scope.result = data;
 			$scope.listAllUsers();
 		});
@@ -252,7 +259,7 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout', '$rootSco
 		$cookieStore.put('user', args.user);
 		$cookieStore.put('admin', args.admin);
 		
-		$scope.userHasAccess($scope.userKey);
+		getAccess($scope.userKey);
 		
 		$scope.updatePage();
 	});
@@ -267,22 +274,31 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout', '$rootSco
 		else
 			$scope.notification = false;
 		
+		$scope.$apply();
 	});
 	
 	$rootScope.$on('message', function (event, args) {
 		
 		$scope.message = true;
+		$scope.$apply();
 	});
 	
 	$rootScope.$on('seen-message', function (event, args) {
 		
 		$scope.message = false;
+		$scope.$apply();
 	});
 	
 	$rootScope.$on('file-update', function (event, args) {
 		
 		$scope.refreshFiles();
 		$scope.getTotalDiskSpace();
+	});
+	
+	$rootScope.$on('access-update', function (event, args) {
+		
+		$scope.hasAccess = args.hasAccess;
+		$scope.$apply();
 	});
 	
 	var autoCloseAlert = function(){
@@ -303,7 +319,7 @@ app.controller('homeController', ['$scope', 'homeFactory', '$timeout', '$rootSco
 		
 		console.log("Using Previous User Session : "+$scope.user);
 		
-		$scope.userHasAccess($scope.userKey);
+		getAccess($scope.userKey);
 		
 		$scope.listAllFiles();
 		$scope.getTotalDiskSpace();
