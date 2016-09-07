@@ -2,7 +2,7 @@ http://www.junkstash.com/
 
 # JunkStash Webapp
 * Java 8
-* Spark 2.5
+* Spark Framework 2.5
 * Spring 4.3.2
 * Mongo 3.0.0
 * Angular 1.5.8
